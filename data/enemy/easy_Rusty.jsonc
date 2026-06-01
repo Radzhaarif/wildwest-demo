@@ -1,0 +1,58 @@
+{
+  "enemyId": "Rusty",
+  "nameTextKey": "enemy.Rusty.name",
+  "descriptionTextKey": "enemy.Rusty.description",
+  "stageCount": 1,
+  "battle_music": "data/Assets/sound/battle_1.mp3",
+  "wall": 0,
+  "box": 0,
+  "vines": 0,
+  "stages": [
+    {
+      "stageId": "main",
+      "nameTextKey": "enemy.Rusty.stage.main.name",
+      "appearance": "data/Assets/enemy/Rusty.png",
+      "health": 50,
+      "shield": 0,
+      "aggression": {
+        "threshold": 50,
+        "damage": 3,
+        "resetOnTrigger": true
+      },
+      "rage": {
+        "secondsToUltimate": 45,
+        "resetAfterUltimate": true,
+        "targetTypes": ["junk_1", "junk_2", "junk_3"]
+      },
+      "ultimate": {
+        "nameTextKey": "enemy.Rusty.ultimate.trashDamage.name",
+        "descriptionTextKey": "enemy.Rusty.ultimate.trashDamage.description",
+        "effects": [
+          {
+            "effectId": "damagePlayerByBoardItems",
+            "type": "damagePlayerByBoardItems",
+            "count": {
+              "itemTypes": ["junk_1", "junk_2", "junk_3"]
+            },
+            "modifier": 1
+          }
+        ]
+      }
+    }
+  ],
+  "reward": {
+    "eventImage": "data/Assets/events/reward_gold.png",
+    "dialogTextKey": "battle.reward.Rusty",
+    "itemCount": 2,
+    "rewards": [
+      {
+        "type": "gold",
+        "amount": 10
+      },
+      {
+        "type": "experience",
+        "amount": 25
+      }
+    ]
+  }
+}

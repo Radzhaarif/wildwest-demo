@@ -1,0 +1,61 @@
+{
+  "enemyId": "Cookie",
+  "nameTextKey": "enemy.Cookie.name",
+  "descriptionTextKey": "enemy.Cookie.description",
+  "stageCount": 1,
+  "battle_music": "data/Assets/sound/battle_1.mp3",
+  "wall": 0,
+  "box": 0,
+  "vines": 0,
+  "stages": [
+    {
+      "stageId": "main",
+      "nameTextKey": "enemy.Cookie.stage.main.name",
+      "appearance": "data/Assets/enemy/Cookie.png",
+      "health": 50,
+      "shield": 0,
+      "aggression": {
+        "threshold": 50,
+        "damage": 3,
+        "resetOnTrigger": true
+      },
+      "rage": {
+        "secondsToUltimate": 45,
+        "resetAfterUltimate": true,
+        "targetItemIds": ["granate", "Knife", "bullet"]
+      },
+      "ultimate": {
+        "nameTextKey": "enemy.Cookie.ultimate.weaponToTrash.name",
+        "descriptionTextKey": "enemy.Cookie.ultimate.weaponToTrash.description",
+        "effects": [
+          {
+            "effectId": "convertItems",
+            "type": "convertItems",
+            "from": {
+              "itemId": ["granate", "Knife", "bullet"]
+            },
+            "to": {
+              "itemId": ["trash_1", "trash_2"]
+            },
+            "scope": "all"
+          }
+        ]
+      }
+    }
+  ],
+  "reward": {
+    "eventImage": "data/Assets/events/reward_gold.png",
+    "dialogTextKey": "battle.reward.Cookie",
+    "itemCount": 2,
+    "rewards": [
+      {
+        "type": "gold",
+        "amount": 10
+      },
+      {
+        "type": "experience",
+        "amount": 25
+      }
+    ]
+  }
+}

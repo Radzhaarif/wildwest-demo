@@ -1,0 +1,211 @@
+{
+  // Шпаргалка по текущему формату ярости врага.
+  // Этот файл не используется игрой напрямую: копируй нужные блоки в stages[].rage и stages[].ultimate нового врага.
+  // Сейчас код поддерживает пять эффектов ульты:
+  // 1. convertItems - превратить предметы на поле.
+  // 2. damagePlayerByBoardItems - нанести игроку урон по количеству предметов на поле.
+  // 3. HealingEnemyByBoardItems - вылечить врага по количеству предметов на поле.
+  // 4. RestoreEnemyShieldByBoardItems - восстановить щит врага по количеству предметов на поле.
+  // 5. kamikaze - ударить игрока текущим здоровьем врага, затем нанести врагу такой же урон.
+  "stageSnippet": {
+    // rage отвечает за таймер и запасные визуальные цели ярости.
+    "rage": {
+      // Время до срабатывания ярости в секундах, не в ходах и не в тиках.
+      "secondsToUltimate": 15,
+      // true - после ульты таймер снова начнется с secondsToUltimate.
+      // false - таймер останется на 0, ульта не перезапустится автоматически.
+      "resetAfterUltimate": true,
+      // Запасные визуальные цели. Используются, если у ульты нет effects
+      // или если конкретный эффект не дает своих целей для светлячков.
+      // itemTypes выбирает все предметы с таким type из items.jsonc, включая усиленные версии.
+      "targetTypes": ["Shield"],
+      // targetItemIds выбирает только точные itemId.
+      "targetItemIds": ["Shield"]
+    },
+    // ultimate хранит текст и список эффектов, которые выполняются строго сверху вниз.
+    "ultimate": {
+      "nameTextKey": "enemy.enemy_id.ultimate.shieldRestore.name",
+      "descriptionTextKey": "enemy.enemy_id.ultimate.shieldRestore.description",
+      "effects": [
+        {
+          "effectId": "RestoreEnemyShieldByBoardItems",
+          "type": "RestoreEnemyShieldByBoardItems",
+          "count": {
+            "itemTypes": ["Shield"]
+          },
+          "modifier": 1
+        }
+      ]
+    }
+  },
+  "effectExamples": {
+    // Превращение по type.
+    // Важно: itemTypes затронет обычные и усиленные предметы с одинаковым type.
+    "convertItemsByType": {
+      "effectId": "convertItems",
+      "type": "convertItems",
+      "from": {
+        "itemTypes": ["granate"]
+      },
+      "to": {
+        "itemId": "trash_1"
+      },
+      // Сейчас scope работает как all: превращаются все найденные предметы.
+      "scope": "all"
+    },
+    // Превращение по точным itemId.
+    // Так можно не трогать усиленные предметы того же type.
+    "convertItemsByExactItemId": {
+      "effectId": "convertItems",
+      "type": "convertItems",
+      "from": {
+        "itemId": ["granate"]
+      },
+      // Если в to.itemId или to.itemIds несколько предметов, результат выбирается случайно для каждой клетки.
+      "to": {
+        "itemId": ["trash_1", "trash_2"]
+      },
+      "scope": "all"
+    },
+    // Урон игроку по type.
+    // Считает все предметы этого type на поле и умножает их количество на modifier.
+    "damagePlayerByBoardItemsByType": {
+      "effectId": "damagePlayerByBoardItems",
+      "type": "damagePlayerByBoardItems",
+      "count": {
+        "itemTypes": ["granate"]
+      },
+      "modifier": 2
+    },
+    // Урон игроку по точным itemId.
+    // Полезно, если нужно считать только обычные гранаты, но не granate_power.
+    "damagePlayerByBoardItemsByExactItemId": {
+      "effectId": "damagePlayerByBoardItems",
+      "type": "damagePlayerByBoardItems",
+      "count": {
+        "itemId": ["granate"]
+      },
+      "modifier": 1
+    },
+    // Лечение врага по type.
+    // Здесь будут посчитаны Bandage и Bandage_power, потому что у них одинаковый type: "Bandage".
+    "HealingEnemyByBoardItemsByType": {
+      "effectId": "HealingEnemyByBoardItems",
+      "type": "HealingEnemyByBoardItems",
+      "count": {
+        "itemTypes": ["Bandage"]
+      },
+      "modifier": 1
+    },
+    // Лечение врага по точным itemId.
+    // Так можно считать только обычные бинты и не трогать Bandage_power.
+    "HealingEnemyByBoardItemsByExactItemId": {
+      "effectId": "HealingEnemyByBoardItems",
+      "type": "HealingEnemyByBoardItems",
+      "count": {
+        "itemId": ["Bandage"]
+      },
+      "modifier": 1
+    },
+    // Восстановление щита врага по type.
+    // Здесь будут посчитаны Shield и Shield_power, потому что у них одинаковый type: "Shield".
+    // Синие светлячки полетят от найденных предметов к иконке щита врага.
+    "RestoreEnemyShieldByBoardItemsByType": {
+      "effectId": "RestoreEnemyShieldByBoardItems",
+      "type": "RestoreEnemyShieldByBoardItems",
+      "count": {
+        "itemTypes": ["Shield"]
+      },
+      "modifier": 1
+    },
+    // Восстановление щита врага по точным itemId.
+    // Так можно считать только обычные щиты и не трогать Shield_power.
+    "RestoreEnemyShieldByBoardItemsByExactItemId": {
+      "effectId": "RestoreEnemyShieldByBoardItems",
+      "type": "RestoreEnemyShieldByBoardItems",
+      "count": {
+        "itemId": ["Shield"]
+      },
+      "modifier": 1
+    },
+    // Камикадзе.
+    // Урон игроку равен текущему health врага на момент срабатывания.
+    // После этого враг получает урон на то же число. Щит врага этот самоурон не поглощает.
+    "kamikaze": {
+      "effectId": "kamikaze",
+      "type": "kamikaze"
+    },
+    // Цепочка эффектов.
+    // Сначала враг лечится от бинтов, потом бинты станут гранатами,
+    // потом урон посчитается уже по новым гранатам, потом гранаты превратятся в мусор.
+    // Каскады match-3 начнутся только после всей цепочки.
+    "orderedChain": {
+      "effects": [
+        {
+          "effectId": "HealingEnemyByBoardItems",
+          "type": "HealingEnemyByBoardItems",
+          "count": {
+            "itemId": ["Bandage"]
+          },
+          "modifier": 1
+        },
+        {
+          "effectId": "convertItems",
+          "type": "convertItems",
+          "from": {
+            "itemId": ["Bandage"]
+          },
+          "to": {
+            "itemId": "granate"
+          },
+          "scope": "all"
+        },
+        {
+          "effectId": "damagePlayerByBoardItems",
+          "type": "damagePlayerByBoardItems",
+          "count": {
+            "itemId": ["granate"]
+          },
+          "modifier": 1
+        },
+        {
+          "effectId": "convertItems",
+          "type": "convertItems",
+          "from": {
+            "itemId": ["granate"]
+          },
+          "to": {
+            "itemId": ["trash_1", "trash_2"]
+          },
+          "scope": "all"
+        }
+      ]
+    }
+  },
+  // Это НЕ ярость, а пассивное правило конкретной стадии врага.
+  // Оно применяется только при генерации новых предметов во время этой стадии: старт поля, добор и резервное верхнее поле.
+  // chance задается долей от 0 до 1: 0.2 значит 20%, 1 значит 100%.
+  "stagePassiveEnemyConvertNotRage": {
+    "stageId": "stage_with_convert",
+    "convert": [
+      {
+        "effectId": "convertItems",
+        "type": "convertItems",
+        "chance": 0.2,
+        "from": {
+          "itemId": ["trash_1", "trash_2"]
+        },
+        "to": {
+          "itemId": ["radioactive"]
+        },
+        "scope": "all"
+      }
+    ]
+  },
+  // Эти типы были задуманы, но пока не реализованы в battle-engine.
+  // Не вставляй их в рабочих врагов, если не хочешь получить красивую запись без эффекта.
+  "reservedButNotImplementedYet": [
+    "healSelfByBoardItems",
+    "freezeRandomItems"
+  ]
+}

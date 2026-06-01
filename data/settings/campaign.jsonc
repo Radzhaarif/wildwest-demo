@@ -1,0 +1,25 @@
+{
+  "id": "main_campaign",
+  "nameTextKey": "campaign.main.name",
+  "startMapId": "WildWest",
+  "maps": [
+    {
+      "mapId": "WildWest",
+      "config": "data/maps/WildWest.jsonc",
+      "onComplete": {
+        "type": "nextMap",
+        "nextMapId": "WildWest"
+      }
+    },
+
+    {
+      "mapId": "WildWest",
+      "config": "data/maps/WildWest.jsonc",
+      "onComplete": {
+        "type": "victory",
+        "titleTextKey": "campaign.main.victory.title",
+        "messageTextKey": "campaign.main.victory.message"
+      }
+    }
+  ]
+}

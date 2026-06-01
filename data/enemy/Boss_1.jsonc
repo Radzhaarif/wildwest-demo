@@ -1,0 +1,125 @@
+{
+  "enemyId": "Boss_1",
+  "nameTextKey": "Boss_1.name",
+  "descriptionTextKey": "enemy.Boss_1.description",
+  "stageCount": 3,
+  "stages": [
+    {
+      "stageId": "windup",
+      "nameTextKey": "enemy.Boss_1.stage.windup.name",
+      "appearance": "data/Assets/enemy/Boss_1.png",
+      "health": 35,
+      "aggression": {
+        "threshold": 6,
+        "damage": 8,
+        "resetOnTrigger": true
+      },
+      "rage": {
+        "secondsToUltimate": 5,
+        "resetAfterUltimate": true
+      },
+      "ultimate": {
+        "nameTextKey": "enemy.Boss_1.ultimate.dustToBandage.name",
+        "descriptionTextKey": "enemy.Boss_1.ultimate.dustToBandage.description",
+        "effects": [
+          {
+            "type": "convertItems",
+            "from": {
+              "itemTypes": ["junk_1", "junk_2", "junk_3"]
+            },
+            "to": {
+              "itemId": "Bandage"
+            },
+            "scope": "all"
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "storm",
+      "nameTextKey": "enemy.Boss_1.stage.storm.name",
+      "appearance": "data/Assets/enemy/Boss_2.png",
+      "health": 55,
+      "aggression": {
+        "threshold": 5,
+        "damage": 12,
+        "resetOnTrigger": true
+      },
+      "rage": {
+        "secondsToUltimate": 4,
+        "resetAfterUltimate": true
+      },
+      "ultimate": {
+        "nameTextKey": "enemy.Boss_1.ultimate.grenadePunish.name",
+        "descriptionTextKey": "enemy.Boss_1.ultimate.grenadePunish.description",
+        "effects": [
+          {
+            "type": "damagePlayerByBoardItems",
+            "count": {
+              "itemTypes": ["granate"]
+            },
+            "modifier": 3
+          },
+          {
+            "type": "convertItems",
+            "from": {
+              "itemTypes": ["granate"]
+            },
+            "to": {
+              "itemId": "trash_1"
+            },
+            "scope": "all"
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "hurricane",
+      "nameTextKey": "enemy.Boss_1.stage.hurricane.name",
+      "appearance": "data/Assets/enemy/Boss_3.png",
+      "health": 80,
+      "aggression": {
+        "threshold": 4,
+        "damage": 16,
+        "resetOnTrigger": true
+      },
+      "rage": {
+        "secondsToUltimate": 3,
+        "resetAfterUltimate": true
+      },
+      "ultimate": {
+        "nameTextKey": "enemy.Boss_1.ultimate.frozenField.name",
+        "descriptionTextKey": "enemy.Boss_1.ultimate.frozenField.description",
+        "effects": [
+          {
+            "type": "freezeRandomItems",
+            "count": 4,
+            "durationTurns": 2
+          },
+          {
+            "type": "healSelfByBoardItems",
+            "count": {
+              "itemTypes": ["junk_1", "junk_2", "junk_3"]
+            },
+            "modifier": 3
+          }
+        ]
+      }
+    }
+  ],
+  "reward": {
+    "eventImage": "data/Assets/events/reward_skull.png",
+    "dialogTextKey": "battle.reward.Boss_1",
+    "itemCount": 2,
+    "rewards": [
+      {
+        "type": "health",
+        "amount": 15
+      },
+      {
+        "type": "experience",
+        "amount": 40
+      }
+    ]
+  }
+}

@@ -1,0 +1,96 @@
+{
+  // UI-only configuration for the campaign map. Gameplay map generation stays in data/maps/*.jsonc.
+  "topButtons": {
+    "surrender": {
+      "textKey": "ui.surrender",
+      "icon": "data/Assets/icons/surrend.png",
+      "iconSizePx": 60
+    },
+    "settings": {
+      "textKey": "menu.settings",
+      "icon": "data/Assets/icons/setting.png",
+      "iconSizePx": 60
+    },
+    "log": {
+      "textKey": "ui.eventLog",
+      "icon": "data/Assets/icons/log.png",
+      "iconSizePx": 60
+    }
+  },
+  "nodes": {
+    "hoverScale": 2.5,
+    "activeLightIcon": "data/Assets/icons/light_white.png",
+    "activeLightSizePx": 160,
+    "hoverLightIcon": "data/Assets/icons/light_gold.png",
+    "hoverLightSizePx": 240,
+    "positionJitterPct": {
+      "x": {
+        "min": -6.0,
+        "max": 6.0
+      },
+      "y": {
+        "min": -1.5,
+        "max": 1.5
+      }
+    },
+    "layoutPasses": 0
+  },
+  "dialog": {
+    "backdropOpacity": 0.72,
+    "backdropBlurPx": 5,
+    "textLetterMs": 25,
+    "answersFadeMs": 1000
+  },
+  "animation": {
+    "enabled": true,
+    "counts": [
+      {
+        "type": "bird",
+        "maxActive": 5,
+        "spawnIntervalMs": {
+          "min": 3000,
+          "max": 30000
+        }
+      }
+    ],
+    "definitions": [
+      {
+        "name": "griff",
+        "type": "bird",
+        "enabled": true,
+        "frames": [
+          "data/Assets/map anim/bird_1.png",
+          "data/Assets/map anim/bird_2.png",
+          "data/Assets/map anim/bird_3.png",
+          "data/Assets/map anim/bird_4.png",
+          "data/Assets/map anim/bird_5.png",
+          "data/Assets/map anim/bird_6.png",
+          "data/Assets/map anim/bird_7.png",
+          "data/Assets/map anim/bird_8.png",
+          "data/Assets/map anim/bird_1.png",
+          "data/Assets/map anim/bird_2.png",
+          "data/Assets/map anim/bird_3.png",
+          "data/Assets/map anim/bird_4.png",
+          "data/Assets/map anim/bird_5.png",
+          "data/Assets/map anim/bird_5.png"
+
+        ],
+        "glideFrame": "data/Assets/map anim/bird_1.png",
+        "headingDegrees": {
+          "min": 220,
+          "max": 260
+        },
+        "frameIntervalMs": 35,
+        "glideDurationMs": {
+          "min": 1500,
+          "max": 12000
+        },
+        "spawnEdges": ["right"],
+        "movementSpeedPxPerSecond": 45,
+        "sizePx": 60,
+        "rotateWithHeading": false,
+        "spriteAngleOffsetDegrees": 0
+      }
+    ]
+  }
+}

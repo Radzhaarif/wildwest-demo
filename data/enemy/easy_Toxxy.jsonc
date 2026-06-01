@@ -1,0 +1,72 @@
+{
+  "enemyId": "Toxxy",
+  "nameTextKey": "enemy.Toxxy.name",
+  "descriptionTextKey": "enemy.Toxxy.description",
+  "stageCount": 1,
+  "battle_music": "data/Assets/sound/battle_3.mp3",
+  "wall": 0,
+  "box": 0,
+  "vines": 0,
+  "stages": [
+    {
+      "stageId": "main",
+      "nameTextKey": "enemy.Toxxy.stage.main.name",
+      "appearance": "data/Assets/enemy/Toxxy.png",
+      "health": 50,
+      "shield": 0,
+      "convert": [
+        {
+          "effectId": "convertItems",
+          "type": "convertItems",
+          "chance": 0.1,
+          "from": {
+            "itemId": ["bullet", "Knife", "granate"]
+          },
+          "to": {
+            "itemId": ["chemical"]
+          },
+          "scope": "all"
+        }
+      ],
+      "aggression": {
+        "threshold": 50,
+        "damage": 3,
+        "resetOnTrigger": true
+      },
+      "rage": {
+        "secondsToUltimate": 60,
+        "resetAfterUltimate": true,
+        "targetTypes": ["chemical"]
+      },
+      "ultimate": {
+        "nameTextKey": "enemy.Toxxy.ultimate.chemicalDamage.name",
+        "descriptionTextKey": "enemy.Toxxy.ultimate.chemicalDamage.description",
+        "effects": [
+          {
+            "effectId": "damagePlayerByBoardItems",
+            "type": "damagePlayerByBoardItems",
+            "count": {
+              "itemId": ["chemical"]
+            },
+            "modifier": 4
+          }
+        ]
+      }
+    }
+  ],
+  "reward": {
+    "eventImage": "data/Assets/events/reward_gold.png",
+    "dialogTextKey": "battle.reward.Toxxy",
+    "itemCount": 2,
+    "rewards": [
+      {
+        "type": "gold",
+        "amount": 10
+      },
+      {
+        "type": "experience",
+        "amount": 25
+      }
+    ]
+  }
+}

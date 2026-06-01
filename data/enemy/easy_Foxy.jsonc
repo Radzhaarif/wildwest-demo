@@ -1,0 +1,84 @@
+{
+  "enemyId": "Foxy",
+  "nameTextKey": "enemy.Foxy.name",
+  "descriptionTextKey": "enemy.Foxy.description",
+  "stageCount": 1,
+  "battle_music": "data/Assets/sound/battle_1.mp3",
+  "wall": 0,
+  "box": 0,
+  "vines": 0,
+  "stages": [
+    {
+      "stageId": "main",
+      "nameTextKey": "enemy.Foxy.stage.main.name",
+      "appearance": "data/Assets/enemy/Foxy.png",
+      "health": 50,
+      "shield": 0,
+      "convert": [
+        {
+          "effectId": "convertItems",
+          "type": "convertItems",
+          "chance": 0.2,
+          "from": {
+            "itemId": ["bullet", "Knife", "granate"]
+          },
+          "to": {
+            "itemId": ["Bandage"]
+          },
+          "scope": "all"
+        },
+        {
+          "effectId": "convertItems",
+          "type": "convertItems",
+          "chance": 0.05,
+          "from": {
+            "itemId": ["Bandage"]
+          },
+          "to": {
+            "itemId": ["Bandage_power"]
+          },
+          "scope": "all"
+        }
+      ],
+      "aggression": {
+        "threshold": 50,
+        "damage": 3,
+        "resetOnTrigger": true
+      },
+      "rage": {
+        "secondsToUltimate": 45,
+        "resetAfterUltimate": true,
+        "targetTypes": ["Bandage"]
+      },
+      "ultimate": {
+        "nameTextKey": "enemy.Foxy.ultimate.bandageHeal.name",
+        "descriptionTextKey": "enemy.Foxy.ultimate.bandageHeal.description",
+        "effects": [
+          {
+            "effectId": "HealingEnemyByBoardItems",
+            "type": "HealingEnemyByBoardItems",
+            "count": {
+              "itemTypes": ["Bandage"]
+            },
+            "modifier": 1
+          }
+        ]
+      }
+    }
+  ],
+  "reward": {
+    "eventImage": "data/Assets/events/reward_gold.png",
+    "dialogTextKey": "battle.reward.Foxy",
+    "itemCount": 2,
+    "rewards": [
+      {
+        "type": "gold",
+        "amount": 10
+      },
+      {
+        "type": "experience",
+        "amount": 25
+      }
+    ]
+  }
+}

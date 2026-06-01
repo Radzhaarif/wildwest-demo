@@ -1,0 +1,68 @@
+{
+  "enemyId": "Rocket",
+  "nameTextKey": "enemy.Rocket.name",
+  "descriptionTextKey": "enemy.Rocket.description",
+  "stageCount": 1,
+  "battle_music": "data/Assets/sound/battle_2.mp3",
+  "wall": 0,
+  "box": 0,
+  "vines": 0,
+  "stages": [
+    {
+      "stageId": "main",
+      "nameTextKey": "enemy.Rocket.stage.main.name",
+      "appearance": "data/Assets/enemy/Rocket.png",
+      "health": 50,
+      "shield": 10,
+      "convert": [
+        {
+          "effectId": "convertItems",
+          "type": "convertItems",
+          "chance": 0.2,
+          "from": {
+            "itemId": ["Shield", "Bandage"]
+          },
+          "to": {
+            "itemId": ["trash_1", "trash_2"]
+          },
+          "scope": "all"
+        }
+      ],
+      "aggression": {
+        "threshold": 50,
+        "damage": 3,
+        "resetOnTrigger": true
+      },
+      "rage": {
+        "secondsToUltimate": 45,
+        "resetAfterUltimate": true,
+        "targetTypes": []
+      },
+      "ultimate": {
+        "nameTextKey": "enemy.Rocket.ultimate.kamikaze.name",
+        "descriptionTextKey": "enemy.Rocket.ultimate.kamikaze.description",
+        "effects": [
+          {
+            "effectId": "kamikaze",
+            "type": "kamikaze"
+          }
+        ]
+      }
+    }
+  ],
+  "reward": {
+    "eventImage": "data/Assets/events/reward_gold.png",
+    "dialogTextKey": "battle.reward.Rocket",
+    "itemCount": 2,
+    "rewards": [
+      {
+        "type": "gold",
+        "amount": 10
+      },
+      {
+        "type": "experience",
+        "amount": 25
+      }
+    ]
+  }
+}

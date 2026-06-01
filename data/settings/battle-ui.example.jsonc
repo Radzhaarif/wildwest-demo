@@ -1,0 +1,285 @@
+{
+  // textKeys хранит ключи локалей для текстов боевого интерфейса.
+  "textKeys": {
+    // Подпись строки стадии врага. Итоговый текст собирается как "Стадия X/Y".
+    "enemyStage": "battle.enemy.stage",
+    // Подпись здоровья врага в панели характеристик.
+    "enemyHealth": "battle.enemy.health",
+    // Подпись шкалы агрессии врага.
+    "enemyAggression": "battle.enemy.aggression",
+    // Подпись значения урона врага.
+    "enemyDamage": "battle.enemy.damage",
+    // Подпись таймера ярости врага.
+    "enemyRage": "battle.enemy.rage",
+    // Подпись шкалы здоровья игрока слева от поля.
+    "playerHealth": "battle.player.health",
+    // Подпись шкалы лечения игрока слева от поля.
+    "playerHeal": "battle.player.heal",
+    // Сообщение, которое вылетает из часов, если часы нельзя использовать.
+    "clockUnavailable": "battle.clock.unavailable",
+    // Сообщение после успешной активации часов.
+    "clockUsed": "battle.clock.used",
+    // Сообщение, когда таймер ярости дошел до нуля и сработало событие ярости.
+    "rageEvent": "battle.rage.event",
+    // Надпись кнопки ручного перемешивания поля под описанием ульты/ярости.
+    "shuffleBoard": "battle.shuffle.button",
+    // Заголовок сообщения поверх поля, если доступных ходов нет.
+    "noMovesTitle": "battle.noMoves.title",
+    // Описание сообщения поверх поля, если доступных ходов нет.
+    "noMovesBody": "battle.noMoves.body",
+    // Надпись на победной полосе.
+    "victoryTitle": "battle.outcome.victory",
+    // Надпись на полосе поражения.
+    "defeatTitle": "battle.outcome.defeat",
+    // Надпись кнопки перезапуска боя после поражения.
+    "restartBattle": "battle.outcome.restart",
+    // Сообщение-заглушка, пока перезапуск боя еще не реализован.
+    "restartBattlePending": "battle.outcome.restartPending",
+    // Тексты статуса/лога боя во время выбора клеток и обработки хода.
+    "selectFirstCell": "battle.status.selectFirstCell",
+    "cellSelected": "battle.status.cellSelected",
+    "selectionCleared": "battle.status.selectionCleared",
+    "newCellSelected": "battle.status.newCellSelected",
+    // Сообщение при попытке обычного обмена через стену между клетками.
+    "wallBlocked": "battle.status.wallBlocked",
+    // Сообщение при попытке выбрать или обменять клетку, закрытую коробкой.
+    "boxBlocked": "battle.status.boxBlocked",
+    // Сообщение при попытке обычного взаимодействия с клеткой, закрытой лианами.
+    "vinesBlocked": "battle.status.vinesBlocked",
+    "noMatchSwapCancelled": "battle.status.noMatchSwapCancelled",
+    "freeSwapDone": "battle.status.freeSwapDone",
+    "moveProcessed": "battle.status.moveProcessed",
+    "moveCells": "battle.status.moveCells",
+    "moveCascades": "battle.status.moveCascades",
+    "moveDamage": "battle.status.moveDamage",
+    "moveBonuses": "battle.status.moveBonuses",
+    "moveHealthRecovered": "battle.status.moveHealthRecovered",
+    "movePlayerDamage": "battle.status.movePlayerDamage",
+    "enemyDefeated": "battle.status.enemyDefeated",
+    // Сообщение в итог хода, если защитный лимит каскадов остановил оставшиеся совпадения.
+    "cascadeLimitReached": "battle.status.cascadeLimitReached",
+    // Сообщение после ручного перемешивания поля.
+    "shuffleBoardDone": "battle.status.shuffleBoardDone"
+  },
+  // Верхние кнопки боя: сдаться, настройки, лог.
+  // В активном data/settings/battle-ui.jsonc можно поменять иконки, ключи текста и размер иконок.
+  "topButtons": {
+    "surrender": {
+      "textKey": "ui.surrender",
+      "icon": "data/Assets/icons/surrend.png",
+      // Размер иконки внутри кнопки в пикселях.
+      "iconSizePx": 60
+    },
+    "settings": {
+      "textKey": "menu.settings",
+      "icon": "data/Assets/icons/setting.png",
+      "iconSizePx": 60
+    },
+    "log": {
+      "textKey": "ui.eventLog",
+      "icon": "data/Assets/icons/log.png",
+      "iconSizePx": 60
+    }
+  },
+  // handItemIds задает видимые слоты предметов справа от боевого поля.
+  // Эти id должны существовать в data/settings/items.jsonc и отрисовываются ровно в этом порядке.
+  "handItemIds": [
+    "item_Shield",
+    "item_Bandage",
+    "item_granate",
+    "item_bullet",
+    "item_Knife",
+    "red",
+    "item_Shield_power",
+    "item_Bandage_power",
+    "item_granate_power",
+    "item_bullet_power",
+    "item_Knife_power",
+    "green"
+  ],
+  // icons хранит пути к служебным иконкам боевого UI.
+  "icons": {
+    // Иконка шкалы здоровья игрока.
+    "playerHealth": "data/Assets/icons/hearts.png",
+    // Иконка шкалы лечения игрока.
+    "playerHeal": "data/Assets/item/bandage.png",
+    // Иконка шкалы здоровья врага.
+    "enemyHealth": "data/Assets/icons/hearts.png",
+    // Иконка щита врага. Показывается поверх здоровья, пока shield стадии больше 0.
+    "enemyShield": "data/Assets/item/Shield.png",
+    // Иконка шкалы агрессии врага.
+    "enemyAggression": "data/Assets/icons/agressive.png",
+    // Иконка значения урона врага.
+    "enemyDamage": "data/Assets/icons/damage.png",
+    // Проекционные огни для урона противнику/игроку.
+    "lightRed": "data/Assets/icons/light_red.png",
+    // Проекционные огни для агрессии.
+    "lightBlue": "data/Assets/icons/light_blue.png",
+    // Проекционные огни для лечения.
+    "lightGreen": "data/Assets/icons/light_green.png",
+    // Золотые светлячки, которые летят из иконки ярости к целевым предметам ульты.
+    "lightGold": "data/Assets/icons/light_gold.png",
+    // Иконка таймера ярости врага.
+    "enemyRage": "data/Assets/icons/rage.png",
+    // Иконки стены между клетками боевого поля.
+    // При анимации стены чередуются кадры wall_1 и wall_2.
+    "wall": "data/Assets/icons/wall.png",
+    "wall_1": "data/Assets/icons/wall_1.png",
+    "wall_2": "data/Assets/icons/wall_2.png",
+    // Иконка коробки, которая закрывает конкретную клетку боя.
+    "box": "data/Assets/icons/box.png",
+    // Иконка лиан, которые накрывают клетку, но не мешают падению предметов.
+    "vines": "data/Assets/icons/vines.png"
+  },
+  // backgrounds хранит фоновые изображения самого окна боя.
+  "backgrounds": {
+    // Фон панели боя. Это не фон сцены с врагом: фон сцены приходит из battle-события карты.
+    "battleWindow": "data/Assets/backgrounds/battle.png"
+  },
+  // limits хранит пределы боевых UI/механик.
+  "limits": {
+    // Максимум щита врага, до которого ярость RestoreEnemyShieldByBoardItems может восстанавливать щит.
+    // Потолок не может быть выше 99.
+    "enemyShieldMax": 99
+  },
+  // board задает размер match-3 поля в клетках.
+  "board": {
+    // Количество клеток по горизонтали. Минимум 3, чтобы были возможны обычные совпадения.
+    "width": 12,
+    // Количество клеток по вертикали. Минимум 3, чтобы были возможны обычные совпадения.
+    "height": 9
+  },
+  // bars хранит цвета прогресс-баров боевого UI.
+  "bars": {
+    // Цвет заполнения шкалы здоровья игрока.
+    "playerHealthColor": "#c8322a",
+    // Цвет заполнения шкалы лечения игрока.
+    "playerHealColor": "#72a343",
+    // Цвет заполнения шкалы здоровья врага.
+    "enemyHealthColor": "#c8322a",
+    // Цвет заполнения шкалы агрессии врага.
+    "enemyAggressionColor": "#b9d4ec"
+  },
+  // feedback хранит настройки коротких UI-сообщений.
+  "feedback": {
+    // Сколько миллисекунд показывается всплывающее сообщение от кнопки или предмета.
+    "floatMessageMs": 3000,
+    // Сколько миллисекунд показывается тултип предмета.
+    "battleTooltipMs": 3000,
+    // Задержка перед показом тултипа предмета.
+    "battleTooltipDelayMs": 3000
+  },
+  // availableMoveSearch настраивает порядок поиска idle-подсказки доступного хода.
+  "availableMoveSearch": {
+    // Каждый вложенный список - одна группа приоритета.
+    // Типы внутри одной группы ищутся одновременно по порядку поля.
+    // Следующая группа проверяется только если предыдущая не нашла ход.
+    // "*" означает любые остальные match-3 типы, которые не были выбраны раньше.
+    // Типы должны совпадать с полем "type" у предметов в data/settings/items.jsonc, включая регистр.
+    "typeGroups": [
+      // Сначала ищем атакующие предметы.
+      ["granate", "Knife", "bullet"],
+      // Потом ищем лечение и защитное успокоение агрессии.
+      ["Bandage", "Shield"],
+      // Потом ищем любой другой доступный ход.
+      ["*"]
+    ]
+  },
+  // animations хранит длительности и расстояния визуальных анимаций боя.
+  "animations": {
+    // Длительность обмена двух соседних иконок в миллисекундах.
+    "swapMs": 1000,
+    // Длительность перемещения предмета при обмене между клетками, используется для drag/swap-анимации. В мс.
+    "swapMoveMs": 1000,
+    // Длительность тряски при неудачном обмене в миллисекундах.
+    "invalidShakeMs": 500,
+    // Длительность тряски собранных предметов перед исчезновением в миллисекундах.
+    "matchShakeMs": 500,
+    // Базовая длительность движения предмета между клетками. Основная скорость падения задается boardMoveStepMs.
+    "boardMoveMs": 50,
+    // Миллисекунды на одну клетку падения или движения после каскада.
+    "boardMoveStepMs": 50,
+    // Скорость падения иконок на поле: миллисекунды на одну клетку.
+    "boardDropMs": 250,
+    // На сколько пикселей выше верхнего края поля стартует первый новый предмет.
+    // Увеличивай значение, если новые иконки должны начинать падение выше за пределами поля.
+    "newItemSpawnOffsetPx": 16000,
+    // Дополнительный вертикальный зазор в пикселях между новыми предметами в стопке.
+    // Реальный шаг стопки равен высоте одной клетки плюс этот зазор.
+    "newItemStackGapPx": 24000,
+    // Задержка между появлением следующих новых предметов при доборе. В мс.
+    "itemDropGapMs": 125,
+    // Задержка между шагами обработки каскада после волны совпадений. В мс.
+    "cascadeStepMs": 150,
+    // Через сколько миллисекунд бездействия начинается поиск доступного хода.
+    "idleHintDelayMs": 5000,
+    // Сколько миллисекунд трясется подсказанный предмет.
+    "idleHintShakeMs": 500,
+    // Сколько миллисекунд показывается окно "нет доступных ходов" без автоматического перемешивания.
+    "noMovesMessageMs": 3000,
+    // Сколько миллисекунд длится ручное перемешивание поля по кнопке.
+    "noMovesShuffleMs": 2000,
+    // Сколько миллисекунд показывается полоса победы перед переходом к награде.
+    "outcomeBannerMs": 2000,
+    // Базовое количество светлячков в одной анимации.
+    "lightDamageProjectileCount": 5,
+    // Дополнительные светлячки за единицу урона. 0 значит использовать только базовое количество.
+    "lightDamageProjectilesPerDamage": 0,
+    // Длительность полета светлячков в миллисекундах.
+    "lightDamageProjectileMs": 900,
+    // Высота дуги полета светлячков в пикселях.
+    "lightDamageProjectileArcHeightPx": 70,
+    // Разброс светлячков вокруг траектории в пикселях.
+    "lightDamageProjectileSpreadPx": 28,
+    // Размер светлячков в пикселях.
+    "lightDamageProjectileSizePx": 52,
+    // Насколько далеко разлетаются красные светлячки от здоровья врага при ярости kamikaze.
+    "kamikazeBurstDistancePx": 190,
+    // Длительность белой волны по всем иконкам поля при срабатывании ярости.
+    "rageWaveMs": 900,
+    // Сколько золотых светлячков летит к каждому предмету-цели ярости.
+    "rageProjectileCount": 3,
+    // Длительность полета золотых светлячков ярости.
+    "rageProjectileMs": 800,
+    // Высота дуги полета золотых светлячков ярости.
+    "rageProjectileArcHeightPx": 70,
+    // Разброс золотых светлячков вокруг траектории.
+    "rageProjectileSpreadPx": 28,
+    // Размер золотых светлячков ярости в пикселях.
+    "rageProjectileSizePx": 35,
+    // Сколько миллисекунд трясется/увеличивается иконка здоровья при изменении HP.
+    "healthChangeMs": 3000,
+    // Во сколько раз увеличивается иконка здоровья во время feedback-анимации. 1.5 = 150%.
+    "healthChangeScale": 1.5,
+    // Длительность полета цифры изменения HP.
+    "healthChangeFloatMs": 3000,
+    // Насколько далеко в пикселях цифра уходит вверх при изменении HP.
+    "healthChangeFloatRisePx": 120,
+    // Сколько миллисекунд трясется/увеличивается иконка лечения при изменении.
+    "healChangeMs": 3000,
+    // Во сколько раз увеличивается иконка лечения во время feedback-анимации.
+    "healChangeScale": 1.5,
+    // Длительность полета цифры изменения лечения.
+    "healChangeFloatMs": 3000,
+    // Насколько далеко в пикселях цифра уходит вверх при изменении лечения.
+    "healChangeFloatRisePx": 120,
+    // Сколько миллисекунд трясется/увеличивается иконка агрессии при изменении.
+    "aggressionChangeMs": 3000,
+    // Во сколько раз увеличивается иконка агрессии во время feedback-анимации.
+    "aggressionChangeScale": 1.5,
+    // Длительность полета цифры изменения агрессии.
+    "aggressionChangeFloatMs": 3000,
+    // Насколько далеко в пикселях цифра уходит вверх при изменении агрессии.
+    "aggressionChangeFloatRisePx": 120,
+    // Как часто меняются кадры стены между wall_1 и wall_2, в миллисекундах.
+    "wallToggleMs": 500,
+    // Сколько миллисекунд трясется/увеличивается иконка ярости на предупреждении таймера.
+    "clockWarningChangeMs": 1000,
+    // Во сколько раз увеличивается иконка ярости на предупреждении таймера.
+    "clockWarningChangeScale": 1.5,
+    // На каких секундах до срабатывания ярости проигрывается предупреждение.
+    "clockWarningSeconds": [1, 3, 5, 10, 15, 20, 30],
+    // Насколько далеко улетает активированный предмет при исчезновении, в пикселях.
+    "deathFlightPx": 96
+  }
+}

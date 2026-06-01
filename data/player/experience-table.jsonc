@@ -1,0 +1,3464 @@
+{
+  // Таблица уровней игрока. requiredExperience - общее количество опыта,
+  // которое нужно накопить, чтобы считаться достигшим уровня.
+  "levels": [
+    {
+      "level": 0,
+      "requiredExperience": 0,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.1.text",
+      "rewardCount": 0,
+      "rewards": []
+    },
+    {
+      "level": 1,
+      "requiredExperience": 50,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.2.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 100,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 12,
+          "amount": 1
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 100,
+          "amount": 1
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 12,
+          "amount": 1
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 100,
+          "amount": 1
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 12,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 7,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 7,
+          "amount": 1
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 1
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "requiredExperience": 105,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.3.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 100,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 12,
+          "amount": 1
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 100,
+          "amount": 1
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 12,
+          "amount": 1
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 100,
+          "amount": 1
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 12,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 7,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 7,
+          "amount": 1
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 1
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "level": 3,
+      "requiredExperience": 170,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 48,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 6,
+          "amount": 1
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 48,
+          "amount": 1
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 6,
+          "amount": 1
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 48,
+          "amount": 1
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 6,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 128,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 16,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 128,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 16,
+          "amount": 1
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 1
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "level": 4,
+      "requiredExperience": 250,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 48,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 6,
+          "amount": 1
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 48,
+          "amount": 1
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 6,
+          "amount": 1
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 48,
+          "amount": 1
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 6,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 128,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 16,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 128,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 16,
+          "amount": 1
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 1
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "level": 5,
+      "requiredExperience": 350,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 50,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 5,
+          "amount": 1
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 50,
+          "amount": 1
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 5,
+          "amount": 1
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 50,
+          "amount": 1
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 5,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 5,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 5,
+          "amount": 1
+        },
+        {
+          "itemId": "red",
+          "weight": 125,
+          "amount": 1
+        },
+        {
+          "itemId": "green",
+          "weight": 125,
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "level": 6,
+      "requiredExperience": 475,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.2.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 100,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 12,
+          "amount": 2
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 100,
+          "amount": 2
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 12,
+          "amount": 2
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 100,
+          "amount": 2
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 12,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 7,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 7,
+          "amount": 2
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 2
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "level": 7,
+      "requiredExperience": 630,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.3.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 100,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 12,
+          "amount": 1
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 100,
+          "amount": 1
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 12,
+          "amount": 1
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 100,
+          "amount": 1
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 12,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 7,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 7,
+          "amount": 1
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 1
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "level": 8,
+      "requiredExperience": 820,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 48,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 6,
+          "amount": 1
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 48,
+          "amount": 1
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 6,
+          "amount": 1
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 48,
+          "amount": 1
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 6,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 128,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 16,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 128,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 16,
+          "amount": 1
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 1
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "level": 9,
+      "requiredExperience": 1050,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 48,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 6,
+          "amount": 1
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 48,
+          "amount": 1
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 6,
+          "amount": 1
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 48,
+          "amount": 1
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 6,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 128,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 16,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 128,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 16,
+          "amount": 1
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 1
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "level": 10,
+      "requiredExperience": 1325,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 50,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 5,
+          "amount": 1
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 50,
+          "amount": 1
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 5,
+          "amount": 1
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 50,
+          "amount": 1
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 5,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 5,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 1
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 5,
+          "amount": 1
+        },
+        {
+          "itemId": "red",
+          "weight": 125,
+          "amount": 1
+        },
+        {
+          "itemId": "green",
+          "weight": 125,
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "level": 11,
+      "requiredExperience": 1650,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.2.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 100,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 12,
+          "amount": 2
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 100,
+          "amount": 2
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 12,
+          "amount": 2
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 100,
+          "amount": 2
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 12,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 7,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 7,
+          "amount": 2
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 2
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "level": 12,
+      "requiredExperience": 2030,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.3.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 100,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 12,
+          "amount": 2
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 100,
+          "amount": 2
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 12,
+          "amount": 2
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 100,
+          "amount": 2
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 12,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 7,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 7,
+          "amount": 2
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 2
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "level": 13,
+      "requiredExperience": 2470,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 48,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 6,
+          "amount": 2
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 48,
+          "amount": 2
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 6,
+          "amount": 2
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 48,
+          "amount": 2
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 6,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 128,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 16,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 128,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 16,
+          "amount": 2
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 2
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "level": 14,
+      "requiredExperience": 2975,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 48,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 6,
+          "amount": 2
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 48,
+          "amount": 2
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 6,
+          "amount": 2
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 48,
+          "amount": 2
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 6,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 128,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 16,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 128,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 16,
+          "amount": 2
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 2
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "level": 15,
+      "requiredExperience": 3550,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 50,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 5,
+          "amount": 2
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 50,
+          "amount": 2
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 5,
+          "amount": 2
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 50,
+          "amount": 2
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 5,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 5,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 5,
+          "amount": 2
+        },
+        {
+          "itemId": "red",
+          "weight": 125,
+          "amount": 2
+        },
+        {
+          "itemId": "green",
+          "weight": 125,
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "level": 16,
+      "requiredExperience": 4200,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.2.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 100,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 12,
+          "amount": 2
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 100,
+          "amount": 2
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 12,
+          "amount": 2
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 100,
+          "amount": 2
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 12,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 7,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 7,
+          "amount": 2
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 2
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "level": 17,
+      "requiredExperience": 4930,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.3.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 100,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 12,
+          "amount": 2
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 100,
+          "amount": 2
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 12,
+          "amount": 2
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 100,
+          "amount": 2
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 12,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 7,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 7,
+          "amount": 2
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 2
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "level": 18,
+      "requiredExperience": 5745,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 48,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 6,
+          "amount": 2
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 48,
+          "amount": 2
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 6,
+          "amount": 2
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 48,
+          "amount": 2
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 6,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 128,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 16,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 128,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 16,
+          "amount": 2
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 2
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "level": 19,
+      "requiredExperience": 6650,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 48,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 6,
+          "amount": 2
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 48,
+          "amount": 2
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 6,
+          "amount": 2
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 48,
+          "amount": 2
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 6,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 128,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 16,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 128,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 16,
+          "amount": 2
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 2
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "level": 20,
+      "requiredExperience": 7650,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 50,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 5,
+          "amount": 2
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 50,
+          "amount": 2
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 5,
+          "amount": 2
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 50,
+          "amount": 2
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 5,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 5,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 2
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 5,
+          "amount": 2
+        },
+        {
+          "itemId": "red",
+          "weight": 125,
+          "amount": 2
+        },
+        {
+          "itemId": "green",
+          "weight": 125,
+          "amount": 2
+        }
+      ]
+    },
+    {
+      "level": 21,
+      "requiredExperience": 8750,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.2.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 100,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 12,
+          "amount": 3
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 100,
+          "amount": 3
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 12,
+          "amount": 3
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 100,
+          "amount": 3
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 12,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 7,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 7,
+          "amount": 3
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 3
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 3
+        }
+      ]
+    },
+    {
+      "level": 22,
+      "requiredExperience": 9955,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.3.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 100,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 12,
+          "amount": 3
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 100,
+          "amount": 3
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 12,
+          "amount": 3
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 100,
+          "amount": 3
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 12,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 7,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 7,
+          "amount": 3
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 3
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 3
+        }
+      ]
+    },
+    {
+      "level": 23,
+      "requiredExperience": 11270,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 48,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 6,
+          "amount": 3
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 48,
+          "amount": 3
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 6,
+          "amount": 3
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 48,
+          "amount": 3
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 6,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 128,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 16,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 128,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 16,
+          "amount": 3
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 3
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 3
+        }
+      ]
+    },
+    {
+      "level": 24,
+      "requiredExperience": 12700,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 48,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 6,
+          "amount": 3
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 48,
+          "amount": 3
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 6,
+          "amount": 3
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 48,
+          "amount": 3
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 6,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 128,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 16,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 128,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 16,
+          "amount": 3
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 3
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 3
+        }
+      ]
+    },
+    {
+      "level": 25,
+      "requiredExperience": 14250,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 50,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 5,
+          "amount": 3
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 50,
+          "amount": 3
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 5,
+          "amount": 3
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 50,
+          "amount": 3
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 5,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 5,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 5,
+          "amount": 3
+        },
+        {
+          "itemId": "red",
+          "weight": 125,
+          "amount": 3
+        },
+        {
+          "itemId": "green",
+          "weight": 125,
+          "amount": 3
+        }
+      ]
+    },
+    {
+      "level": 26,
+      "requiredExperience": 15925,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.2.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 100,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 12,
+          "amount": 3
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 100,
+          "amount": 3
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 12,
+          "amount": 3
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 100,
+          "amount": 3
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 12,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 7,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 7,
+          "amount": 3
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 3
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 3
+        }
+      ]
+    },
+    {
+      "level": 27,
+      "requiredExperience": 17730,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.3.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 100,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 12,
+          "amount": 3
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 100,
+          "amount": 3
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 12,
+          "amount": 3
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 100,
+          "amount": 3
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 12,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 7,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 7,
+          "amount": 3
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 3
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 3
+        }
+      ]
+    },
+    {
+      "level": 28,
+      "requiredExperience": 19670,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 48,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 6,
+          "amount": 3
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 48,
+          "amount": 3
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 6,
+          "amount": 3
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 48,
+          "amount": 3
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 6,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 128,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 16,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 128,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 16,
+          "amount": 3
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 3
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 3
+        }
+      ]
+    },
+    {
+      "level": 29,
+      "requiredExperience": 21750,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 48,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 6,
+          "amount": 3
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 48,
+          "amount": 3
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 6,
+          "amount": 3
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 48,
+          "amount": 3
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 6,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 128,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 16,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 128,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 16,
+          "amount": 3
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 3
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 3
+        }
+      ]
+    },
+    {
+      "level": 30,
+      "requiredExperience": 23975,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 50,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 5,
+          "amount": 3
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 50,
+          "amount": 3
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 5,
+          "amount": 3
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 50,
+          "amount": 3
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 5,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 5,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 3
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 5,
+          "amount": 3
+        },
+        {
+          "itemId": "red",
+          "weight": 125,
+          "amount": 3
+        },
+        {
+          "itemId": "green",
+          "weight": 125,
+          "amount": 3
+        }
+      ]
+    },
+    {
+      "level": 31,
+      "requiredExperience": 26350,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.2.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 100,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 12,
+          "amount": 4
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 100,
+          "amount": 4
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 12,
+          "amount": 4
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 100,
+          "amount": 4
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 12,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 7,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 7,
+          "amount": 4
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 4
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 4
+        }
+      ]
+    },
+    {
+      "level": 32,
+      "requiredExperience": 28880,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.3.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 100,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 12,
+          "amount": 4
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 100,
+          "amount": 4
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 12,
+          "amount": 4
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 100,
+          "amount": 4
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 12,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 7,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 7,
+          "amount": 4
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 4
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 4
+        }
+      ]
+    },
+    {
+      "level": 33,
+      "requiredExperience": 31570,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 48,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 6,
+          "amount": 4
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 48,
+          "amount": 4
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 6,
+          "amount": 4
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 48,
+          "amount": 4
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 6,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 128,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 16,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 128,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 16,
+          "amount": 4
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 4
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 4
+        }
+      ]
+    },
+    {
+      "level": 34,
+      "requiredExperience": 34425,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 48,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 6,
+          "amount": 4
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 48,
+          "amount": 4
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 6,
+          "amount": 4
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 48,
+          "amount": 4
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 6,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 128,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 16,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 128,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 16,
+          "amount": 4
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 4
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 4
+        }
+      ]
+    },
+    {
+      "level": 35,
+      "requiredExperience": 37450,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 50,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 5,
+          "amount": 4
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 50,
+          "amount": 4
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 5,
+          "amount": 4
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 50,
+          "amount": 4
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 5,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 5,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 5,
+          "amount": 4
+        },
+        {
+          "itemId": "red",
+          "weight": 125,
+          "amount": 4
+        },
+        {
+          "itemId": "green",
+          "weight": 125,
+          "amount": 4
+        }
+      ]
+    },
+    {
+      "level": 36,
+      "requiredExperience": 40650,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.2.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 100,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 12,
+          "amount": 4
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 100,
+          "amount": 4
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 12,
+          "amount": 4
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 100,
+          "amount": 4
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 12,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 7,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 7,
+          "amount": 4
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 4
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 4
+        }
+      ]
+    },
+    {
+      "level": 37,
+      "requiredExperience": 44030,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.3.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 100,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 12,
+          "amount": 4
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 100,
+          "amount": 4
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 12,
+          "amount": 4
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 100,
+          "amount": 4
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 12,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 7,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 7,
+          "amount": 4
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 4
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 4
+        }
+      ]
+    },
+    {
+      "level": 38,
+      "requiredExperience": 47595,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 48,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 6,
+          "amount": 4
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 48,
+          "amount": 4
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 6,
+          "amount": 4
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 48,
+          "amount": 4
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 6,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 128,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 16,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 128,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 16,
+          "amount": 4
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 4
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 4
+        }
+      ]
+    },
+    {
+      "level": 39,
+      "requiredExperience": 51350,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 48,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 6,
+          "amount": 4
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 48,
+          "amount": 4
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 6,
+          "amount": 4
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 48,
+          "amount": 4
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 6,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 128,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 16,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 128,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 16,
+          "amount": 4
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 4
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 4
+        }
+      ]
+    },
+    {
+      "level": 40,
+      "requiredExperience": 55300,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 50,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 5,
+          "amount": 4
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 50,
+          "amount": 4
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 5,
+          "amount": 4
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 50,
+          "amount": 4
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 5,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 5,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 4
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 5,
+          "amount": 4
+        },
+        {
+          "itemId": "red",
+          "weight": 125,
+          "amount": 4
+        },
+        {
+          "itemId": "green",
+          "weight": 125,
+          "amount": 4
+        }
+      ]
+    },
+    {
+      "level": 41,
+      "requiredExperience": 59450,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.2.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 100,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 12,
+          "amount": 5
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 100,
+          "amount": 5
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 12,
+          "amount": 5
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 100,
+          "amount": 5
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 12,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 7,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 7,
+          "amount": 5
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 5
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 5
+        }
+      ]
+    },
+    {
+      "level": 42,
+      "requiredExperience": 63805,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.3.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 100,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 12,
+          "amount": 5
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 100,
+          "amount": 5
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 12,
+          "amount": 5
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 100,
+          "amount": 5
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 12,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 7,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 7,
+          "amount": 5
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 5
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 5
+        }
+      ]
+    },
+    {
+      "level": 43,
+      "requiredExperience": 68370,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 48,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 6,
+          "amount": 5
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 48,
+          "amount": 5
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 6,
+          "amount": 5
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 48,
+          "amount": 5
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 6,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 128,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 16,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 128,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 16,
+          "amount": 5
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 5
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 5
+        }
+      ]
+    },
+    {
+      "level": 44,
+      "requiredExperience": 73150,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 48,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 6,
+          "amount": 5
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 48,
+          "amount": 5
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 6,
+          "amount": 5
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 48,
+          "amount": 5
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 6,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 128,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 16,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 128,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 16,
+          "amount": 5
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 5
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 5
+        }
+      ]
+    },
+    {
+      "level": 45,
+      "requiredExperience": 78150,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 50,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 5,
+          "amount": 5
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 50,
+          "amount": 5
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 5,
+          "amount": 5
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 50,
+          "amount": 5
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 5,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 5,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 5,
+          "amount": 5
+        },
+        {
+          "itemId": "red",
+          "weight": 125,
+          "amount": 5
+        },
+        {
+          "itemId": "green",
+          "weight": 125,
+          "amount": 5
+        }
+      ]
+    },
+    {
+      "level": 46,
+      "requiredExperience": 83375,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.2.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 100,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 12,
+          "amount": 5
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 100,
+          "amount": 5
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 12,
+          "amount": 5
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 100,
+          "amount": 5
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 12,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 7,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 7,
+          "amount": 5
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 5
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 5
+        }
+      ]
+    },
+    {
+      "level": 47,
+      "requiredExperience": 88830,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.3.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 100,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 12,
+          "amount": 5
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 100,
+          "amount": 5
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 12,
+          "amount": 5
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 100,
+          "amount": 5
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 12,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 7,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 7,
+          "amount": 5
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 5
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 5
+        }
+      ]
+    },
+    {
+      "level": 48,
+      "requiredExperience": 94520,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 48,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 6,
+          "amount": 5
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 48,
+          "amount": 5
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 6,
+          "amount": 5
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 48,
+          "amount": 5
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 6,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 128,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 16,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 128,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 16,
+          "amount": 5
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 5
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 5
+        }
+      ]
+    },
+    {
+      "level": 49,
+      "requiredExperience": 100450,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 48,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 6,
+          "amount": 5
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 48,
+          "amount": 5
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 6,
+          "amount": 5
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 48,
+          "amount": 5
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 6,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 128,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 16,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 128,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 16,
+          "amount": 5
+        },
+        {
+          "itemId": "red",
+          "weight": 25,
+          "amount": 5
+        },
+        {
+          "itemId": "green",
+          "weight": 25,
+          "amount": 5
+        }
+      ]
+    },
+    {
+      "level": 50,
+      "requiredExperience": 106625,
+      "eventImage": "data/Assets/events/level_up.png",
+      "textKey": "level.4.text",
+      "rewardCount": 3,
+      "rewards": [
+        {
+          "itemId": "item_Knife",
+          "weight": 50,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Knife_power",
+          "weight": 5,
+          "amount": 5
+        },
+        {
+          "itemId": "item_bullet",
+          "weight": 50,
+          "amount": 5
+        },
+        {
+          "itemId": "item_bullet_power",
+          "weight": 5,
+          "amount": 5
+        },
+        {
+          "itemId": "item_granate",
+          "weight": 50,
+          "amount": 5
+        },
+        {
+          "itemId": "item_granate_power",
+          "weight": 5,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Bandage",
+          "weight": 50,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "weight": 5,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Shield",
+          "weight": 50,
+          "amount": 5
+        },
+        {
+          "itemId": "item_Shield_power",
+          "weight": 5,
+          "amount": 5
+        },
+        {
+          "itemId": "red",
+          "weight": 125,
+          "amount": 5
+        },
+        {
+          "itemId": "green",
+          "weight": 125,
+          "amount": 5
+        }
+      ]
+    }
+  ]
+}

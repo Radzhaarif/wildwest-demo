@@ -1,0 +1,133 @@
+{
+  "enemyId": "test",
+  "nameTextKey": "Boss_1.name",
+  "descriptionTextKey": "enemy.Boss_1.description",
+  "stageCount": 2,
+  "battle_music": "data/Assets/sound/battle_3.mp3",
+  "wall": 5,
+  "box": 3,
+  "vines": 3,
+  "stages": [
+    {
+      "stageId": "windup",
+      "nameTextKey": "enemy.Boss_1.stage.windup.name",
+      "appearance": "data/Assets/enemy/boom.png",
+      "health": 40,
+      "shield": 10,
+      "convert": [
+        {
+          "effectId": "convertItems",
+          "type": "convertItems",
+          "chance": 0.2,
+          "from": {
+            "itemId": ["trash_1", "trash_2"]
+          },
+          "to": {
+            "itemId": ["radioactive"]
+          },
+          "scope": "all"
+        }
+      ],
+      "aggression": {
+        "threshold": 50,
+        "damage": 3,
+        "resetOnTrigger": true
+      },
+      "rage": {
+        "secondsToUltimate": 15,
+        "resetAfterUltimate": true
+      },
+      "ultimate": {
+        "nameTextKey": "enemy.Boss_1.ultimate.kamikaze.name",
+        "descriptionTextKey": "enemy.Boss_1.ultimate.kamikaze.description",
+        "effects": [
+          {
+            "effectId": "kamikaze",
+            "type": "kamikaze"
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "storm",
+      "nameTextKey": "enemy.Boss_1.stage.storm.name",
+      "appearance": "data/Assets/enemy/Boss_2.png",
+      "health": 60,
+      "convert": [
+        {
+          "effectId": "convertItems",
+          "type": "convertItems",
+          "chance": 0.2,
+          "from": {
+            "itemId": ["trash_1", "trash_2"]
+          },
+          "to": {
+            "itemId": ["radioactive"]
+          },
+          "scope": "all"
+        }
+      ],
+      "aggression": {
+        "threshold": 50,
+        "damage": 5,
+        "resetOnTrigger": true
+      },
+      "rage": {
+        "secondsToUltimate": 15,
+        "resetAfterUltimate": true,
+        "targetTypes": ["granate"]
+      },
+      "ultimate": {
+        "nameTextKey": "enemy.Boss_1.ultimate.grenadePunish.name",
+        "descriptionTextKey": "enemy.Boss_1.ultimate.grenadePunish.description",
+        "effects": [
+          {
+            "effectId": "convertItems",
+            "type": "convertItems",
+            "from": {
+              "itemTypes": ["Bandage"]
+            },
+            "to": {
+              "itemId": "granate"
+            },
+            "scope": "all"
+          },
+          {
+            "effectId": "damagePlayerByBoardItems",
+            "type": "damagePlayerByBoardItems",
+            "count": {
+              "itemId": ["granate"]
+            },
+            "modifier": 1
+          },
+          {
+            "effectId": "convertItems",
+            "type": "convertItems",
+            "from": {
+              "itemId": ["granate"]
+            },
+            "to": {
+              "itemId": ["trash_1", "trash_2"]
+            },
+            "scope": "all"
+          }
+        ]
+      }
+    }
+  ],
+  "reward": {
+    "eventImage": "data/Assets/events/reward_gold.png",
+    "dialogTextKey": "battle.reward.test",
+    "itemCount": 2,
+    "rewards": [
+      {
+        "type": "gold",
+        "amount": 15
+      },
+      {
+        "type": "experience",
+        "amount": 50
+      }
+    ]
+  }
+}

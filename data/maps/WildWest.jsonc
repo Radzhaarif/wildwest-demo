@@ -1,0 +1,412 @@
+{
+  "id": "WildWest",
+  "nameTextKey": "WildWest.name",
+  "mapImage": "data/Assets/map/WildWest_map.png",
+  "pathRules": {
+    "connectionCountWeights": [
+      {
+        "count": 1,
+        "weight": 20
+      },
+      {
+        "count": 2,
+        "weight": 65
+      },
+      {
+        "count": 3,
+        "weight": 15
+      }
+    ],
+    "maxSinglePathChain": 2
+  },
+  "events": [
+    {
+      "name": "battle_easy",
+      "type": "battle",
+      "icon": "data/Assets/icons/clown_skull.png"
+    },
+    {
+      "name": "battle",
+      "type": "battle",
+      "icon": "data/Assets/icons/white_skull.png"
+    },
+    {
+      "name": "battle_hard",
+      "type": "battle",
+      "icon": "data/Assets/icons/green_skull.png"
+    },
+    {
+      "name": "boss",
+      "type": "battle",
+      "icon": "data/Assets/icons/boss.png"
+    },
+    {
+      "name": "reward",
+      "type": "reward",
+      "icon": "data/Assets/icons/reward.png"
+    },
+    {
+      "name": "heal",
+      "type": "heal",
+      "icon": "data/Assets/icons/heal.png"
+    },
+    {
+      "name": "heal_paid",
+      "type": "heal",
+      "icon": "data/Assets/icons/heal.png"
+    },
+    {
+      "name": "shop",
+      "type": "shop",
+      "icon": "data/Assets/icons/shop.png"
+    }
+  ],
+  "levels": [
+    {
+      "level": 1,
+      "nodes": {
+        "count": 1
+      },
+      "paths": {
+        "minConnectionsFromNode": 1,
+        "maxConnectionsFromNode": 3,
+        "extraConnectionChance": 0
+      },
+      "events": [
+        {
+          "name": "battle_easy",
+          "weight": 100,
+          "guaranteed": true
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "nodes": {
+        "min": 2,
+        "max": 3
+      },
+      "paths": {
+        "minConnectionsFromNode": 1,
+        "maxConnectionsFromNode": 3,
+        "extraConnectionChance": 0
+      },
+      "events": [
+        {
+          "name": "battle",
+          "weight": 100,
+          "guaranteed": false
+        }
+      ]
+    },
+    {
+      "level": 3,
+      "nodes": {
+        "min": 2,
+        "max": 3
+      },
+      "paths": {
+        "minConnectionsFromNode": 1,
+        "maxConnectionsFromNode": 3,
+        "extraConnectionChance": 0
+      },
+      "events": [
+        {
+          "name": "shop",
+          "weight": 30,
+          "guaranteed": false
+        },
+        {
+          "name": "heal",
+          "weight": 30,
+          "guaranteed": false
+        },
+        {
+          "name": "battle",
+          "weight": 40,
+          "guaranteed": false
+        }
+      ]
+    },
+    {
+      "level": 4,
+      "nodes": {
+        "min": 2,
+        "max": 3
+      },
+      "paths": {
+        "minConnectionsFromNode": 1,
+        "maxConnectionsFromNode": 3,
+        "extraConnectionChance": 0
+      },
+      "events": [
+        {
+          "name": "battle",
+          "weight": 70,
+          "guaranteed": false
+        },
+        {
+          "name": "reward",
+          "weight": 30,
+          "guaranteed": false
+        }
+      ]
+    },
+    {
+      "level": 5,
+      "nodes": {
+        "min": 2,
+        "max": 3
+      },
+      "paths": {
+        "minConnectionsFromNode": 1,
+        "maxConnectionsFromNode": 3,
+        "extraConnectionChance": 0
+      },
+      "events": [
+        {
+          "name": "battle",
+          "weight": 65,
+          "guaranteed": false
+        },
+        {
+          "name": "battle_hard",
+          "weight": 35,
+          "guaranteed": false
+        }
+      ]
+    },
+    {
+      "level": 6,
+      "nodes": {
+        "min": 2,
+        "max": 3
+      },
+      "paths": {
+        "minConnectionsFromNode": 1,
+        "maxConnectionsFromNode": 3,
+        "extraConnectionChance": 0
+      },
+      "events": [
+        {
+          "name": "shop",
+          "weight": 34,
+          "guaranteed": false
+        },
+        {
+          "name": "heal_paid",
+          "weight": 33,
+          "guaranteed": false
+        },
+        {
+          "name": "reward",
+          "weight": 33,
+          "guaranteed": false
+        }
+      ]
+    },
+    {
+      "level": 7,
+      "nodes": {
+        "min": 2,
+        "max": 3
+      },
+      "paths": {
+        "minConnectionsFromNode": 1,
+        "maxConnectionsFromNode": 3,
+        "extraConnectionChance": 0
+      },
+      "events": [
+        {
+          "name": "battle",
+          "weight": 60,
+          "guaranteed": false
+        },
+        {
+          "name": "battle_hard",
+          "weight": 40,
+          "guaranteed": false
+        }
+      ]
+    },
+    {
+      "level": 8,
+      "nodes": {
+        "count": 2
+      },
+      "paths": {
+        "minConnectionsFromNode": 1,
+        "maxConnectionsFromNode": 2,
+        "connectionCountWeights": [
+          {
+            "count": 1,
+            "weight": 35
+          },
+          {
+            "count": 2,
+            "weight": 65
+          }
+        ],
+        "extraConnectionChance": 0
+      },
+      "events": [
+        {
+          "name": "shop",
+          "weight": 50,
+          "guaranteed": false
+        },
+        {
+          "name": "heal",
+          "weight": 50,
+          "guaranteed": false
+        }
+      ]
+    },
+    {
+      "level": 9,
+      "nodes": {
+        "count": 1
+      },
+      "paths": {
+        "minConnectionsFromNode": 1,
+        "maxConnectionsFromNode": 1,
+        "connectionCountWeights": [
+          {
+            "count": 1,
+            "weight": 100
+          }
+        ],
+        "extraConnectionChance": 0
+      },
+      "events": [
+        {
+          "name": "boss",
+          "weight": 100,
+          "guaranteed": true
+        }
+      ]
+    }
+  ],
+  "battle": [
+    {
+      "eventName": "battle_easy",
+      "enemyId": "easy_Foxy",
+      "background": "data/Assets/backgrounds/WildWest_1.png",
+      "minLevel": 1,
+      "maxLevel": 1,
+      "weight": 100
+    },
+    {
+      "eventName": "battle",
+      "enemyId": "easy_Candy",
+      "background": "data/Assets/backgrounds/WildWest_1.png",
+      "minLevel": 2,
+      "maxLevel": 7,
+      "weight": 34
+    },
+    {
+      "eventName": "battle",
+      "enemyId": "easy_Sweety",
+      "background": "data/Assets/backgrounds/WildWest_2.png",
+      "minLevel": 2,
+      "maxLevel": 7,
+      "weight": 33
+    },
+    {
+      "eventName": "battle",
+      "enemyId": "easy_Boom",
+      "background": "data/Assets/backgrounds/WildWest_1.png",
+      "minLevel": 2,
+      "maxLevel": 7,
+      "weight": 33
+    },
+    {
+      "eventName": "battle_hard",
+      "enemyId": "easy_Rusty",
+      "background": "data/Assets/backgrounds/WildWest_2.png",
+      "minLevel": 5,
+      "maxLevel": 7,
+      "weight": 50
+    },
+    {
+      "eventName": "battle_hard",
+      "enemyId": "easy_Cookie",
+      "background": "data/Assets/backgrounds/WildWest_3.png",
+      "minLevel": 5,
+      "maxLevel": 7,
+      "weight": 50
+    },
+    {
+      "eventName": "boss",
+      "enemyId": "boss_Fireman",
+      "background": "data/Assets/backgrounds/WildWest_3.png",
+      "minLevel": 9,
+      "maxLevel": 9,
+      "weight": 100,
+      "nodeTitleTextKey": "enemy.Fireman.name"
+    }
+  ],
+  "reward": [
+    {
+      "eventName": "reward",
+      "minLevel": 4,
+      "maxLevel": 6,
+      "weight": 100,
+      "dialogTextKey": "reward.gold.text_01",
+      "eventImage": "data/Assets/events/reward_gold.png",
+      "itemCount": 1,
+      "rewards": [
+        {
+          "type": "gold",
+          "amount": 25
+        }
+      ]
+    }
+  ],
+  "heal": [
+    {
+      "eventName": "heal",
+      "minLevel": 3,
+      "maxLevel": 8,
+      "healPercent": 25,
+      "dialogTextKey": "healer.text_01",
+      "eventImage": "data/Assets/events/doctor.png",
+      "goldPrice": 0,
+      "weight": 100
+    },
+    {
+      "eventName": "heal_paid",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "healPercent": 50,
+      "dialogTextKey": "healer.text_02",
+      "eventImage": "data/Assets/events/doctor.png",
+      "goldPrice": 40,
+      "weight": 100
+    }
+  ],
+  "shop": [
+    {
+      "eventName": "shop",
+      "minLevel": 3,
+      "maxLevel": 8,
+      "weight": 100,
+      "dialogTextKey": "trader.text_01",
+      "eventImage": "data/Assets/events/trader.png",
+      "items": [
+        {
+          "itemId": "item_swap",
+          "amount": 1,
+          "goldPrice": 35
+        },
+        {
+          "itemId": "item_time",
+          "amount": 1,
+          "goldPrice": 65
+        }
+      ]
+    }
+  ],
+  "skip": [],
+  "dialog": []
+}

@@ -1,0 +1,84 @@
+{
+  "enemyId": "boom",
+  "nameTextKey": "enemy.boom.name",
+  "descriptionTextKey": "enemy.boom.description",
+  "stageCount": 1,
+  "battle_music": "data/Assets/sound/battle_2.mp3",
+  "wall": 0,
+  "box": 0,
+  "vines": 0,
+  "stages": [
+    {
+      "stageId": "main",
+      "nameTextKey": "enemy.boom.stage.main.name",
+      "appearance": "data/Assets/enemy/boom.png",
+      "health": 50,
+      "shield": 0,
+      "convert": [
+        {
+          "effectId": "convertItems",
+          "type": "convertItems",
+          "chance": 0.2,
+          "from": {
+            "itemId": ["Knife", "bullet"]
+          },
+          "to": {
+            "itemId": ["granate"]
+          },
+          "scope": "all"
+        },
+        {
+          "effectId": "convertItems",
+          "type": "convertItems",
+          "chance": 0.05,
+          "from": {
+            "itemId": ["granate"]
+          },
+          "to": {
+            "itemId": ["granate_power"]
+          },
+          "scope": "all"
+        }
+      ],
+      "aggression": {
+        "threshold": 50,
+        "damage": 3,
+        "resetOnTrigger": true
+      },
+      "rage": {
+        "secondsToUltimate": 45,
+        "resetAfterUltimate": true,
+        "targetTypes": ["Knife"]
+      },
+      "ultimate": {
+        "nameTextKey": "enemy.boom.ultimate.knifeDamage.name",
+        "descriptionTextKey": "enemy.boom.ultimate.knifeDamage.description",
+        "effects": [
+          {
+            "effectId": "damagePlayerByBoardItems",
+            "type": "damagePlayerByBoardItems",
+            "count": {
+              "itemTypes": ["Knife"]
+            },
+            "modifier": 1
+          }
+        ]
+      }
+    }
+  ],
+  "reward": {
+    "eventImage": "data/Assets/events/reward_gold.png",
+    "dialogTextKey": "battle.reward.boom",
+    "itemCount": 2,
+    "rewards": [
+      {
+        "type": "gold",
+        "amount": 10
+      },
+      {
+        "type": "experience",
+        "amount": 25
+      }
+    ]
+  }
+}

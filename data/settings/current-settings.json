@@ -1,0 +1,24 @@
+{
+  "musicVolume": 0.5,
+  "soundVolume": 1,
+  "language": "en",
+  "languages": ["en", "ru", "new_ru"],
+  "rewardAnimationMs": {
+    "clearMs": 500,
+    "blurMs": 1500,
+    "iconDelayMs": 400,
+    "iconZoomMs": 1500,
+    "iconStaggerMs": 0
+  },
+  "battleTooltipMs": 4000,
+  "battleTooltipDelayMs": 1500,
+  "battleMusicCrossfadeMs": 2000,
+  "inlineItemIconEm": 2.3,
+  "tooltipFontSizePx": 18,
+  "tooltipMaxWidthPx": 420,
+  "audio": {
+    "click": "data/Assets/sound/Click.mp3",
+    "mainMenuMusic": "data/Assets/sound/main_menu.mp3",
+    "mapMusic": "data/Assets/sound/main_menu.mp3"
+  }
+}

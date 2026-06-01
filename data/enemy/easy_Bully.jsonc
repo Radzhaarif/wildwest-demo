@@ -1,0 +1,84 @@
+{
+  "enemyId": "Bully",
+  "nameTextKey": "enemy.Bully.name",
+  "descriptionTextKey": "enemy.Bully.description",
+  "stageCount": 1,
+  "battle_music": "data/Assets/sound/battle_3.mp3",
+  "wall": 0,
+  "box": 0,
+  "vines": 0,
+  "stages": [
+    {
+      "stageId": "main",
+      "nameTextKey": "enemy.Bully.stage.main.name",
+      "appearance": "data/Assets/enemy/Bully.png",
+      "health": 50,
+      "shield": 10,
+      "convert": [
+        {
+          "effectId": "convertItems",
+          "type": "convertItems",
+          "chance": 0.2,
+          "from": {
+            "itemId": ["Knife", "granate", "bullet"]
+          },
+          "to": {
+            "itemId": ["Shield"]
+          },
+          "scope": "all"
+        },
+        {
+          "effectId": "convertItems",
+          "type": "convertItems",
+          "chance": 0.05,
+          "from": {
+            "itemId": ["Shield"]
+          },
+          "to": {
+            "itemId": ["Shield_power"]
+          },
+          "scope": "all"
+        }
+      ],
+      "aggression": {
+        "threshold": 50,
+        "damage": 3,
+        "resetOnTrigger": true
+      },
+      "rage": {
+        "secondsToUltimate": 45,
+        "resetAfterUltimate": true,
+        "targetTypes": ["Shield"]
+      },
+      "ultimate": {
+        "nameTextKey": "enemy.Bully.ultimate.shieldRestore.name",
+        "descriptionTextKey": "enemy.Bully.ultimate.shieldRestore.description",
+        "effects": [
+          {
+            "effectId": "RestoreEnemyShieldByBoardItems",
+            "type": "RestoreEnemyShieldByBoardItems",
+            "count": {
+              "itemTypes": ["Shield"]
+            },
+            "modifier": 1
+          }
+        ]
+      }
+    }
+  ],
+  "reward": {
+    "eventImage": "data/Assets/events/reward_gold.png",
+    "dialogTextKey": "battle.reward.Bully",
+    "itemCount": 2,
+    "rewards": [
+      {
+        "type": "gold",
+        "amount": 10
+      },
+      {
+        "type": "experience",
+        "amount": 25
+      }
+    ]
+  }
+}

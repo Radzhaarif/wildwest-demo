@@ -1,0 +1,84 @@
+{
+  "enemyId": "Sweety",
+  "nameTextKey": "enemy.Sweety.name",
+  "descriptionTextKey": "enemy.Sweety.description",
+  "stageCount": 1,
+  "battle_music": "data/Assets/sound/battle_2.mp3",
+  "wall": 0,
+  "box": 0,
+  "vines": 0,
+  "stages": [
+    {
+      "stageId": "main",
+      "nameTextKey": "enemy.Sweety.stage.main.name",
+      "appearance": "data/Assets/enemy/Sweety.png",
+      "health": 50,
+      "shield": 0,
+      "convert": [
+        {
+          "effectId": "convertItems",
+          "type": "convertItems",
+          "chance": 0.2,
+          "from": {
+            "itemId": ["granate", "Knife"]
+          },
+          "to": {
+            "itemId": ["bullet"]
+          },
+          "scope": "all"
+        },
+        {
+          "effectId": "convertItems",
+          "type": "convertItems",
+          "chance": 0.05,
+          "from": {
+            "itemId": ["bullet"]
+          },
+          "to": {
+            "itemId": ["bullet_power"]
+          },
+          "scope": "all"
+        }
+      ],
+      "aggression": {
+        "threshold": 50,
+        "damage": 3,
+        "resetOnTrigger": true
+      },
+      "rage": {
+        "secondsToUltimate": 45,
+        "resetAfterUltimate": true,
+        "targetTypes": ["bullet"]
+      },
+      "ultimate": {
+        "nameTextKey": "enemy.Sweety.ultimate.bulletDamage.name",
+        "descriptionTextKey": "enemy.Sweety.ultimate.bulletDamage.description",
+        "effects": [
+          {
+            "effectId": "damagePlayerByBoardItems",
+            "type": "damagePlayerByBoardItems",
+            "count": {
+              "itemTypes": ["bullet"]
+            },
+            "modifier": 1
+          }
+        ]
+      }
+    }
+  ],
+  "reward": {
+    "eventImage": "data/Assets/events/reward_gold.png",
+    "dialogTextKey": "battle.reward.Sweety",
+    "itemCount": 2,
+    "rewards": [
+      {
+        "type": "gold",
+        "amount": 10
+      },
+      {
+        "type": "experience",
+        "amount": 25
+      }
+    ]
+  }
+}

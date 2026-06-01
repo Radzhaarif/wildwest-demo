@@ -1,0 +1,504 @@
+{
+  "items": [
+    {
+      "itemId": "health",
+      "category": "stat",
+      "nameTextKey": "items.health.name",
+      "descriptionTextKey": "items.health.description",
+      "icon": "data/Assets/item/hearts.png",
+      "bigIcon": "data/Assets/big_icon/hearts.png",
+      "showInHudAlways": true,
+      "hudOrder": 10,
+      "hudValue": "health"
+    },
+    {
+      "itemId": "gold",
+      "category": "currency",
+      "nameTextKey": "items.item_gold.name",
+      "descriptionTextKey": "items.item_gold.description",
+      "icon": "data/Assets/item/item_gold.png",
+      "bigIcon": "data/Assets/big_icon/item_gold.png",
+      "showInHudAlways": true,
+      "hudOrder": 20
+    },
+    {
+      "itemId": "exp",
+      "category": "stat",
+      "nameTextKey": "items.exp.name",
+      "descriptionTextKey": "items.exp.description",
+      "icon": "data/Assets/item/exp.png",
+      "bigIcon": "data/Assets/big_icon/exp.png",
+      "showInHudAlways": true,
+      "hudOrder": 15,
+      "hudValue": "experience"
+    },
+    {
+      "itemId": "item_skull",
+      "category": "item",
+      "nameTextKey": "items.item_skull.name",
+      "descriptionTextKey": "items.item_skull.description",
+      "icon": "data/Assets/item/Item_Skull.png",
+      "bigIcon": "data/Assets/big_icon/Item_Skull.png",
+      "showInHudAlways": true,
+      "hudOrder": 30
+    },
+    {
+      "itemId": "item_time",
+      "category": "item",
+      "nameTextKey": "items.item_time.name",
+      "descriptionTextKey": "items.item_time.description",
+      "icon": "data/Assets/item/item_time.png",
+      "bigIcon": "data/Assets/big_icon/item_time.png",
+      "showInHudAlways": true,
+      "battleTimeStopSeconds": 30,
+      "hudOrder": 40
+    },
+    {
+      "itemId": "item_swap",
+      "category": "item",
+      "nameTextKey": "items.item_swap.name",
+      "descriptionTextKey": "items.item_swap.description",
+      "icon": "data/Assets/item/Item_Swap.png",
+      "bigIcon": "data/Assets/big_icon/Item_Swap.png",
+      "showInHudAlways": true,
+      "hudOrder": 50
+    },
+
+
+    {
+      "itemId": "granate",
+      "category": "match-3",
+      "type": "granate",
+        "damage": 5,
+        "heal": 0,
+        "aggression": 5,
+        "calm": 0,
+      "Leave_side": 0,
+      "death_time": 0.5,
+      "createsOnFour": "granate_power",
+      "createsOnFive": "battary",
+      "nameTextKey": "items.granate.name",
+      "descriptionTextKey": "items.granate.description",
+      "icon": "data/Assets/item/granate.png",
+      "bigIcon": "data/Assets/big_icon/granate.png",
+      "hudOrder": 110
+    },
+    {
+      "itemId": "granate_power",
+      "category": "rare_match-3",
+      "type": "granate",
+        "damage": 10,
+        "heal": 0,
+        "aggression": 5,
+        "calm": 0,
+      "Leave_side": 0,
+      "death_time": 0.5,
+      "createsOnFour": "granate_power",
+      "createsOnFive": "battary",
+      "nameTextKey": "items.granate_power.name",
+      "descriptionTextKey": "items.granate_power.description",
+      "icon": "data/Assets/item/granate_power.png",
+      "bigIcon": "data/Assets/big_icon/granate_power.png",
+      "hudOrder": 111
+    },
+
+
+    {
+      "itemId": "bullet",
+      "category": "match-3",
+      "type": "bullet",
+        "damage": 5,
+        "heal": 0,
+        "aggression": 5,
+        "calm": 0,
+      "Leave_side": 0,
+      "death_time": 0.5,
+      "createsOnFour": "bullet_power",
+      "createsOnFive": "battary",
+      "nameTextKey": "items.bullet.name",
+      "descriptionTextKey": "items.bullet.description",
+      "icon": "data/Assets/item/bullet.png",
+      "bigIcon": "data/Assets/big_icon/bullet.png",
+      "hudOrder": 120
+    },
+    {
+      "itemId": "bullet_power",
+      "category": "rare_match-3",
+      "type": "bullet",
+        "damage": 10,
+        "heal": 0,
+        "aggression": 5,
+        "calm": 0,
+      "Leave_side": 0,
+      "death_time": 0.5,
+      "createsOnFour": "bullet_power",
+      "createsOnFive": "battary",
+      "nameTextKey": "items.bullet_power.name",
+      "descriptionTextKey": "items.bullet_power.description",
+      "icon": "data/Assets/item/bullet_power.png",
+      "bigIcon": "data/Assets/big_icon/bullet_power.png",
+      "hudOrder": 121
+    },
+
+
+    {
+      "itemId": "Knife",
+      "category": "match-3",
+      "type": "Knife",
+        "damage": 5,
+        "heal": 0,
+        "aggression": 5,
+        "calm": 0,
+      "Leave_side": 0,
+      "death_time": 0.5,
+      "createsOnFour": "Knife_power",
+      "createsOnFive": "battary",
+      "nameTextKey": "items.Knife.name",
+      "descriptionTextKey": "items.Knife.description",
+      "icon": "data/Assets/item/Knife.png",
+      "bigIcon": "data/Assets/big_icon/Knife.png",
+      "hudOrder": 130
+    },
+    {
+      "itemId": "Knife_power",
+      "category": "rare_match-3",
+      "type": "Knife",
+        "damage": 10,
+        "heal": 0,
+        "aggression": 5,
+        "calm": 0,
+      "Leave_side": 0,
+      "death_time": 0.5,
+      "createsOnFour": "Knife_power",
+      "createsOnFive": "battary",
+      "nameTextKey": "items.Knife_power.name",
+      "descriptionTextKey": "items.Knife_power.description",
+      "icon": "data/Assets/item/Knife_power.png",
+      "bigIcon": "data/Assets/big_icon/Knife_power.png",
+      "hudOrder": 131
+    },
+
+
+    {
+      "itemId": "Bandage",
+      "category": "match-3",
+      "type": "Bandage",
+        "damage": 0,
+        "heal": 5,
+        "aggression": 0,
+        "calm": 0,
+      "Leave_side": 0,
+      "death_time": 0.5,
+      "createsOnFour": "Bandage_power",
+      "createsOnFive": "battary",
+      "nameTextKey": "items.Bandage.name",
+      "descriptionTextKey": "items.Bandage.description",
+      "icon": "data/Assets/item/bandage.png",
+      "bigIcon": "data/Assets/big_icon/bandage.png",
+      "hudOrder": 140
+    },
+    {
+      "itemId": "Bandage_power",
+      "category": "rare_match-3",
+      "type": "Bandage",
+        "damage": 0,
+        "heal": 10,
+        "aggression": 0,
+        "calm": 0,
+      "Leave_side": 0,
+      "death_time": 0.5,
+      "createsOnFour": "Bandage_power",
+      "createsOnFive": "battary",
+      "nameTextKey": "items.Bandage_power.name",
+      "descriptionTextKey": "items.Bandage_power.description",
+      "icon": "data/Assets/item/bandage_power.png",
+      "bigIcon": "data/Assets/big_icon/bandage_power.png",
+      "hudOrder": 141
+    },
+
+
+    {
+      "itemId": "Shield",
+      "category": "match-3",
+      "type": "Shield",
+        "damage": 0,
+        "heal": 0,
+        "aggression": 0,
+        "calm": 5,
+      "Leave_side": 0,
+      "death_time": 0.5,
+      "createsOnFour": "Shield_power",
+      "createsOnFive": "battary",
+      "nameTextKey": "items.Shield.name",
+      "descriptionTextKey": "items.Shield.description",
+      "icon": "data/Assets/item/Shield.png",
+      "bigIcon": "data/Assets/big_icon/Shield.png",
+      "hudOrder": 150
+    },
+    {
+      "itemId": "Shield_power",
+      "category": "rare_match-3",
+      "type": "Shield",
+        "damage": 0,
+        "heal": 0,
+        "aggression": 0,
+        "calm": 10,
+      "Leave_side": 0,
+      "death_time": 0.5,
+      "createsOnFour": "Shield_power",
+      "createsOnFive": "battary",
+      "nameTextKey": "items.Shield_power.name",
+      "descriptionTextKey": "items.Shield_power.description",
+      "icon": "data/Assets/item/Shield_power.png",
+      "bigIcon": "data/Assets/big_icon/Shield_power.png",
+      "hudOrder": 151
+    },
+     
+
+    {
+      "itemId": "battary",
+      "category": "rare_match-3",
+      "type": "utility",
+        "damage": 0,
+        "heal": 0,
+        "aggression": 0,
+        "calm": 0,
+      "Leave_side": 0,
+      "death_time": 0.5,
+      "nameTextKey": "items.battary.name",
+      "descriptionTextKey": "items.battary.description",
+      "icon": "data/Assets/item/battary.png",
+      "bigIcon": "data/Assets/big_icon/battary.png",
+      "hudOrder": 160
+    },
+
+
+    {
+      "itemId": "trash_1",
+      "category": "match-3",
+      "type": "junk_1",
+        "damage": 0,
+        "heal": 0,
+        "aggression": 10,
+        "calm": 0,
+      "Leave_side": 0,
+      "death_time": 0.5,
+      "nameTextKey": "items.trash_1.name",
+      "descriptionTextKey": "items.trash_1.description",
+      "icon": "data/Assets/item/trash_phone.png",
+      "bigIcon": "data/Assets/big_icon/trash_phone.png",
+      "hudOrder": 170
+    },
+    {
+      "itemId": "trash_2",
+      "category": "match-3",
+      "type": "junk_2",
+        "damage": 0,
+        "heal": 0,
+        "aggression": 10,
+        "calm": 0,
+      "Leave_side": 0,
+      "death_time": 0.5,
+      "nameTextKey": "items.trash_2.name",
+      "descriptionTextKey": "items.trash_2.description",
+      "icon": "data/Assets/item/trash_tires.png",
+      "bigIcon": "data/Assets/big_icon/trash_tires.png",
+      "hudOrder": 171
+    },
+    {
+      "itemId": "trash_3",
+      "category": "rare_match-3",
+      "type": "junk_3",
+        "damage": 0,
+        "heal": 0,
+        "aggression": 10,
+        "calm": 0,
+      "Leave_side": 0,
+      "death_time": 0.5,
+      "nameTextKey": "items.trash_3.name",
+      "descriptionTextKey": "items.trash_3.description",
+      "icon": "data/Assets/item/trash_phone.png",
+      "bigIcon": "data/Assets/big_icon/trash_phone.png",
+      "hudOrder": 172
+    },
+
+
+
+
+    {
+      "itemId": "item_granate",
+      "category": "item",
+      "modificate": [
+        {
+         "itemId": "granate",
+            "damage": 1,
+            "heal": 0,
+           "aggression": 0,
+           "calm": 0
+        },
+        {
+         "itemId": "granate_power",
+           "damage": 2,
+           "heal": 0,
+           "aggression": 0,
+           "calm": 0
+        }
+      ],
+      "nameTextKey": "items.granate.name",
+      "descriptionTextKey": "items.granate.description",
+      "icon": "data/Assets/item/granate.png",
+      "bigIcon": "data/Assets/big_icon/granate.png",
+      "hudOrder": 210
+    },
+    {
+      "itemId": "item_granate_power",
+      "category": "item",
+      "chance_trash": 1,
+      "nameTextKey": "items.granate_power.name",
+      "descriptionTextKey": "items.granate_power.description",
+      "icon": "data/Assets/item/granate_power.png",
+      "bigIcon": "data/Assets/big_icon/granate_power.png",
+      "hudOrder": 211
+    },
+    {
+      "itemId": "item_bullet",
+      "category": "item",
+      "modificate": [
+        {
+         "itemId": "bullet",
+            "damage": 1,
+            "heal": 0,
+           "aggression": 0,
+           "calm": 0
+        },
+        {
+         "itemId": "bullet_power",
+           "damage": 2,
+           "heal": 0,
+           "aggression": 0,
+           "calm": 0
+        }
+      ],
+      "nameTextKey": "items.bullet.name",
+      "descriptionTextKey": "items.bullet.description",
+      "icon": "data/Assets/item/bullet.png",
+      "bigIcon": "data/Assets/big_icon/bullet.png",
+      "hudOrder": 220
+    },
+    {
+      "itemId": "item_bullet_power",
+      "category": "item",
+      "chance_trash": 1,
+      "nameTextKey": "items.bullet_power.name",
+      "descriptionTextKey": "items.bullet_power.description",
+      "icon": "data/Assets/item/bullet_power.png",
+      "bigIcon": "data/Assets/big_icon/bullet_power.png",
+      "hudOrder": 221
+    },
+    {
+      "itemId": "item_Knife",
+      "category": "item",
+      "modificate": [
+        {
+         "itemId": "Knife",
+            "damage": 1,
+            "heal": 0,
+           "aggression": 0,
+           "calm": 0
+        },
+        {
+         "itemId": "Knife_power",
+           "damage": 2,
+           "heal": 0,
+           "aggression": 0,
+           "calm": 0
+        }
+      ],
+      "nameTextKey": "items.Knife.name",
+      "descriptionTextKey": "items.Knife.description",
+      "icon": "data/Assets/item/Knife.png",
+      "bigIcon": "data/Assets/big_icon/Knife.png",
+      "hudOrder": 230
+    },
+    {
+      "itemId": "item_Knife_power",
+      "category": "item",
+      "chance_trash": 1,
+      "nameTextKey": "items.Knife_power.name",
+      "descriptionTextKey": "items.Knife_power.description",
+      "icon": "data/Assets/item/Knife_power.png",
+      "bigIcon": "data/Assets/big_icon/Knife_power.png",
+      "hudOrder": 231
+    },
+    {
+      "itemId": "item_Bandage",
+      "category": "item",
+      "modificate": [
+        {
+         "itemId": "Bandage",
+            "damage": 0,
+            "heal": 1,
+           "aggression": 0,
+           "calm": 0
+        },
+        {
+         "itemId": "Bandage_power",
+           "damage": 0,
+           "heal": 2,
+           "aggression": 0,
+           "calm": 0
+        }
+      ],
+      "nameTextKey": "items.Bandage.name",
+      "descriptionTextKey": "items.Bandage.description",
+      "icon": "data/Assets/item/bandage.png",
+      "bigIcon": "data/Assets/big_icon/bandage.png",
+      "hudOrder": 240
+    },
+    {
+      "itemId": "item_Bandage_power",
+      "category": "item",
+      "chance_trash": 1,
+      "nameTextKey": "items.Bandage_power.name",
+      "descriptionTextKey": "items.Bandage_power.description",
+      "icon": "data/Assets/item/bandage_power.png",
+      "bigIcon": "data/Assets/big_icon/bandage_power.png",
+      "hudOrder": 241
+    },
+    {
+      "itemId": "item_Shield",
+      "category": "item",
+      "modificate": [
+        {
+         "itemId": "Shield",
+            "damage": 0,
+            "heal": 0,
+           "aggression": 0,
+           "calm": 1
+        },
+        {
+         "itemId": "Shield_power",
+           "damage": 0,
+           "heal": 0,
+           "aggression": 0,
+           "calm": 2
+        }
+      ],
+      "nameTextKey": "items.Shield.name",
+      "descriptionTextKey": "items.Shield.description",
+      "icon": "data/Assets/item/Shield.png",
+      "bigIcon": "data/Assets/big_icon/Shield.png",
+      "hudOrder": 250
+    },
+    {
+      "itemId": "item_Shield_power",
+      "category": "item",
+      "chance_trash": 1,
+      "nameTextKey": "items.Shield_power.name",
+      "descriptionTextKey": "items.Shield_power.description",
+      "icon": "data/Assets/item/Shield_power.png",
+      "bigIcon": "data/Assets/big_icon/Shield_power.png",
+      "hudOrder": 251
+    }
+  ]
+}

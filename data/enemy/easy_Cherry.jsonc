@@ -1,0 +1,71 @@
+{
+  "enemyId": "Cherry",
+  "nameTextKey": "enemy.Cherry.name",
+  "descriptionTextKey": "enemy.Cherry.description",
+  "stageCount": 1,
+  "wall": 0,
+  "box": 0,
+  "vines": 0,
+  "stages": [
+    {
+      "stageId": "main",
+      "nameTextKey": "enemy.Cherry.stage.main.name",
+      "appearance": "data/Assets/enemy/Cherry.png",
+      "health": 50,
+      "shield": 0,
+      "convert": [
+        {
+          "effectId": "convertItems",
+          "type": "convertItems",
+          "chance": 0.2,
+          "from": {
+            "itemId": ["bullet", "Knife", "granate"]
+          },
+          "to": {
+            "itemId": ["trash_3"]
+          },
+          "scope": "all"
+        }
+      ],
+      "aggression": {
+        "threshold": 50,
+        "damage": 3,
+        "resetOnTrigger": true
+      },
+      "rage": {
+        "secondsToUltimate": 45,
+        "resetAfterUltimate": true,
+        "targetTypes": ["junk_1", "junk_2", "junk_3"]
+      },
+      "ultimate": {
+        "nameTextKey": "enemy.Cherry.ultimate.trashHeal.name",
+        "descriptionTextKey": "enemy.Cherry.ultimate.trashHeal.description",
+        "effects": [
+          {
+            "effectId": "HealingEnemyByBoardItems",
+            "type": "HealingEnemyByBoardItems",
+            "count": {
+              "itemTypes": ["junk_1", "junk_2", "junk_3"]
+            },
+            "modifier": 1
+          }
+        ]
+      }
+    }
+  ],
+  "reward": {
+    "eventImage": "data/Assets/events/reward_gold.png",
+    "dialogTextKey": "battle.reward.Cherry",
+    "itemCount": 2,
+    "rewards": [
+      {
+        "type": "gold",
+        "amount": 10
+      },
+      {
+        "type": "experience",
+        "amount": 25
+      }
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  // Music volume: from 0 to 1.
+  "musicVolume": 0.5,
+  // Sound effects volume: from 0 to 1.
+  "soundVolume": 1,
+  // Default language key, must exist in data/locales.
+  "language": "en",
+  // Active languages.
+  // The first language in this list is used as fallback for missing translations.
+  "languages": ["en", "ru", "new_ru"],
+  // Reward animation settings used by reward-window rendering.
+  // clearMs: how long eventImage stays clear.
+  // blurMs: how long blur transition lasts.
+  // iconDelayMs: delay before reward icons appear.
+  // iconZoomMs: icon zoom animation duration.
+  // iconStaggerMs: delay between multiple icons in ms.
+  "rewardAnimationMs": {
+    "clearMs": 1000,
+    "blurMs": 2000,
+    "iconDelayMs": 1000,
+    "iconZoomMs": 4000,
+    "iconStaggerMs": 160
+  },
+  // Tooltip time in battle for item hints (ms).
+  "battleTooltipMs": 3000,
+  // Delay before battle tooltip appears after cursor hover / open (ms).
+  "battleTooltipDelayMs": 3000,
+  // Time in ms for crossfade when switching battle music: map fades down, battle fades up.
+  "battleMusicCrossfadeMs": 2000,
+  // Size of item icons embedded into localized text, measured in em relative to the current font.
+  "inlineItemIconEm": 2.1,
+  // Font size for item tooltip windows in pixels.
+  "tooltipFontSizePx": 16,
+  // Maximum width of item tooltip windows in pixels.
+  "tooltipMaxWidthPx": 360,
+  // Audio assets. Keep in sync with available files.
+  "audio": {
+    "click": "data/Assets/sound/Click.mp3",
+    "mainMenuMusic": "data/Assets/sound/main_menu.mp3",
+    "mapMusic": "data/Assets/sound/main_menu.mp3"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "titleTextKey": "battle.tutorial.title",
+  "buttons": {
+    "backTextKey": "ui.back",
+    "exitTextKey": "battle.tutorial.exit",
+    "nextTextKey": "battle.tutorial.next"
+  },
+  "pages": [
+    {
+      "textKey": "battle.tutorial.page.status"
+    },
+    {
+      "textKey": "battle.tutorial.page.items"
+    },
+    {
+      "textKey": "battle.tutorial.page.matches"
+    },
+    {
+      "textKey": "battle.tutorial.page.inventory"
+    },
+    {
+      "textKey": "battle.tutorial.page.obstacles"
+    }
+  ]
+}

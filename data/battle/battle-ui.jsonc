@@ -1,0 +1,115 @@
+{
+  // UI-only configuration for the battle screen. Gameplay values still come from player/enemy/item JSON.
+  "textKeys": {
+    "enemyStage": "battle.enemy.stage",
+    "enemyHealth": "battle.enemy.health",
+    "enemyAggression": "battle.enemy.aggression",
+    "enemyDamage": "battle.enemy.damage",
+    "enemyRage": "battle.enemy.rage",
+    "playerHealth": "battle.player.health",
+    "playerHeal": "battle.player.heal",
+    "clockUnavailable": "battle.clock.unavailable",
+    "clockUsed": "battle.clock.used",
+    "rageEvent": "battle.rage.event",
+    "noMovesTitle": "battle.noMoves.title",
+    "noMovesBody": "battle.noMoves.body",
+    "victoryTitle": "battle.outcome.victory",
+    "defeatTitle": "battle.outcome.defeat",
+    "restartBattle": "battle.outcome.restart",
+    "restartBattlePending": "battle.outcome.restartPending",
+    "selectFirstCell": "battle.status.selectFirstCell",
+    "cellSelected": "battle.status.cellSelected",
+    "selectionCleared": "battle.status.selectionCleared",
+    "newCellSelected": "battle.status.newCellSelected",
+    "noMatchSwapCancelled": "battle.status.noMatchSwapCancelled",
+    "freeSwapDone": "battle.status.freeSwapDone",
+    "moveProcessed": "battle.status.moveProcessed",
+    "moveCells": "battle.status.moveCells",
+    "moveCascades": "battle.status.moveCascades",
+    "moveDamage": "battle.status.moveDamage",
+    "moveBonuses": "battle.status.moveBonuses",
+    "moveHealthRecovered": "battle.status.moveHealthRecovered",
+    "movePlayerDamage": "battle.status.movePlayerDamage",
+    "enemyDefeated": "battle.status.enemyDefeated",
+    "cascadeLimitReached": "battle.status.cascadeLimitReached"
+  },
+  "topButtons": {
+    "surrender": {
+      "textKey": "ui.surrender",
+      "icon": "data/Assets/icons/surrend.png"
+    },
+    "settings": {
+      "textKey": "menu.settings",
+      "icon": "data/Assets/icons/setting.png"
+    },
+    "log": {
+      "textKey": "ui.eventLog",
+      "icon": "data/Assets/icons/log.png"
+    }
+  },
+  "handItemIds": [
+    "item_Shield",
+    "item_Bandage",
+    "item_granate",
+    "item_bullet",
+    "item_Knife",
+    "item_Shield_power",
+    "item_Bandage_power",
+    "item_granate_power",
+    "item_bullet_power",
+    "item_Knife_power"
+  ],
+  "icons": {
+    "playerHealth": "data/Assets/icons/hearts.png",
+    "playerHeal": "data/Assets/item/bandage.png",
+    "enemyHealth": "data/Assets/icons/hearts.png",
+    "enemyAggression": "data/Assets/icons/agressive.png",
+    "enemyDamage": "data/Assets/icons/damage.png",
+    "enemyRage": "data/Assets/icons/rage.png"
+  },
+  "backgrounds": {
+    "battleWindow": "data/Assets/backgrounds/battle.png"
+  },
+  "board": {
+    "width": 9,
+    "height": 7
+  },
+  "bars": {
+    "playerHealthColor": "#c8322a",
+    "playerHealColor": "#72a343",
+    "enemyHealthColor": "#c8322a",
+    "enemyAggressionColor": "#b9d4ec"
+  },
+  "feedback": {
+    "floatMessageMs": 3000,
+    "battleTooltipMs": 3000,
+    "battleTooltipDelayMs": 3000
+  },
+  "availableMoveSearch": {
+    // Each inner array is one priority group. Types inside the same group are searched together.
+    // "*" means any remaining match-3 type.
+    "typeGroups": [
+      ["granate", "Knife", "bullet"],
+      ["Bandage", "Shield"],
+      ["*"]
+    ]
+  },
+  "animations": {
+    "swapMs": 1000,
+    "swapMoveMs": 1000,
+    "invalidShakeMs": 500,
+    "matchShakeMs": 500,
+    "boardMoveMs": 500,
+    "boardDropMs": 250,
+    "newItemSpawnOffsetPx": 16,
+    "newItemStackGapPx": 12,
+    "itemDropGapMs": 125,
+    "boardMoveStepMs": 250,
+    "cascadeStepMs": 150,
+    "idleHintDelayMs": 5000,
+    "idleHintShakeMs": 500,
+    "noMovesShuffleMs": 2000,
+    "outcomeBannerMs": 2000,
+    "deathFlightPx": 96
+  }
+}

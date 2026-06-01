@@ -1,0 +1,72 @@
+{
+  "enemyId": "Venom",
+  "nameTextKey": "enemy.Venom.name",
+  "descriptionTextKey": "enemy.Venom.description",
+  "stageCount": 1,
+  "battle_music": "data/Assets/sound/battle_1.mp3",
+  "wall": 0,
+  "box": 0,
+  "vines": 0,
+  "stages": [
+    {
+      "stageId": "main",
+      "nameTextKey": "enemy.Venom.stage.main.name",
+      "appearance": "data/Assets/enemy/Venom.png",
+      "health": 50,
+      "shield": 0,
+      "convert": [
+        {
+          "effectId": "convertItems",
+          "type": "convertItems",
+          "chance": 0.1,
+          "from": {
+            "itemId": ["bullet", "Knife", "granate"]
+          },
+          "to": {
+            "itemId": ["radioactive"]
+          },
+          "scope": "all"
+        }
+      ],
+      "aggression": {
+        "threshold": 50,
+        "damage": 3,
+        "resetOnTrigger": true
+      },
+      "rage": {
+        "secondsToUltimate": 60,
+        "resetAfterUltimate": true,
+        "targetTypes": ["radioactive"]
+      },
+      "ultimate": {
+        "nameTextKey": "enemy.Venom.ultimate.radioactiveDamage.name",
+        "descriptionTextKey": "enemy.Venom.ultimate.radioactiveDamage.description",
+        "effects": [
+          {
+            "effectId": "damagePlayerByBoardItems",
+            "type": "damagePlayerByBoardItems",
+            "count": {
+              "itemId": ["radioactive"]
+            },
+            "modifier": 6
+          }
+        ]
+      }
+    }
+  ],
+  "reward": {
+    "eventImage": "data/Assets/events/reward_gold.png",
+    "dialogTextKey": "battle.reward.Venom",
+    "itemCount": 2,
+    "rewards": [
+      {
+        "type": "gold",
+        "amount": 10
+      },
+      {
+        "type": "experience",
+        "amount": 25
+      }
+    ]
+  }
+}

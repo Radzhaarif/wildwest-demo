@@ -1,0 +1,168 @@
+{
+  // textKeys хранит ключи локалей для текстов боевого интерфейса.
+  "textKeys": {
+    // Подпись строки стадии врага. Итоговый текст собирается как "Стадия X/Y".
+    "enemyStage": "battle.enemy.stage",
+    // Подпись здоровья врага в панели характеристик.
+    "enemyHealth": "battle.enemy.health",
+    // Подпись шкалы агрессии врага.
+    "enemyAggression": "battle.enemy.aggression",
+    // Подпись значения урона врага.
+    "enemyDamage": "battle.enemy.damage",
+    // Подпись таймера ярости врага.
+    "enemyRage": "battle.enemy.rage",
+    // Подпись шкалы здоровья игрока слева от поля.
+    "playerHealth": "battle.player.health",
+    // Подпись шкалы лечения игрока слева от поля.
+    "playerHeal": "battle.player.heal",
+    // Сообщение, которое вылетает из часов, если часы нельзя использовать.
+    "clockUnavailable": "battle.clock.unavailable",
+    // Сообщение после успешной активации часов.
+    "clockUsed": "battle.clock.used",
+    // Сообщение, когда таймер ярости дошел до нуля и сработало событие ярости.
+    "rageEvent": "battle.rage.event",
+    // Заголовок сообщения поверх поля, если доступных ходов нет.
+    "noMovesTitle": "battle.noMoves.title",
+    // Описание штрафного перемешивания, если доступных ходов нет.
+    "noMovesBody": "battle.noMoves.body",
+    // Надпись на победной полосе.
+    "victoryTitle": "battle.outcome.victory",
+    // Надпись на полосе поражения.
+    "defeatTitle": "battle.outcome.defeat",
+    // Надпись кнопки будущего перезапуска боя после поражения.
+    "restartBattle": "battle.outcome.restart",
+    // Сообщение-заглушка, пока перезапуск боя еще не реализован.
+    "restartBattlePending": "battle.outcome.restartPending",
+    // Status text shown in the battle log/status line during normal cell selection and move resolution.
+    "selectFirstCell": "battle.status.selectFirstCell",
+    "cellSelected": "battle.status.cellSelected",
+    "selectionCleared": "battle.status.selectionCleared",
+    "newCellSelected": "battle.status.newCellSelected",
+    "noMatchSwapCancelled": "battle.status.noMatchSwapCancelled",
+    "freeSwapDone": "battle.status.freeSwapDone",
+    "moveProcessed": "battle.status.moveProcessed",
+    "moveCells": "battle.status.moveCells",
+    "moveCascades": "battle.status.moveCascades",
+    "moveDamage": "battle.status.moveDamage",
+    "moveBonuses": "battle.status.moveBonuses",
+    "moveHealthRecovered": "battle.status.moveHealthRecovered",
+    "movePlayerDamage": "battle.status.movePlayerDamage",
+    "enemyDefeated": "battle.status.enemyDefeated",
+    // Message added to the move summary if the cascade safety limit stopped unresolved matches.
+    "cascadeLimitReached": "battle.status.cascadeLimitReached"
+  },
+  // Top action buttons shown in the battle header (surrender, settings, log).
+  // Can be overridden from active battle-ui.jsonc to change icon assets and text keys.
+  "topButtons": {
+    "surrender": {
+      "textKey": "ui.surrender",
+      "icon": "data/Assets/icons/surrend.png"
+    },
+    "settings": {
+      "textKey": "menu.settings",
+      "icon": "data/Assets/icons/setting.png"
+    },
+    "log": {
+      "textKey": "ui.eventLog",
+      "icon": "data/Assets/icons/log.png"
+    }
+  },
+  // handItemIds defines the visible item slots on the right side of the battle board.
+  // These ids must exist in data/items.jsonc and are rendered in this exact order.
+  "handItemIds": [
+    "item_Shield",
+    "item_Bandage",
+    "item_granate",
+    "item_bullet",
+    "item_Knife",
+    "item_Shield_power",
+    "item_Bandage_power",
+    "item_granate_power",
+    "item_bullet_power",
+    "item_Knife_power"
+  ],
+  // icons хранит пути к служебным иконкам боевого UI.
+  "icons": {
+    // Иконка шкалы здоровья игрока.
+    "playerHealth": "data/Assets/icons/hearts.png",
+    // Иконка шкалы лечения игрока.
+    "playerHeal": "data/Assets/item/bandage.png",
+    // Иконка шкалы здоровья врага.
+    "enemyHealth": "data/Assets/icons/hearts.png",
+    // Иконка шкалы агрессии врага.
+    "enemyAggression": "data/Assets/icons/agressive.png",
+    // Иконка значения урона врага.
+    "enemyDamage": "data/Assets/icons/damage.png",
+    // Иконка таймера ярости врага.
+    "enemyRage": "data/Assets/icons/rage.png"
+  },
+  // backgrounds хранит фоновые изображения самого окна боя.
+  "backgrounds": {
+    // Фон панели боя. Это не фон сцены с врагом: фон сцены приходит из battle-события карты.
+    "battleWindow": "data/Assets/backgrounds/battle.png"
+  },
+  // board задает размер match-3 поля в клетках.
+  "board": {
+    // Количество клеток по горизонтали. Минимум 3, чтобы были возможны обычные совпадения.
+    "width": 12,
+    // Количество клеток по вертикали. Минимум 3, чтобы были возможны обычные совпадения.
+    "height": 9
+  },
+  // bars хранит цвета прогресс-баров боевого UI.
+  "bars": {
+    // Цвет заполнения шкалы здоровья игрока.
+    "playerHealthColor": "#c8322a",
+    // Цвет заполнения шкалы лечения игрока.
+    "playerHealColor": "#72a343",
+    // Цвет заполнения шкалы здоровья врага.
+    "enemyHealthColor": "#c8322a",
+    // Цвет заполнения шкалы агрессии врага.
+    "enemyAggressionColor": "#b9d4ec"
+  },
+  // feedback хранит настройки коротких UI-сообщений.
+  "feedback": {
+    // Сколько миллисекунд показывается всплывающее сообщение от кнопки или предмета.
+    "floatMessageMs": 3000,
+    "battleTooltipMs": 3000,
+    "battleTooltipDelayMs": 3000
+  },
+  // availableMoveSearch настраивает порядок поиска idle-подсказки доступного хода.
+  "availableMoveSearch": {
+    // Каждый вложенный список - одна группа приоритета.
+    // Типы внутри одной группы ищутся одновременно по порядку поля.
+    // Следующая группа проверяется только если предыдущая не нашла ход.
+    // "*" означает любые остальные match-3 типы, которые не были выбраны раньше.
+    // Типы должны совпадать с полем "type" у предметов в data/items.jsonc, включая регистр.
+    "typeGroups": [
+      // Сначала ищем атакующие предметы.
+      ["granate", "Knife", "bullet"],
+      // Потом ищем лечение и защитное успокоение агрессии.
+      ["Bandage", "Shield"],
+      // Потом ищем любой другой доступный ход.
+      ["*"]
+    ]
+  },
+  // animations хранит длительности и расстояния визуальных анимаций боя.
+  "animations": {
+    // Длительность обмена двух соседних иконок в миллисекундах.
+    "swapMs": 1000,
+    // Длительность тряски при неудачном обмене в миллисекундах.
+    "invalidShakeMs": 500,
+    // Длительность тряски собранных предметов перед исчезновением в миллисекундах.
+    "matchShakeMs": 500,
+    // Базовая длительность движения предмета между клетками. Сейчас основная скорость падения задается boardMoveStepMs.
+    "boardMoveMs": 500,
+    // Миллисекунды на одну клетку падения или движения после каскада.
+    "boardMoveStepMs": 250,
+    // Через сколько миллисекунд бездействия начинается поиск доступного хода.
+    "idleHintDelayMs": 5000,
+    // Сколько миллисекунд трясется подсказанный предмет.
+    "idleHintShakeMs": 500,
+    // Сколько миллисекунд длится штрафное перемешивание, если ходов нет.
+    "noMovesShuffleMs": 2000,
+    // Сколько миллисекунд показывается полоса победы перед переходом к награде.
+    "outcomeBannerMs": 2000,
+    // Насколько далеко улетает активированный предмет при исчезновении, в пикселях.
+    "deathFlightPx": 96
+  }
+}

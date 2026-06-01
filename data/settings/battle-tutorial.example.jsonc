@@ -1,0 +1,33 @@
+{
+  // Заголовок окна обучения. Ключ должен быть во всех активных локалях.
+  "titleTextKey": "battle.tutorial.title",
+
+  // Подписи кнопок окна обучения.
+  // Назад скрывается на первой странице, далее скрывается на последней, выйти видно всегда.
+  "buttons": {
+    "backTextKey": "ui.back",
+    "exitTextKey": "battle.tutorial.exit",
+    "nextTextKey": "battle.tutorial.next"
+  },
+
+  // Страницы обучения. Каждая страница - один текстовый ключ.
+  // Внутри локали можно использовать переносы \n, иконки предметов {item:bullet}
+  // и иконки battle-ui {icon:enemyRage}. Размер иконки можно умножить через \s{1.3}.
+  "pages": [
+    {
+      "textKey": "battle.tutorial.page.status"
+    },
+    {
+      "textKey": "battle.tutorial.page.items"
+    },
+    {
+      "textKey": "battle.tutorial.page.matches"
+    },
+    {
+      "textKey": "battle.tutorial.page.inventory"
+    },
+    {
+      "textKey": "battle.tutorial.page.obstacles"
+    }
+  ]
+}
