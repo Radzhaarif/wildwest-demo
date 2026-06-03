@@ -55,6 +55,11 @@
       "iconSizePx": 60
     }
   },
+  "shuffleButton": {
+    "textKey": "battle.shuffle.button",
+    "icon": "data/Assets/icons/mix.png",
+    "iconSizePx": 64
+  },
   "handItemIds": [
     "item_Shield",
     "item_Bandage",
@@ -95,7 +100,7 @@
   },
   "board": {
     "width": 9,
-    "height": 7
+    "height": 8
   },
   "bars": {
     "playerHealthColor": "#c8322a",

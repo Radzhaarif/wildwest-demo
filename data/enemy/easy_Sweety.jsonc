@@ -12,7 +12,7 @@
       "stageId": "main",
       "nameTextKey": "enemy.Sweety.stage.main.name",
       "appearance": "data/Assets/enemy/Sweety.png",
-      "health": 50,
+      "health": 100,
       "shield": 0,
       "convert": [
         {

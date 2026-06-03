@@ -12,7 +12,7 @@
       "stageId": "main",
       "nameTextKey": "enemy.Foxy.stage.main.name",
       "appearance": "data/Assets/enemy/Foxy.png",
-      "health": 50,
+      "health": 100,
       "shield": 0,
       "convert": [
         {
@@ -60,7 +60,7 @@
             "count": {
               "itemTypes": ["Bandage"]
             },
-            "modifier": 1
+            "modifier": 2
           }
         ]
       }

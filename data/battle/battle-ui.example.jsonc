@@ -67,6 +67,12 @@
       "icon": "data/Assets/icons/log.png"
     }
   },
+  // Кнопка ручного перемешивания доски.
+  "shuffleButton": {
+    "textKey": "battle.shuffle.button",
+    "icon": "data/Assets/icons/mix.png",
+    "iconSizePx": 64
+  },
   // handItemIds defines the visible item slots on the right side of the battle board.
   // These ids must exist in data/items.jsonc and are rendered in this exact order.
   "handItemIds": [

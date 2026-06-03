@@ -11,7 +11,7 @@
       "stageId": "main",
       "nameTextKey": "enemy.Cherry.stage.main.name",
       "appearance": "data/Assets/enemy/Cherry.png",
-      "health": 50,
+      "health": 100,
       "shield": 0,
       "convert": [
         {

@@ -1,18 +1,31 @@
 {
-  "enemyId": "Rusty",
-  "nameTextKey": "enemy.Rusty.name",
-  "descriptionTextKey": "enemy.Rusty.description",
+  "enemyId": "Cherry",
+  "nameTextKey": "enemy.Cherry.name",
+  "descriptionTextKey": "enemy.Cherry.description",
   "stageCount": 1,
-  "battle_music": "data/Assets/sound/battle_1.mp3",
   "wall": 0,
   "box": 0,
   "vines": 0,
+  "convert": [
+    {
+      "effectId": "convertItems",
+      "type": "convertItems",
+      "chance": 0.2,
+      "from": {
+        "itemId": ["bullet", "Knife", "granate"]
+      },
+      "to": {
+        "itemId": ["trash_3"]
+      },
+      "scope": "all"
+    }
+  ],
   "stages": [
     {
       "stageId": "main",
-      "nameTextKey": "enemy.Rusty.stage.main.name",
-      "appearance": "data/Assets/enemy/Rusty.png",
-      "health": 100,
+      "nameTextKey": "enemy.Cherry.stage.main.name",
+      "appearance": "data/Assets/enemy/Cherry.png",
+      "health": 50,
       "shield": 0,
       "aggression": {
         "threshold": 50,
@@ -25,12 +38,12 @@
         "targetTypes": ["junk_1", "junk_2", "junk_3"]
       },
       "ultimate": {
-        "nameTextKey": "enemy.Rusty.ultimate.trashDamage.name",
-        "descriptionTextKey": "enemy.Rusty.ultimate.trashDamage.description",
+        "nameTextKey": "enemy.Cherry.ultimate.trashHeal.name",
+        "descriptionTextKey": "enemy.Cherry.ultimate.trashHeal.description",
         "effects": [
           {
-            "effectId": "damagePlayerByBoardItems",
-            "type": "damagePlayerByBoardItems",
+            "effectId": "HealingEnemyByBoardItems",
+            "type": "HealingEnemyByBoardItems",
             "count": {
               "itemTypes": ["junk_1", "junk_2", "junk_3"]
             },
@@ -42,7 +55,7 @@
   ],
   "reward": {
     "eventImage": "data/Assets/events/reward_gold.png",
-    "dialogTextKey": "battle.reward.Rusty",
+    "dialogTextKey": "battle.reward.Cherry",
     "itemCount": 2,
     "rewards": [
       {

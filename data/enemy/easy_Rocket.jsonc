@@ -12,8 +12,8 @@
       "stageId": "main",
       "nameTextKey": "enemy.Rocket.stage.main.name",
       "appearance": "data/Assets/enemy/Rocket.png",
-      "health": 50,
-      "shield": 10,
+      "health": 100,
+      "shield": 5,
       "convert": [
         {
           "effectId": "convertItems",

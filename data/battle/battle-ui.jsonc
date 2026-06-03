@@ -47,6 +47,11 @@
       "icon": "data/Assets/icons/log.png"
     }
   },
+  "shuffleButton": {
+    "textKey": "battle.shuffle.button",
+    "icon": "data/Assets/icons/mix.png",
+    "iconSizePx": 64
+  },
   "handItemIds": [
     "item_Shield",
     "item_Bandage",

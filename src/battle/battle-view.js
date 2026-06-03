@@ -3,6 +3,7 @@ import { renderInlineRichText } from "../rich-text.js";
 
 const MAX_CASCADE_STEPS = 30;
 const CLOCK_ITEM_ID = "item_time";
+const LITTLE_MENU_ITEM_ID = "little_menu";
 const SKULL_ITEM_ID = "item_skull";
 const SWAP_ITEM_ID = "item_swap";
 const DEFAULT_LIGHT_PROJECTILE_ICON = "data/Assets/icons/light_red.png";
@@ -18,6 +19,7 @@ const DEFAULT_LIGHT_PROJECTILES_PER_DAMAGE = 0;
 const MIN_DAMAGE_PROJECTILES = 1;
 const MAX_DAMAGE_PROJECTILES = 12;
 const SPECIAL_ITEM_IDS = ["item_skull", "item_swap", "item_time"];
+const GOLD_ITEM_ID = "gold";
 const DEFAULT_HAND_ITEM_IDS = [
   "item_Shield",
   "item_Bandage",
@@ -52,6 +54,7 @@ const DEFAULT_TOP_ACTION_BUTTONS = {
 const DEFAULT_CLOCK_WARNING_SECONDS = [1, 3, 5, 10, 15, 20, 30];
 const DEFAULT_CLOCK_WARNING_CHANGE_MS = 1000;
 const DEFAULT_CLOCK_WARNING_CHANGE_SCALE = 1.5;
+const ASSET_CACHE_BUSTER = Date.now();
 let battleTooltipHideTimeoutId = null;
 let battleTooltipShowTimeoutId = null;
 const battleCellAnimationState = new WeakMap();
@@ -154,6 +157,7 @@ function showBattleScaffold(context, root) {
     const fxLayer = document.createElement("div");
     fxLayer.className = "battle-scaffold-fx-layer";
 
+    const battleUiConfig = getBattleUiConfig(context);
     const layout = document.createElement("div");
     layout.className = "battle-scaffold-layout";
 
@@ -180,8 +184,12 @@ function showBattleScaffold(context, root) {
 
     const handItems = document.createElement("div");
     handItems.className = "battle-scaffold-hand-items";
+    handItems.className = "battle-scaffold-hand-items battle-scaffold-hand-items-hidden";
 
     const enemyVisual = createEnemyVisual(context);
+
+    const enemyHeader = document.createElement("div");
+    enemyHeader.className = "battle-scaffold-enemy-header";
 
     const enemyInfo = document.createElement("div");
     enemyInfo.className = "battle-scaffold-enemy-info";
@@ -193,32 +201,78 @@ function showBattleScaffold(context, root) {
     const enemyStats = document.createElement("div");
     enemyStats.className = "battle-scaffold-stats";
 
+    const enemyStage = document.createElement("div");
+    enemyStage.className = "battle-scaffold-enemy-stage";
+
+    const enemyHeaderValues = document.createElement("div");
+    enemyHeaderValues.className = "battle-scaffold-enemy-header-values";
+
     const ultimateText = document.createElement("p");
     ultimateText.className = "battle-scaffold-ultimate";
 
+    const shuffleButtonConfig = battleUiConfig.shuffleButton || {};
+    const shuffleTextKey = shuffleButtonConfig.textKey || getBattleUiConfig(context).textKeys.shuffleBoard;
+    const shuffleIconPath = shuffleButtonConfig.icon
+      || battleUiConfig.shuffleIcon
+      || getBattleUiConfig(context).shuffleIcon
+      || "data/Assets/icons/mix.png";
+    const shuffleButtonSize = shuffleButtonConfig.iconSizePx;
     const shuffleButton = document.createElement("button");
     shuffleButton.type = "button";
     shuffleButton.className = "battle-scaffold-shuffle-button";
-    shuffleButton.textContent = translate(context.request.locale, getBattleUiConfig(context).textKeys.shuffleBoard);
+    shuffleButton.setAttribute("aria-label", translate(context.request.locale, shuffleTextKey));
+    const shuffleIcon = document.createElement("img");
+    shuffleIcon.className = "battle-scaffold-shuffle-icon";
+    shuffleIcon.src = resolveAssetPath(shuffleIconPath);
+    shuffleIcon.alt = "";
+    shuffleIcon.loading = "lazy";
+    const shuffleIconSize = Number(
+      Number.isFinite(Number(shuffleButtonSize)) ? Number(shuffleButtonSize) : 64,
+    );
+    shuffleButton.style.setProperty("--battle-shuffle-size", `${shuffleIconSize}px`);
+    shuffleButton.append(shuffleIcon);
 
     const status = document.createElement("p");
     status.className = "battle-scaffold-status";
     setBattleStatus(context, status, translateBattleText(context, "selectFirstCell"));
 
-    playerPanel.append(specialItems, playerMeters, handItems);
-    leftColumn.append(boardElement, playerPanel);
-    enemyInfo.append(title, enemyStats, ultimateText, shuffleButton);
-    rightColumn.append(enemyVisual, enemyInfo);
-    layout.append(leftColumn, rightColumn);
+    leftColumn.append(boardElement, playerMeters, playerPanel, specialItems);
+
+    const leftBottom = document.createElement("div");
+    leftBottom.className = "battle-scaffold-left-bottom";
+    const enemyHeaderTitle = document.createElement("div");
+    enemyHeaderTitle.className = "battle-scaffold-enemy-title";
+    enemyHeaderTitle.append(title, enemyStage);
+
+    enemyHeader.append(enemyHeaderTitle, enemyHeaderValues);
+    enemyInfo.append(enemyStats, ultimateText);
+    rightColumn.append(enemyHeader, enemyVisual, enemyInfo);
+    leftBottom.append(shuffleButton);
+    layout.append(leftColumn, rightColumn, leftBottom);
     panel.append(layout);
     overlay.append(topActions, panel, logOverlay, fxLayer);
     root.append(overlay);
+
+    const alignBattleSideWidgetsToBoardRightEdge = () => {
+      const boardRect = boardElement.getBoundingClientRect();
+      const leftColumnRect = leftColumn.getBoundingClientRect();
+      const buttonRect = shuffleButton.getBoundingClientRect();
+      if (!Number.isFinite(boardRect.width) || !Number.isFinite(buttonRect.width) || !Number.isFinite(leftColumnRect.left)) {
+        return;
+      }
+      const offset = Math.max(0, boardRect.right - leftColumnRect.left - buttonRect.width + 200);
+      leftBottom.style.setProperty("--battle-shuffle-container-left-offset", `${offset}px`);
+      const specialItemsOffset = boardRect.left - leftColumnRect.left - 125;
+      specialItems.style.setProperty("--battle-special-items-left-offset", `${specialItemsOffset}px`);
+    };
 
     const renderTargets = {
       boardElement,
       specialItems,
       handItems,
       enemyVisual,
+      enemyStage,
+      enemyHeaderValues,
       enemyStats,
       playerMeters,
       ultimateText,
@@ -243,6 +297,7 @@ function showBattleScaffold(context, root) {
     renderBattleInventory(specialItems, handItems, context, renderTargets);
     renderBattleBoard(boardElement, context, status, enemyStats, playerMeters, ultimateText);
     startBattleRuntime(context, renderTargets);
+    requestAnimationFrame(alignBattleSideWidgetsToBoardRightEdge);
 
     logButton.addEventListener("click", () => {
       renderBattleLog(logOverlay, context);
@@ -356,9 +411,13 @@ function updateBattleShuffleButtonLanguage(context, button) {
     return;
   }
 
-  const label = translate(context.request.locale, getBattleUiConfig(context).textKeys.shuffleBoard);
-  button.textContent = label;
+  const label = translate(
+    context.request.locale,
+    getBattleUiConfig(context).shuffleButton.textKey || getBattleUiConfig(context).textKeys.shuffleBoard,
+  );
+  button.title = label;
   button.setAttribute("aria-label", label);
+  button.setAttribute("title", label);
 }
 
 function updateBattleShuffleButtonState(context) {
@@ -567,6 +626,7 @@ function restartCurrentBattle(context, renderTargets, banner) {
   context.battleState.specialSwapCell = null;
   context.battleState.noMovesMessageVisible = false;
   context.battleState.ragePausedUntil = 0;
+  context.battleState.pendingRageAction = false;
   context.battleState.isResolving = false;
   context.battleState.isRageResolving = false;
   context.battleState.isComplete = false;
@@ -630,6 +690,12 @@ function createEnemyVisual(context) {
   visual.className = "battle-scaffold-enemy-visual";
   visual.style.backgroundImage = `url("${resolveAssetPath(context.request.background)}")`;
 
+  const healthOverlay = document.createElement("div");
+  healthOverlay.className = "battle-scaffold-enemy-meter-overlay battle-scaffold-enemy-health-overlay";
+
+  const aggressionOverlay = document.createElement("div");
+  aggressionOverlay.className = "battle-scaffold-enemy-meter-overlay battle-scaffold-enemy-aggression-overlay";
+
   const currentStage = context.engine.getCurrentBattleStage(
     context.battleData.enemyConfig,
     context.battleState.enemyState,
@@ -639,7 +705,7 @@ function createEnemyVisual(context) {
   enemyImage.src = resolvedAppearance;
   enemyImage.dataset.appearance = resolvedAppearance;
   enemyImage.alt = "";
-  visual.append(enemyImage);
+  visual.append(healthOverlay, enemyImage, aggressionOverlay);
   return visual;
 }
 
@@ -675,15 +741,19 @@ function renderBattleStats(enemyStatsElement, playerMetersElement, ultimateTextE
     }
   }
 
-  const stageLine = enemyStatsElement.querySelector(".battle-scaffold-stage-line");
+  const stageContainer = context.battleRenderTargets?.enemyStage || enemyStatsElement;
+  const stageLine = stageContainer.querySelector(".battle-scaffold-stage-line");
   const stageText = `${stageLabel} ${stageNumber}/${enemyState.stageCount}`;
   if (stageLine) {
     stageLine.textContent = stageText;
   } else {
-    enemyStatsElement.prepend(createEnemyStageLine(stageLabel, stageNumber, enemyState.stageCount));
+    stageContainer.replaceChildren(createEnemyStageLine(stageLabel, stageNumber, enemyState.stageCount));
   }
 
-  upsertBattleLabeledMeter(context, enemyStatsElement, {
+  const enemyHealthContainer = enemyVisual?.querySelector(".battle-scaffold-enemy-health-overlay") || enemyStatsElement;
+  const enemyAggressionContainer = enemyVisual?.querySelector(".battle-scaffold-enemy-aggression-overlay") || enemyStatsElement;
+
+  upsertBattleLabeledMeter(context, enemyHealthContainer, {
     label: textLabels.enemyHealth.label,
     description: textLabels.enemyHealth.description,
     icon: uiConfig.icons.enemyHealth,
@@ -694,7 +764,7 @@ function renderBattleStats(enemyStatsElement, playerMetersElement, ultimateTextE
     healthFeedback: enemyHealthFeedback,
     shieldOverlay: createEnemyShieldOverlayConfig(context, enemyState),
   });
-  upsertBattleLabeledMeter(context, enemyStatsElement, {
+  upsertBattleLabeledMeter(context, enemyAggressionContainer, {
     label: textLabels.enemyAggression.label,
     description: textLabels.enemyAggression.description,
     icon: uiConfig.icons.enemyAggression,
@@ -705,7 +775,12 @@ function renderBattleStats(enemyStatsElement, playerMetersElement, ultimateTextE
     healthFeedback: enemyAggressionFeedback,
   });
 
-  const enemyValueRow = enemyStatsElement.querySelector(".battle-scaffold-value-row");
+  const enemyValuesContainer = context.battleRenderTargets?.enemyHeaderValues || enemyStatsElement;
+  const oldEnemyValueRow = enemyStatsElement.querySelector(".battle-scaffold-value-row");
+  if (oldEnemyValueRow && enemyValuesContainer !== enemyStatsElement) {
+    oldEnemyValueRow.remove();
+  }
+  const enemyValueRow = enemyValuesContainer.querySelector(".battle-scaffold-value-row");
   const enemyValues = [
     {
       stat: "enemy-damage",
@@ -725,10 +800,10 @@ function renderBattleStats(enemyStatsElement, playerMetersElement, ultimateTextE
   if (enemyValueRow) {
     enemyValueRow.replaceChildren(...enemyValues.map((value) => createEnemyValue(context, value)));
   } else {
-    enemyStatsElement.append(createEnemyValuesRow(context, enemyValues));
+    enemyValuesContainer.append(createEnemyValuesRow(context, enemyValues));
   }
 
-  applyBattleRageWarningVisualState(context, enemyStatsElement);
+  applyBattleRageWarningVisualState(context, enemyValuesContainer);
 
   upsertBattleLabeledMeter(context, playerMetersElement, {
     label: textLabels.playerHealth.label,
@@ -1669,6 +1744,7 @@ function getBattleProjectileSourceIcon(context, selector) {
     return null;
   }
   const searchRoots = [
+    context.battleRenderTargets.enemyVisual,
     context.battleRenderTargets.enemyStats,
     context.battleRenderTargets.playerMeters,
     context.battleRenderTargets.overlay,
@@ -1692,7 +1768,7 @@ function getBattleStatProjectileConfig(context, modifier, normalizedStatDelta, o
   const sourceSelectorByModifier = {
     "enemy-health": '[data-battle-stat="enemy-damage"] img',
     "player-health": '[data-battle-stat="enemy-damage"] img',
-    "enemy-aggression": '[data-battle-stat="enemy-aggression"] img',
+    "enemy-aggression": '[data-battle-stat-id="enemy-aggression"] img',
     "player-heal": '[data-battle-stat="player-heal"] img',
   };
   const config = {
@@ -1760,7 +1836,7 @@ function getBattleStatProjectileConfig(context, modifier, normalizedStatDelta, o
 }
 
 function getBattlePlayerHealthSourceElements(context) {
-  const enemyDamageElement = context?.battleRenderTargets?.enemyStats?.querySelector('[data-battle-stat="enemy-damage"]');
+  const enemyDamageElement = getBattleEnemyStatRoot(context)?.querySelector('[data-battle-stat="enemy-damage"]');
   if (enemyDamageElement) {
     const enemyDamageIcon = enemyDamageElement.querySelector("img");
     if (enemyDamageIcon) {
@@ -1777,7 +1853,8 @@ function getBattlePlayerHealthSourceElements(context) {
 }
 
 function getBattleEnemyHealthSourceElements(context) {
-  const enemyHealthMeter = context?.battleRenderTargets?.enemyStats?.querySelector('[data-battle-stat-id="enemy-health"]');
+  const enemyHealthMeter = context?.battleRenderTargets?.enemyVisual?.querySelector('[data-battle-stat-id="enemy-health"]')
+    || context?.battleRenderTargets?.enemyStats?.querySelector('[data-battle-stat-id="enemy-health"]');
   if (!enemyHealthMeter) {
     return [];
   }
@@ -1834,6 +1911,12 @@ function createEnemyValuesRow(context, values) {
   return row;
 }
 
+function getBattleEnemyStatRoot(context) {
+  return context?.battleRenderTargets?.enemyHeaderValues
+    || context?.battleRenderTargets?.enemyStats
+    || null;
+}
+
 function createEnemyValue(context, { label, icon, value, stat }) {
   const item = document.createElement("div");
   item.className = "battle-scaffold-value";
@@ -1860,13 +1943,33 @@ function createEnemyValue(context, { label, icon, value, stat }) {
 }
 
 function renderBattleInventory(specialItemsElement, handItemsElement, context, renderTargets = null) {
-  specialItemsElement.replaceChildren(...SPECIAL_ITEM_IDS.map((itemId) => createInventorySlot(
-    context,
-    itemId,
-    {
-      onClick: (slot) => handleSpecialItemClick(context, itemId, slot, renderTargets),
-    },
-  )));
+  const littleMenuSlot = createInventorySlot(context, LITTLE_MENU_ITEM_ID, {
+    iconOverride: "data/Assets/icons/little_menu.png",
+    showQuantity: false,
+    name: translate(context.request.locale, "ui.battleMenu") || translate(context.request.locale, "menu.settings") || "Menu",
+    description: "",
+  });
+  const specialSlots = SPECIAL_ITEM_IDS.map((itemId) => createInventorySlot(
+      context,
+      itemId,
+      {
+        onClick: (slot) => handleSpecialItemClick(context, itemId, slot, renderTargets),
+      },
+    ));
+  const goldSlot = createInventorySlot(context, GOLD_ITEM_ID);
+  const bagSlot = createInventorySlot(context, "bag", {
+    iconOverride: "data/Assets/icons/bag.png",
+    showQuantity: false,
+    name: translate(context.request.locale, "ui.bag") || "Bag",
+    description: "",
+  });
+
+  specialItemsElement.replaceChildren(
+    littleMenuSlot,
+    ...specialSlots,
+    goldSlot,
+    bagSlot,
+  );
   handItemsElement.replaceChildren(...getBattleHandItemIds(context).map((itemId) => createInventorySlot(context, itemId)));
 }
 
@@ -1875,12 +1978,12 @@ function createInventorySlot(context, itemId, options = {}) {
   const slot = document.createElement("div");
   slot.className = "battle-scaffold-inventory-slot";
   slot.dataset.itemId = itemId;
-  const itemLabel = getItemLabel(context, item, itemId);
+  const itemLabel = options.name || getItemLabel(context, item, itemId);
   slot.dataset.itemLabel = itemLabel;
-  const itemDescription = getItemDescription(context, item, itemId);
+  const itemDescription = options.description || getItemDescription(context, item, itemId);
   slot.dataset.itemDescription = itemDescription;
   slot.setAttribute("aria-label", itemLabel);
-  const itemIcon = item?.icon;
+  const itemIcon = options.iconOverride || item?.icon;
   if (itemIcon) {
     slot.dataset.itemIcon = resolveAssetPath(itemIcon);
   }
@@ -1902,17 +2005,20 @@ function createInventorySlot(context, itemId, options = {}) {
     slot.classList.add("is-disabled");
   }
 
-  if (item?.icon) {
+  if (itemIcon) {
     const image = document.createElement("img");
-    image.src = resolveAssetPath(item.icon);
+    image.src = resolveAssetPath(itemIcon);
     image.alt = "";
     slot.append(image);
   }
 
-  const quantity = document.createElement("span");
-  quantity.className = "battle-scaffold-inventory-quantity";
-  quantity.textContent = String(getInventoryQuantity(context.battleState.playerState, itemId));
-  slot.append(quantity);
+  const shouldShowQuantity = options.showQuantity !== false;
+  if (shouldShowQuantity) {
+    const quantity = document.createElement("span");
+    quantity.className = "battle-scaffold-inventory-quantity";
+    quantity.textContent = String(getInventoryQuantity(context.battleState.playerState, itemId));
+    slot.append(quantity);
+  }
 
   if (clockCooldownSeconds > 0) {
     const cooldown = document.createElement("strong");
@@ -2399,24 +2505,65 @@ function tickBattleRuntime(context, renderTargets) {
     return;
   }
 
-  if (context.battleState.isResolving || hasActiveBattleResolutionAnimation(context)) {
+  if (context.battleState.pendingRageAction) {
     if (renderTargets) {
-      updateBattleRageTimerDisplay(context, renderTargets.enemyStats);
-      applyBattleRageWarningVisualState(context, renderTargets.enemyStats);
+      updateBattleRageTimerDisplay(context, getBattleEnemyStatRoot(context));
+      applyBattleRageWarningVisualState(context, getBattleEnemyStatRoot(context));
+      void runPendingBattleRageIfReady(context, renderTargets);
     }
     return;
   }
 
   const result = context.engine.tickBattleRage(context.battleState.enemyState, 1);
-  if (result.triggered > 0 && renderTargets?.status) {
-    void runBattleRageAction(context, renderTargets);
+  if (result.triggered > 0) {
+    markBattleRagePending(context, renderTargets);
+    if (renderTargets?.status) {
+      void runPendingBattleRageIfReady(context, renderTargets);
+    }
     return;
   }
 
   if (renderTargets) {
-    updateBattleRageTimerDisplay(context, renderTargets.enemyStats);
-    applyBattleRageWarningVisualState(context, renderTargets.enemyStats);
+    updateBattleRageTimerDisplay(context, getBattleEnemyStatRoot(context));
+    applyBattleRageWarningVisualState(context, getBattleEnemyStatRoot(context));
   }
+}
+
+function markBattleRagePending(context, renderTargets) {
+  const rageState = context.battleState.enemyState?.rage;
+  context.battleState.pendingRageAction = true;
+  if (rageState) {
+    rageState.current = 0;
+  }
+  if (renderTargets) {
+    updateBattleRageTimerDisplay(context, getBattleEnemyStatRoot(context));
+    applyBattleRageWarningVisualState(context, getBattleEnemyStatRoot(context));
+  }
+}
+
+async function runPendingBattleRageIfReady(context, renderTargets) {
+  if (
+    !context.battleState.pendingRageAction
+    || context.battleState.isRageResolving
+    || context.battleState.isComplete
+    || !shouldContinueBattle(context, renderTargets)
+  ) {
+    return false;
+  }
+
+  if (isBattleFieldBusyForRage(context)) {
+    return false;
+  }
+
+  await runBattleRageAction(context, renderTargets);
+  return true;
+}
+
+function isBattleFieldBusyForRage(context) {
+  return Boolean(
+    context.battleState.isResolving
+    || hasActiveBattleResolutionAnimation(context)
+  );
 }
 
 async function runBattleRageAction(context, renderTargets) {
@@ -2437,6 +2584,7 @@ async function runBattleRageAction(context, renderTargets) {
   const uiConfig = getBattleUiConfig(context);
   let transformLights = [];
   let shouldFinalizeRage = true;
+  context.battleState.pendingRageAction = false;
   context.battleState.isRageResolving = true;
   context.battleState.isResolving = true;
   context.battleState.selectedCell = null;
@@ -2445,7 +2593,7 @@ async function runBattleRageAction(context, renderTargets) {
 
   try {
     setBattleStatus(context, renderTargets.status, translate(context.request.locale, uiConfig.textKeys.rageEvent));
-    updateBattleRageTimerDisplay(context, renderTargets.enemyStats);
+    updateBattleRageTimerDisplay(context, getBattleEnemyStatRoot(context));
     renderBattleBoard(
       renderTargets.boardElement,
       context,
@@ -2560,7 +2708,7 @@ async function runBattleRageAction(context, renderTargets) {
     }
 
     rageState.current = rageState.resetAfterUltimate === false ? 0 : rageState.max;
-    updateBattleRageTimerDisplay(context, renderTargets.enemyStats);
+    updateBattleRageTimerDisplay(context, getBattleEnemyStatRoot(context));
 
     if (shouldResolveUltimateCascades) {
       renderBattleBoard(
@@ -2606,8 +2754,8 @@ async function runBattleRageAction(context, renderTargets) {
         rageState.current = rageState.resetAfterUltimate === false ? 0 : rageState.max;
       }
       context.battleState.isResolving = false;
-      updateBattleRageTimerDisplay(context, renderTargets.enemyStats);
-      applyBattleRageWarningVisualState(context, renderTargets.enemyStats);
+      updateBattleRageTimerDisplay(context, getBattleEnemyStatRoot(context));
+      applyBattleRageWarningVisualState(context, getBattleEnemyStatRoot(context));
       renderBattleBoard(
         renderTargets.boardElement,
         context,
@@ -2720,7 +2868,7 @@ async function animateBattleRageWave(context, boardElement) {
 
 async function animateBattleRageProjectiles(context, boardElement, targetIcons = null) {
   const targets = Array.isArray(targetIcons) ? targetIcons : getBattleRageTargetIcons(context, boardElement);
-  const sourceIcon = context.battleRenderTargets?.enemyStats?.querySelector('[data-battle-stat="enemy-rage"] img');
+  const sourceIcon = getBattleEnemyStatRoot(context)?.querySelector('[data-battle-stat="enemy-rage"] img');
   const fxLayer = context.battleRenderTargets?.battleFxLayer;
   if (!sourceIcon || !fxLayer || targets.length === 0) {
     return;
@@ -4816,6 +4964,9 @@ function ensureBattleStateShape(context) {
   if (!("specialSwapCell" in battleState)) {
     battleState.specialSwapCell = null;
   }
+  if (!("pendingRageAction" in battleState)) {
+    battleState.pendingRageAction = false;
+  }
   if (!Array.isArray(battleState.walls)) {
     battleState.walls = [];
   }
@@ -4936,6 +5087,12 @@ function getBattleUiConfig(context) {
         iconSizePx: 38,
       },
       ...(config.topButtons || {}),
+    },
+    shuffleButton: {
+      textKey: "battle.shuffle.button",
+      icon: "data/Assets/icons/mix.png",
+      iconSizePx: 64,
+      ...(config.shuffleButton || {}),
     },
     handItemIds: Array.isArray(config.handItemIds) ? config.handItemIds : DEFAULT_HAND_ITEM_IDS,
     icons: {
@@ -5222,6 +5379,7 @@ function getCurrentBattleConvertEffects(context) {
 function prepareBattleAttemptState(context) {
   context.battleHealthFeedbackState = {};
   context.battleState.healthFeedbackSuppression = {};
+  context.battleState.pendingRageAction = false;
   context.battleState.board = context.engine.createBattleBoard(
     context.request.itemCatalog,
     getBattleGenerationConfig(context),
@@ -5383,6 +5541,13 @@ async function finishBattleMoveIfNeeded(context, renderTargets) {
     await completeBattleVictory(context, renderTargets);
     return true;
   }
+  if (await runPendingBattleRageIfReady(context, normalizeBattleRenderTargets(context, renderTargets))) {
+    return Boolean(
+      context.battleState.isComplete
+      || isBattlePlayerDefeated(context)
+      || context.battleState.enemyState.isDefeated
+    );
+  }
   resetBattleIdleTimer(context, context.battleRenderTargets || renderTargets);
   return false;
 }
@@ -5435,10 +5600,19 @@ function changeInventoryQuantity(playerState, itemId, delta) {
 }
 
 function resolveAssetPath(assetPath) {
-  if (!assetPath || assetPath.startsWith("http") || assetPath.startsWith("./") || assetPath.startsWith("/")) {
+  if (!assetPath || assetPath.startsWith("http") || assetPath.startsWith("data:") || assetPath.startsWith("blob:")) {
     return assetPath;
   }
-  return `./${assetPath}`;
+  if (assetPath.startsWith("./") || assetPath.startsWith("/")) {
+    return appendAssetCacheBuster(assetPath);
+  }
+  return appendAssetCacheBuster(`./${assetPath}`);
+}
+
+function appendAssetCacheBuster(assetPath) {
+  const [pathWithoutHash, hash = ""] = assetPath.split("#");
+  const separator = pathWithoutHash.includes("?") ? "&" : "?";
+  return `${pathWithoutHash}${separator}v=${ASSET_CACHE_BUSTER}${hash ? `#${hash}` : ""}`;
 }
 
 function areAdjacentCells(firstCell, secondCell) {

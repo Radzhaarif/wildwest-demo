@@ -1,0 +1,71 @@
+{
+  "enemyId": "Fireman",
+  "nameTextKey": "enemy.Fireman.name",
+  "descriptionTextKey": "enemy.Fireman.description",
+  "stageCount": 1,
+  "wall": 0,
+  "box": 0,
+  "vines": 0,
+  "convert": [
+    {
+      "effectId": "convertItems",
+      "type": "convertItems",
+      "chance": 0.1,
+      "from": {
+        "itemId": ["bullet", "Knife", "granate"]
+      },
+      "to": {
+        "itemId": ["flame"]
+      },
+      "scope": "all"
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "main",
+      "nameTextKey": "enemy.Fireman.stage.main.name",
+      "appearance": "data/Assets/enemy/Fireman.png",
+      "health": 50,
+      "shield": 0,
+      "aggression": {
+        "threshold": 50,
+        "damage": 3,
+        "resetOnTrigger": true
+      },
+      "rage": {
+        "secondsToUltimate": 60,
+        "resetAfterUltimate": true,
+        "targetTypes": ["flame"]
+      },
+      "ultimate": {
+        "nameTextKey": "enemy.Fireman.ultimate.flameHeal.name",
+        "descriptionTextKey": "enemy.Fireman.ultimate.flameHeal.description",
+        "effects": [
+          {
+            "effectId": "HealingEnemyByBoardItems",
+            "type": "HealingEnemyByBoardItems",
+            "count": {
+              "itemTypes": ["flame"]
+            },
+            "modifier": 1
+          }
+        ]
+      }
+    }
+  ],
+  "reward": {
+    "eventImage": "data/Assets/events/reward_gold.png",
+    "dialogTextKey": "battle.reward.Fireman",
+    "itemCount": 2,
+    "rewards": [
+      {
+        "type": "gold",
+        "amount": 10
+      },
+      {
+        "type": "experience",
+        "amount": 25
+      }
+    ]
+  }
+}
