@@ -408,10 +408,29 @@ function validateMapUiConfigObject(config, source, issues, requiredTextKeys) {
     return;
   }
 
+  validateMapUiLayout(config.layout, `${source}.layout`, issues);
   validateMapUiTopButtons(config.topButtons, `${source}.topButtons`, issues, requiredTextKeys);
   validateMapUiNodes(config.nodes, `${source}.nodes`, issues);
   validateMapUiDialog(config.dialog, `${source}.dialog`, issues);
   validateMapAnimationConfig(config.animation, `${source}.animation`, issues);
+}
+
+function validateMapUiLayout(layout, path, issues) {
+  if (layout === undefined) {
+    return;
+  }
+  if (!layout || typeof layout !== "object") {
+    issues.push(`${path}: must be an object when present`);
+    return;
+  }
+  requireIntegerInRange(layout.designWidthPx, `${path}.designWidthPx`, 1, Infinity, issues);
+  requireIntegerInRange(layout.designHeightPx, `${path}.designHeightPx`, 1, Infinity, issues);
+  requireNumberInRange(layout.viewportPaddingPx, `${path}.viewportPaddingPx`, 0, Infinity, issues);
+  if (typeof layout.allowUpscale !== "boolean") {
+    issues.push(`${path}.allowUpscale: must be a boolean`);
+  }
+  requireNumberInRange(layout.upscaleFactor, `${path}.upscaleFactor`, 0, 1, issues);
+  requireNumberInRange(layout.minScale, `${path}.minScale`, 0.1, 2, issues);
 }
 
 function validateMapUiDialog(dialog, path, issues) {

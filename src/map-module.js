@@ -51,6 +51,14 @@ const DEFAULT_MAP_TOP_ACTION_BUTTONS = {
     icon: "data/Assets/icons/log.png",
   },
 };
+const DEFAULT_MAP_UI_LAYOUT = {
+  designWidthPx: 1500,
+  designHeightPx: 860,
+  viewportPaddingPx: 8,
+  allowUpscale: true,
+  upscaleFactor: 0.5,
+  minScale: 0.1,
+};
 
 // Runtime-состояние всей текущей сессии. Важно: это не зеркальная копия файлов
 // current-*.json, браузер меняет эти данные в памяти и в localStorage, но не
@@ -119,6 +127,8 @@ const elements = {
   mainMenuTitle: document.querySelector("#mainMenuTitle"),
   startGameButton: document.querySelector("#startGameButton"),
   settingsButton: document.querySelector("#settingsButton"),
+  mapUiFrame: document.querySelector("#mapUiFrame"),
+  mapUiPanel: document.querySelector("#mapUiPanel"),
   settingsOverlay: document.querySelector("#settingsOverlay"),
   settingsPanel: document.querySelector("#settingsPanel"),
   mainMenuActions: document.querySelector("#mainMenuActions"),
@@ -290,6 +300,7 @@ elements.mapDialogOverlay.addEventListener("click", (event) => {
 });
 
 initDragScroll(elements.mapViewport);
+setupMapUiViewportScale();
 
 // Общий звук клика висит на document, чтобы не дублировать playClickSound на
 // каждой активной кнопке. Первый клик также помогает браузеру разрешить музыку.
@@ -338,6 +349,7 @@ async function reloadDataAndStart() {
   state.mapUiConfig = validation.mapUiConfig;
   state.battleConfigCache = validation.battleConfigCache;
   state.itemCatalogById = validation.itemCatalogById;
+  applyMapUiScale();
   await preloadGameAssets(loadingText("loading.mapAssets", "Preparing map assets"));
   renderMapTopActionButtons();
   await resetPlayerState();
@@ -854,6 +866,117 @@ function showEventLogOverlay() {
 
 function hideEventLogOverlay() {
   elements.eventLogOverlay.classList.add("hidden");
+}
+
+function setupMapUiViewportScale() {
+  const resizeTarget = window.visualViewport || window;
+  resizeTarget.addEventListener("resize", applyMapUiScale);
+  window.addEventListener("orientationchange", applyMapUiScale);
+  applyMapUiScale();
+}
+
+function applyMapUiScale() {
+  const layout = getMapUiLayoutConfig();
+  const viewport = getMapViewportSize();
+  const availableWidth = Math.max(1, viewport.width - layout.viewportPaddingPx * 2);
+  const availableHeight = Math.max(1, viewport.height - layout.viewportPaddingPx * 2);
+  const fitScale = Math.min(
+    availableWidth / layout.designWidthPx,
+    availableHeight / layout.designHeightPx,
+  );
+  const scale = fitScale > 1
+    ? (layout.allowUpscale ? 1 + (fitScale - 1) * layout.upscaleFactor : 1)
+    : Math.max(fitScale, layout.minScale);
+
+  document.documentElement.style.setProperty("--map-ui-current-scale", String(scale));
+  document.documentElement.style.setProperty("--map-ui-viewport-padding", `${layout.viewportPaddingPx}px`);
+  applyMapPermanentUiScale(elements.mapUiFrame, layout, scale);
+  for (const frame of getMapUiOverlayFrames()) {
+    applyMapUiFrameScale(frame, layout, scale);
+  }
+}
+
+function getMapUiOverlayFrames() {
+  return [...document.querySelectorAll(".map-ui-overlay-frame")];
+}
+
+function applyMapPermanentUiScale(frame, layout, scale) {
+  if (!frame) {
+    return;
+  }
+  frame.style.width = "";
+  frame.style.height = "";
+  frame.style.setProperty("--map-ui-design-width", `${layout.designWidthPx}px`);
+  frame.style.setProperty("--map-ui-design-height", `${layout.designHeightPx}px`);
+  frame.style.setProperty("--map-ui-scale", String(scale));
+
+  const panel = frame.firstElementChild;
+  if (!panel) {
+    return;
+  }
+  panel.style.setProperty("--map-ui-design-width", `${layout.designWidthPx}px`);
+  panel.style.setProperty("--map-ui-design-height", `${layout.designHeightPx}px`);
+  panel.style.setProperty("--map-ui-scale", String(scale));
+}
+
+function applyMapUiFrameScale(frame, layout, scale) {
+  frame.style.width = `${layout.designWidthPx * scale}px`;
+  frame.style.height = `${layout.designHeightPx * scale}px`;
+  frame.style.setProperty("--map-ui-design-width", `${layout.designWidthPx}px`);
+  frame.style.setProperty("--map-ui-design-height", `${layout.designHeightPx}px`);
+  frame.style.setProperty("--map-ui-scale", String(scale));
+
+  const panel = frame.firstElementChild;
+  if (!panel) {
+    return;
+  }
+  panel.style.setProperty("--map-ui-design-width", `${layout.designWidthPx}px`);
+  panel.style.setProperty("--map-ui-design-height", `${layout.designHeightPx}px`);
+  panel.style.setProperty("--map-ui-scale", String(scale));
+}
+
+function getMapViewportSize() {
+  const visualViewport = window.visualViewport;
+  return {
+    width: Number(visualViewport?.width) || window.innerWidth || document.documentElement.clientWidth || DEFAULT_MAP_UI_LAYOUT.designWidthPx,
+    height: Number(visualViewport?.height) || window.innerHeight || document.documentElement.clientHeight || DEFAULT_MAP_UI_LAYOUT.designHeightPx,
+  };
+}
+
+function getMapUiLayoutConfig() {
+  const layout = state.mapUiConfig?.layout || {};
+  const designWidthPx = getPositiveNumber(layout.designWidthPx, DEFAULT_MAP_UI_LAYOUT.designWidthPx);
+  const designHeightPx = getPositiveNumber(layout.designHeightPx, DEFAULT_MAP_UI_LAYOUT.designHeightPx);
+  const viewportPaddingPx = Math.max(0, getFiniteNumber(layout.viewportPaddingPx, DEFAULT_MAP_UI_LAYOUT.viewportPaddingPx));
+  const upscaleFactor = clampNumber(
+    getFiniteNumber(layout.upscaleFactor, DEFAULT_MAP_UI_LAYOUT.upscaleFactor),
+    0,
+    1,
+  );
+  const minScale = clampNumber(
+    getFiniteNumber(layout.minScale, DEFAULT_MAP_UI_LAYOUT.minScale),
+    0.1,
+    2,
+  );
+  return {
+    designWidthPx,
+    designHeightPx,
+    viewportPaddingPx,
+    allowUpscale: typeof layout.allowUpscale === "boolean"
+      ? layout.allowUpscale
+      : DEFAULT_MAP_UI_LAYOUT.allowUpscale,
+    upscaleFactor,
+    minScale,
+  };
+}
+
+function getFiniteNumber(value, fallback) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function clampNumber(value, min, max) {
+  return Math.min(max, Math.max(min, value));
 }
 
 async function resetPlayerState() {
@@ -1844,7 +1967,7 @@ function applyMapDialogUiSettings(payload = {}) {
   elements.mapDialogOverlay.style.setProperty("--map-dialog-backdrop-blur", `${config.backdropBlurPx}px`);
   elements.mapDialogOverlay.style.setProperty("--map-dialog-answers-fade-ms", `${config.answersFadeMs}ms`);
   if (payload.characterWidthPct !== undefined) {
-    elements.mapDialogCharacter.style.setProperty("--map-dialog-character-width", `${getPositiveNumber(payload.characterWidthPct, 72)}vw`);
+    elements.mapDialogCharacter.style.setProperty("--map-dialog-character-width", `${getPositiveNumber(payload.characterWidthPct, 72)}%`);
   } else {
     elements.mapDialogCharacter.style.setProperty("--map-dialog-character-width", `${getPositiveNumber(payload.characterWidthPx, 420)}px`);
   }

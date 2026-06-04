@@ -189,6 +189,43 @@ select {
   padding: 0;
 }
 
+.map-ui-frame,
+.map-ui-overlay-frame {
+  width: var(--map-ui-frame-width, 1500px);
+  height: var(--map-ui-frame-height, 860px);
+  pointer-events: none;
+}
+
+.map-ui-frame {
+  position: fixed;
+  inset: 0;
+  z-index: 12;
+  width: 100vw;
+  height: 100vh;
+  transform: none;
+}
+
+.map-ui-panel,
+.map-ui-overlay-panel {
+  position: relative;
+  width: var(--map-ui-design-width, 1500px);
+  height: var(--map-ui-design-height, 860px);
+  pointer-events: none;
+  transform: scale(var(--map-ui-scale, 1));
+  transform-origin: top left;
+  will-change: transform;
+}
+
+#mapUiPanel {
+  width: 100%;
+  height: 100%;
+  transform: none;
+}
+
+.map-ui-overlay-frame {
+  position: relative;
+}
+
 .status-row,
 .map-actions {
   width: min(1280px, 100%);
@@ -196,29 +233,44 @@ select {
 }
 
 .map-actions {
-  position: fixed;
+  position: absolute;
   top: 16px;
   right: 16px;
   z-index: 12;
   display: flex;
   justify-content: end;
+  align-items: flex-start;
+  flex-wrap: wrap;
   gap: 10px;
   width: auto;
   margin: 0;
+  pointer-events: auto;
+  transform: scale(var(--map-ui-current-scale, 1));
+  transform-origin: top right;
 }
 
 .map-top-button {
   height: 64px;
   width: 64px;
+  min-width: 0;
+  min-height: 0;
+  max-width: 64px;
+  max-height: 64px;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  aspect-ratio: 1 / 1;
   padding: 0;
   border: 1px solid rgba(255, 238, 194, 0.32);
   position: relative;
   border-radius: 14px;
+  appearance: none;
   background: rgba(48, 33, 22, 0.34);
   color: #fff7e7;
   font-weight: 700;
   display: grid;
   place-items: center;
+  overflow: hidden;
+  line-height: 0;
   cursor: var(--cursor-active), pointer;
   backdrop-filter: blur(3px);
 }
@@ -228,9 +280,17 @@ select {
 }
 
 .map-top-button-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
   width: var(--map-top-button-icon-size, 38px);
   height: var(--map-top-button-icon-size, 38px);
+  max-width: 94%;
+  max-height: 94%;
+  transform: translate(-50%, -50%);
   object-fit: contain;
+  pointer-events: none;
 }
 
 .map-top-button-label {
@@ -301,6 +361,11 @@ button:disabled {
 }
 
 .status-row {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%) scale(var(--map-ui-current-scale, 1));
+  transform-origin: top center;
   display: none;
   justify-content: space-between;
   gap: 12px;
@@ -310,7 +375,7 @@ button:disabled {
 
 .map-hud {
   /* HUD фиксирован поверх карты и читает числа из playerState через renderHud(). */
-  position: fixed;
+  position: absolute;
   top: 16px;
   left: 16px;
   z-index: 12;
@@ -323,6 +388,9 @@ button:disabled {
   scrollbar-width: thin;
   scrollbar-color: var(--accent) rgba(18, 12, 8, 0.45);
   cursor: var(--cursor-default), auto;
+  pointer-events: auto;
+  transform: scale(var(--map-ui-current-scale, 1));
+  transform-origin: top left;
 }
 
 .hud-item {
@@ -634,7 +702,8 @@ button:disabled {
   z-index: 70;
   display: grid;
   place-items: center;
-  padding: 24px;
+  padding: 0;
+  overflow: hidden;
   background: rgba(9, 7, 6, 0.72);
 }
 
@@ -642,10 +711,27 @@ button:disabled {
   display: none;
 }
 
+.map-ui-overlay-panel > .settings-panel,
+.map-ui-overlay-panel > .event-log-modal,
+.map-ui-overlay-panel > .surrender-modal,
+.map-ui-overlay-panel > .shop-panel,
+.map-ui-overlay-panel > .heal-panel,
+.map-ui-overlay-panel > .reward-window,
+.map-ui-overlay-panel > .event-dialog-panel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  pointer-events: auto;
+  transform: translate(-50%, -50%);
+}
+
 .modal-overlay .settings-panel,
 .event-log-modal {
   width: min(520px, 100%);
-  max-height: min(760px, calc(100vh - 48px));
+  max-height: min(760px, calc(var(--map-ui-design-height, 860px) - 48px));
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
   overflow: auto;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -661,9 +747,14 @@ button:disabled {
 
 .surrender-modal {
   width: min(520px, 100%);
+  max-height: min(760px, calc(var(--map-ui-design-height, 860px) - 48px));
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
   display: grid;
   gap: 18px;
   padding: 22px;
+  overflow: auto;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: rgba(24, 16, 10, 0.96);
@@ -687,7 +778,7 @@ button:disabled {
 
 .event-log-modal ol {
   min-height: 260px;
-  max-height: min(520px, 58vh);
+  max-height: min(520px, calc(var(--map-ui-design-height, 860px) - 220px));
   overflow: auto;
   margin: 0;
   padding-left: 22px;
@@ -718,7 +809,8 @@ button:disabled {
   z-index: 20;
   display: grid;
   place-items: center;
-  padding: 24px;
+  padding: 0;
+  overflow: hidden;
   background: rgba(9, 7, 6, 0.72);
 }
 
@@ -728,9 +820,12 @@ button:disabled {
 
 .shop-panel {
   width: min(1180px, 100%);
-  max-height: min(860px, calc(100vh - 48px));
+  max-height: min(860px, calc(var(--map-ui-design-height, 860px) - 48px));
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
   display: grid;
-  grid-template-columns: minmax(320px, 1fr) minmax(300px, 0.9fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
   grid-template-rows: minmax(360px, 1fr) auto;
   gap: 14px;
   padding: 18px;
@@ -744,9 +839,12 @@ button:disabled {
 
 .heal-panel {
   width: min(980px, 100%);
-  max-height: min(760px, calc(100vh - 48px));
+  max-height: min(760px, calc(var(--map-ui-design-height, 860px) - 48px));
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
   display: grid;
-  grid-template-columns: minmax(300px, 0.9fr) minmax(300px, 1fr);
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
   gap: 14px;
   padding: 18px;
   border: 1px solid var(--line);
@@ -761,6 +859,9 @@ button:disabled {
   display: grid;
   grid-template-rows: auto 1fr auto;
   gap: 14px;
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -777,6 +878,8 @@ button:disabled {
   justify-items: center;
   gap: 10px;
   min-height: 220px;
+  min-width: 0;
+  box-sizing: border-box;
   padding: 18px;
   border: 1px solid rgba(255, 244, 223, 0.14);
   border-radius: 8px;
@@ -785,8 +888,10 @@ button:disabled {
 }
 
 .heal-card img {
+  display: block;
   width: 82px;
   height: 82px;
+  max-width: 100%;
   object-fit: contain;
 }
 
@@ -807,6 +912,9 @@ button:disabled {
 .shop-goods,
 .shop-trader,
 .shop-inventory {
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: rgba(35, 25, 18, 0.88);
@@ -838,6 +946,8 @@ button:disabled {
   justify-items: center;
   gap: 7px;
   min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
   padding: 10px;
   border: 1px solid rgba(255, 244, 223, 0.14);
   border-radius: 8px;
@@ -848,8 +958,10 @@ button:disabled {
 
 .shop-item-card img,
 .inventory-item-card img {
+  display: block;
   width: 54px;
   height: 54px;
+  max-width: 100%;
   object-fit: contain;
 }
 
@@ -932,9 +1044,11 @@ button:disabled {
 }
 
 .shop-trader img {
+  display: block;
   width: 100%;
   height: 100%;
   min-height: 290px;
+  min-width: 0;
   object-fit: contain;
   object-position: center bottom;
 }
@@ -960,12 +1074,38 @@ button:disabled {
 }
 
 .event-dialog {
-  max-width: min(420px, calc(100vw - 32px));
+  position: fixed;
+  inset: 0;
+  box-sizing: border-box;
+  width: 100vw;
+  max-width: none;
+  height: 100vh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: transparent;
+  cursor: var(--cursor-default), auto;
+}
+
+.event-dialog form {
+  display: grid;
+  justify-items: center;
+  min-width: 0;
+  margin: 0;
+}
+
+.event-dialog-panel {
+  width: fit-content;
+  max-width: min(420px, calc(var(--map-ui-design-width, 1500px) - 32px));
+  max-height: calc(var(--map-ui-design-height, 860px) - 32px);
+  padding: 18px;
+  overflow: auto;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--panel-strong);
   color: var(--text);
-  cursor: var(--cursor-default), auto;
 }
 
 .event-dialog::backdrop {
@@ -995,7 +1135,7 @@ button:disabled {
   inset: 0;
   z-index: 30;
   display: grid;
-  place-items: stretch;
+  place-items: center;
   overflow: hidden;
   background: rgba(0, 0, 0, var(--map-dialog-backdrop-opacity, 0.72));
   backdrop-filter: blur(var(--map-dialog-backdrop-blur, 5px));
@@ -1006,8 +1146,10 @@ button:disabled {
 }
 
 .map-dialog-scene {
-  position: relative;
-  min-height: 100vh;
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  min-width: 0;
   overflow: hidden;
   pointer-events: none;
 }
@@ -1016,7 +1158,9 @@ button:disabled {
   position: absolute;
   left: var(--map-dialog-character-left, 50%);
   bottom: var(--map-dialog-character-bottom, 150px);
-  width: var(--map-dialog-character-width, 72vw);
+  width: var(--map-dialog-character-width, 72%);
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
   transform: translateX(-50%);
   filter: drop-shadow(0 28px 36px rgba(0, 0, 0, 0.62));
@@ -1033,9 +1177,14 @@ button:disabled {
   left: 50%;
   bottom: 34px;
   width: min(780px, calc(100vw - 32px));
+  max-height: calc(100vh - 68px);
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
   display: grid;
   gap: 14px;
   padding: 18px;
+  overflow: auto;
   border: 1px solid rgba(255, 230, 168, 0.34);
   border-radius: 8px;
   background: rgba(20, 13, 8, 0.92);
@@ -1082,7 +1231,7 @@ button:disabled {
   display: grid;
   place-items: center;
   overflow: hidden;
-  padding: 30px;
+  padding: 0;
   background:
     radial-gradient(circle at center, rgba(255, 201, 105, 0.12), transparent 38%),
     rgba(0, 0, 0, 0.66);
@@ -1098,7 +1247,10 @@ button:disabled {
   grid-template-rows: 1fr auto;
   overflow: hidden;
   width: min(740px, 100%);
-  min-height: min(560px, calc(100vh - 60px));
+  min-width: 0;
+  min-height: min(560px, calc(var(--map-ui-design-height, 860px) - 60px));
+  max-height: calc(var(--map-ui-design-height, 860px) - 60px);
+  box-sizing: border-box;
   border: 1px solid rgba(255, 223, 157, 0.34);
   border-radius: 8px;
   background: rgba(20, 13, 8, 0.94);
@@ -1138,7 +1290,9 @@ button:disabled {
   justify-content: center;
   flex-wrap: wrap;
   gap: 18px;
-  min-height: 360px;
+  min-height: min(360px, 45vh);
+  min-width: 0;
+  overflow: auto;
   padding: 44px 30px 24px;
 }
 
@@ -1148,6 +1302,7 @@ button:disabled {
   justify-items: center;
   gap: 12px;
   min-width: 168px;
+  box-sizing: border-box;
   padding: 22px 24px;
   border-radius: 8px;
   cursor: var(--cursor-help), help;
@@ -1197,8 +1352,11 @@ button.reward-item {
 }
 
 .reward-item img {
+  display: block;
   width: 138px;
   height: 138px;
+  max-width: min(138px, 32vw);
+  max-height: min(138px, 28vh);
   object-fit: contain;
   filter: drop-shadow(0 15px 26px rgba(0, 0, 0, 0.52));
   opacity: 0;
@@ -1231,6 +1389,8 @@ button.reward-item {
   display: grid;
   justify-items: center;
   gap: 14px;
+  min-width: 0;
+  box-sizing: border-box;
   padding: 18px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -1252,12 +1412,12 @@ button.reward-item {
 @keyframes rewardWindowIn {
   from {
     opacity: 0;
-    transform: translateY(18px) scale(0.96);
+    transform: translate(-50%, calc(-50% + 18px)) scale(0.96);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translate(-50%, -50%) scale(1);
   }
 }
 
@@ -1420,16 +1580,20 @@ button.reward-item {
   left: var(--battle-mini-menu-panel-left, clamp(18px, 8vw, 132px));
   z-index: 1;
   display: grid;
-  gap: 14px;
-  padding: 16px;
+  grid-template-columns: var(--battle-popup-top-button-size, 64px);
+  grid-auto-rows: var(--battle-popup-top-button-size, 64px);
+  align-items: start;
+  justify-items: start;
+  gap: var(--battle-popup-menu-gap, 14px);
+  padding: var(--battle-popup-padding, 16px);
   border: 1px solid rgba(255, 238, 194, 0.36);
-  border-radius: 16px;
+  border-radius: var(--battle-popup-radius, 16px);
   background: rgba(37, 25, 16, 0.78);
   box-shadow:
     0 18px 42px rgba(0, 0, 0, 0.42),
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(6px);
-  transform: translateX(-18px);
+  transform: translateX(var(--battle-popup-shift, -18px));
   transition: transform 180ms ease;
 }
 
@@ -1442,31 +1606,45 @@ button.reward-item {
   top: var(--battle-mini-menu-anchor-top, 16px);
   left: var(--battle-mini-menu-anchor-left, 16px);
   z-index: 2;
+  box-sizing: border-box;
+  flex: 0 0 auto;
   display: grid;
   place-items: center;
   width: var(--battle-mini-menu-anchor-width, 78px);
   height: var(--battle-mini-menu-anchor-height, 78px);
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: 1 / 1;
   padding: 0;
   border: 1px solid rgba(255, 238, 194, 0.24);
   border-radius: 8px;
+  appearance: none;
   background: rgba(255, 220, 165, 0.18);
   box-shadow:
     inset 0 0 0 3px rgba(255, 241, 169, 0.9),
     0 0 18px rgba(255, 241, 169, 0.5);
+  overflow: hidden;
+  line-height: 0;
   cursor: var(--cursor-active), pointer;
 }
 
 .battle-mini-menu-anchor img {
-  max-width: 82%;
-  max-height: 82%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: 82%;
+  height: 82%;
+  transform: translate(-50%, -50%);
   object-fit: contain;
+  pointer-events: none;
 }
 
 .battle-inventory-overlay {
   position: fixed;
   inset: 0;
   z-index: 74;
-  --battle-slot-size: clamp(72px, calc(108px * var(--battle-current-scale, 1)), 150px);
+  --battle-slot-size: var(--battle-popup-slot-size, 108px);
   display: block;
   opacity: 0;
   pointer-events: none;
@@ -1485,23 +1663,32 @@ button.reward-item {
   top: var(--battle-inventory-anchor-top, 16px);
   left: var(--battle-inventory-anchor-left, 16px);
   z-index: 2;
+  box-sizing: border-box;
+  flex: 0 0 auto;
   display: grid;
   place-items: center;
   width: var(--battle-inventory-anchor-width, 78px);
   height: var(--battle-inventory-anchor-height, 78px);
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: 1 / 1;
   padding: 0;
   border: 1px solid rgba(255, 238, 194, 0.24);
   border-radius: 8px;
+  appearance: none;
   background: rgba(255, 220, 165, 0.18);
   box-shadow:
     inset 0 0 0 3px rgba(255, 241, 169, 0.9),
     0 0 18px rgba(255, 241, 169, 0.5);
+  overflow: hidden;
+  line-height: 0;
   cursor: var(--cursor-active), pointer;
 }
 
 .battle-inventory-anchor img {
-  max-width: 82%;
-  max-height: 82%;
+  display: block;
+  width: 82%;
+  height: 82%;
   object-fit: contain;
 }
 
@@ -1512,18 +1699,18 @@ button.reward-item {
   z-index: 1;
   display: grid !important;
   grid-template-columns: repeat(6, var(--battle-slot-size, 72px));
-  gap: 10px;
-  max-width: calc(100vw - var(--battle-inventory-panel-left, 120px) - 18px);
-  padding: 16px;
+  gap: var(--battle-popup-inventory-gap, 10px);
+  max-width: calc(100vw - var(--battle-inventory-panel-left, 120px) - var(--battle-popup-edge-gap, 18px));
+  padding: var(--battle-popup-padding, 16px);
   overflow-x: auto;
   border: 1px solid rgba(255, 238, 194, 0.36);
-  border-radius: 16px;
+  border-radius: var(--battle-popup-radius, 16px);
   background: rgba(37, 25, 16, 0.78);
   box-shadow:
     0 18px 42px rgba(0, 0, 0, 0.42),
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(6px);
-  transform: translateX(-18px);
+  transform: translateX(var(--battle-popup-shift, -18px));
   transition: transform 180ms ease;
 }
 
@@ -1532,17 +1719,29 @@ button.reward-item {
 }
 
 .battle-top-button {
-  height: 64px;
-  width: 64px;
+  height: var(--battle-popup-top-button-size, 64px);
+  width: var(--battle-popup-top-button-size, 64px);
+  min-width: 0;
+  min-height: 0;
+  max-width: var(--battle-popup-top-button-size, 64px);
+  max-height: var(--battle-popup-top-button-size, 64px);
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  justify-self: start;
+  align-self: start;
+  aspect-ratio: 1 / 1;
   padding: 0;
   border: 1px solid rgba(255, 238, 194, 0.32);
   position: relative;
-  border-radius: 14px;
+  border-radius: var(--battle-popup-top-button-radius, 14px);
+  appearance: none;
   background: rgba(48, 33, 22, 0.34);
   color: #fff7e7;
   font-weight: 700;
   display: grid;
   place-items: center;
+  overflow: hidden;
+  line-height: 0;
   cursor: var(--cursor-active), pointer;
   backdrop-filter: blur(3px);
 }
@@ -1552,9 +1751,24 @@ button.reward-item {
 }
 
 .battle-top-button-icon {
+  display: block;
   width: var(--battle-top-button-icon-size, 38px);
   height: var(--battle-top-button-icon-size, 38px);
+  max-width: 94%;
+  max-height: 94%;
   object-fit: contain;
+  pointer-events: none;
+}
+
+.battle-mini-menu-overlay .battle-top-button-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(var(--battle-top-button-icon-size, 38px), 94%);
+  height: min(var(--battle-top-button-icon-size, 38px), 94%);
+  max-width: none;
+  max-height: none;
+  transform: translate(-50%, -50%);
 }
 
 .battle-top-button-label {
@@ -2655,11 +2869,11 @@ button.reward-item {
 
 .battle-scaffold-inventory-quantity {
   position: absolute;
-  right: 5px;
-  bottom: 3px;
-  min-width: 20px;
+  right: var(--battle-popup-quantity-offset-x, 5px);
+  bottom: var(--battle-popup-quantity-offset-y, 3px);
+  min-width: var(--battle-popup-quantity-min-width, 20px);
   color: #fff7e7;
-  font-size: 24px;
+  font-size: var(--battle-popup-quantity-font-size, 24px);
   font-weight: 800;
   text-align: center;
   text-shadow:
@@ -3015,41 +3229,10 @@ button.reward-item {
 }
 
 @media (max-width: 720px) {
-  /* На мобильном кнопки карты уходят вниз, а shop/heal становятся одноколоночными. */
+  /* На мобильном сама карта остается прокручиваемой; map UI масштабируется отдельным виртуальным слоем. */
   .app-shell {
     padding: 14px;
     grid-template-rows: auto auto 1fr auto;
-  }
-
-  .status-row {
-    align-items: start;
-    flex-direction: column;
-  }
-
-  .map-actions {
-    top: auto;
-    right: 10px;
-    bottom: 10px;
-    left: 10px;
-    justify-content: stretch;
-    width: auto;
-  }
-
-  .map-actions button {
-    flex: 1;
-    padding: 0 8px;
-  }
-
-  .map-top-button {
-    width: 52px;
-    height: 52px;
-    flex: 0 0 auto;
-    margin-right: 4px;
-  }
-
-  .map-top-button-icon {
-    width: 32px;
-    height: 32px;
   }
 
   .map-viewport {
@@ -3057,37 +3240,7 @@ button.reward-item {
     min-height: 100vh;
   }
 
-  .map-hud {
-    top: 10px;
-    left: 10px;
-    width: 118px;
-    max-height: calc(100vh - 92px);
-  }
-
-  .hud-item {
-    width: 106px;
-    height: 38px;
-    padding: 4px 7px;
-  }
-
   .map-board {
     min-height: 1080px;
-  }
-
-  .shop-overlay {
-    padding: 12px;
-  }
-
-  .shop-panel {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
-  }
-
-  .heal-panel {
-    grid-template-columns: 1fr;
-  }
-
-  .shop-inventory {
-    grid-column: auto;
   }
 }

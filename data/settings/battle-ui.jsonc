@@ -61,7 +61,7 @@
     "viewportPaddingPx": 8,
     "allowUpscale": true,
     "upscaleFactor": 0.5,
-    "minScale": 0.5
+    "minScale": 0.1
   },
   "shuffleButton": {
     "textKey": "battle.shuffle.button",

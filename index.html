@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Map Module Prototype</title>
-    <link rel="stylesheet" href="./src/styles.css?v=2026-06-04-battle-layout-frame" />
+    <link rel="stylesheet" href="./src/styles.css?v=2026-06-05-map-ui-scale-fix" />
   </head>
   <body>
     <section id="loadingOverlay" class="loading-overlay" aria-live="polite" aria-busy="true">
@@ -33,19 +33,23 @@
 
     <!-- Карта и игровые overlay живут в одном shell: JS скрывает меню и показывает этот слой после START. -->
     <main class="app-shell">
-      <header class="map-actions">
-        <button id="surrenderButton" type="button">Surrender</button>
-        <button id="mapSettingsButton" type="button">Settings</button>
-        <button id="eventLogButton" type="button">Log</button>
-      </header>
+      <div id="mapUiFrame" class="map-ui-frame">
+        <div id="mapUiPanel" class="map-ui-panel">
+          <header class="map-actions">
+            <button id="surrenderButton" type="button">Surrender</button>
+            <button id="mapSettingsButton" type="button">Settings</button>
+            <button id="eventLogButton" type="button">Log</button>
+          </header>
 
-      <section class="status-row" aria-live="polite">
-        <span id="campaignStatus">Campaign loading</span>
-        <span id="selectionStatus">No node selected</span>
-      </section>
+          <section class="status-row" aria-live="polite">
+            <span id="campaignStatus">Campaign loading</span>
+            <span id="selectionStatus">No node selected</span>
+          </section>
 
-      <!-- HUD полностью строится из runtime playerState и data/settings/items.jsonc при старте игры. -->
-      <section id="mapHud" class="map-hud" aria-label="Player status"></section>
+          <!-- HUD полностью строится из runtime playerState и data/settings/items.jsonc при старте игры. -->
+          <section id="mapHud" class="map-hud" aria-label="Player status"></section>
+        </div>
+      </div>
 
       <!-- mapBoard очищается и полностью перерисовывается при каждом render(). -->
       <section class="map-stage">
@@ -58,76 +62,92 @@
 
       <!-- Диалоговая точка карты: затемняет/размывает карту, показывает персонажа и варианты ответа. -->
       <section id="mapDialogOverlay" class="map-dialog-overlay hidden" aria-label="Dialog">
-        <div class="map-dialog-scene">
-          <img id="mapDialogCharacter" class="map-dialog-character" alt="" />
-          <div class="map-dialog-box">
-            <p id="mapDialogText"></p>
-            <div id="mapDialogAnswers" class="map-dialog-answers"></div>
+        <div class="map-ui-overlay-frame">
+          <div class="map-ui-overlay-panel">
+            <div class="map-dialog-scene">
+              <img id="mapDialogCharacter" class="map-dialog-character" alt="" />
+              <div class="map-dialog-box">
+                <p id="mapDialogText"></p>
+                <div id="mapDialogAnswers" class="map-dialog-answers"></div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       <!-- Магазин использует payload выбранной точки shop из JSONC карты. -->
       <section id="shopOverlay" class="shop-overlay hidden" aria-label="Trader shop">
-        <div class="shop-panel">
-          <div class="shop-goods">
-            <h2 id="shopTitle">Trader</h2>
-            <div id="shopItems" class="shop-items"></div>
-            <div id="shopConfirm" class="shop-confirm hidden">
-              <p id="shopConfirmText"></p>
-              <div>
-                <button id="shopConfirmNoButton" type="button">No</button>
-                <button id="shopConfirmYesButton" type="button">Yes</button>
+        <div class="map-ui-overlay-frame">
+          <div class="map-ui-overlay-panel">
+            <div class="shop-panel">
+              <div class="shop-goods">
+                <h2 id="shopTitle">Trader</h2>
+                <div id="shopItems" class="shop-items"></div>
+                <div id="shopConfirm" class="shop-confirm hidden">
+                  <p id="shopConfirmText"></p>
+                  <div>
+                    <button id="shopConfirmNoButton" type="button">No</button>
+                    <button id="shopConfirmYesButton" type="button">Yes</button>
+                  </div>
+                </div>
+                <p id="shopErrorText" class="shop-error hidden"></p>
+                <div class="shop-actions">
+                  <button id="shopLeaveButton" type="button">Leave</button>
+                  <button id="shopBuyButton" type="button">Buy</button>
+                </div>
+              </div>
+              <div class="shop-trader">
+                <img id="shopEventImage" alt="" />
+                <p id="shopDialogText"></p>
+              </div>
+              <div class="shop-inventory">
+                <h2 id="inventoryTitle">Inventory</h2>
+                <div id="inventoryItems" class="inventory-items"></div>
               </div>
             </div>
-            <p id="shopErrorText" class="shop-error hidden"></p>
-            <div class="shop-actions">
-              <button id="shopLeaveButton" type="button">Leave</button>
-              <button id="shopBuyButton" type="button">Buy</button>
-            </div>
-          </div>
-          <div class="shop-trader">
-            <img id="shopEventImage" alt="" />
-            <p id="shopDialogText"></p>
-          </div>
-          <div class="shop-inventory">
-            <h2 id="inventoryTitle">Inventory</h2>
-            <div id="inventoryItems" class="inventory-items"></div>
           </div>
         </div>
       </section>
 
       <!-- Лечение использует payload выбранной точки heal из JSONC карты. -->
       <section id="healOverlay" class="shop-overlay hidden" aria-label="Healing">
-        <div class="heal-panel">
-          <div class="heal-info">
-            <h2 id="healTitle">Healing</h2>
-            <div class="heal-card">
-              <img src="./data/Assets/icons/hearts.png" alt="" />
-              <strong id="healAmountText"></strong>
-              <span id="healCurrentHpText"></span>
+        <div class="map-ui-overlay-frame">
+          <div class="map-ui-overlay-panel">
+            <div class="heal-panel">
+              <div class="heal-info">
+                <h2 id="healTitle">Healing</h2>
+                <div class="heal-card">
+                  <img src="./data/Assets/icons/hearts.png" alt="" />
+                  <strong id="healAmountText"></strong>
+                  <span id="healCurrentHpText"></span>
+                </div>
+                <div class="heal-actions">
+                  <button id="healApplyButton" type="button"></button>
+                  <button id="healLeaveButton" type="button"></button>
+                </div>
+                <p id="healErrorText" class="shop-error hidden"></p>
+              </div>
+              <div class="shop-trader">
+                <img id="healEventImage" alt="" />
+                <p id="healDialogText"></p>
+              </div>
             </div>
-            <div class="heal-actions">
-              <button id="healApplyButton" type="button"></button>
-              <button id="healLeaveButton" type="button"></button>
-            </div>
-            <p id="healErrorText" class="shop-error hidden"></p>
-          </div>
-          <div class="shop-trader">
-            <img id="healEventImage" alt="" />
-            <p id="healDialogText"></p>
           </div>
         </div>
       </section>
 
       <!-- Награда показывает замыленное eventImage и крупные иконки полученных предметов. -->
       <section id="rewardOverlay" class="reward-overlay hidden" aria-label="Reward">
-        <div class="reward-window">
-          <div id="rewardBackdrop" class="reward-backdrop"></div>
-          <div id="rewardItems" class="reward-items"></div>
-          <div class="reward-message">
-            <p id="rewardDialogText"></p>
-            <button id="rewardClaimButton" type="button"></button>
+        <div class="map-ui-overlay-frame">
+          <div class="map-ui-overlay-panel">
+            <div class="reward-window">
+              <div id="rewardBackdrop" class="reward-backdrop"></div>
+              <div id="rewardItems" class="reward-items"></div>
+              <div class="reward-message">
+                <p id="rewardDialogText"></p>
+                <button id="rewardClaimButton" type="button"></button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -135,57 +155,73 @@
 
     <!-- Один overlay настроек используется и в меню, и поверх карты. -->
     <section id="settingsOverlay" class="modal-overlay hidden">
-      <div id="settingsPanel" class="settings-panel">
-        <h2 id="settingsTitle">Settings</h2>
-        <label>
-          <span id="musicVolumeLabel">Music volume</span>
-          <input id="musicVolumeInput" type="range" min="0" max="1" step="0.05" />
-        </label>
-        <label>
-          <span id="soundVolumeLabel">Sound volume</span>
-          <input id="soundVolumeInput" type="range" min="0" max="1" step="0.05" />
-        </label>
-        <label>
-          <span id="settingsLanguageLabel">Language</span>
-          <select id="settingsLanguageSelect">
-            <option value="en">EN</option>
-            <option value="ru">RU</option>
-          </select>
-        </label>
-        <div class="settings-actions">
-          <button id="resetSettingsButton" type="button">Reset</button>
-          <button id="backSettingsButton" type="button">Back</button>
+      <div class="map-ui-overlay-frame">
+        <div class="map-ui-overlay-panel">
+          <div id="settingsPanel" class="settings-panel">
+            <h2 id="settingsTitle">Settings</h2>
+            <label>
+              <span id="musicVolumeLabel">Music volume</span>
+              <input id="musicVolumeInput" type="range" min="0" max="1" step="0.05" />
+            </label>
+            <label>
+              <span id="soundVolumeLabel">Sound volume</span>
+              <input id="soundVolumeInput" type="range" min="0" max="1" step="0.05" />
+            </label>
+            <label>
+              <span id="settingsLanguageLabel">Language</span>
+              <select id="settingsLanguageSelect">
+                <option value="en">EN</option>
+                <option value="ru">RU</option>
+              </select>
+            </label>
+            <div class="settings-actions">
+              <button id="resetSettingsButton" type="button">Reset</button>
+              <button id="backSettingsButton" type="button">Back</button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- Лог событий перенесен из нижней панели в отдельный overlay. -->
     <section id="eventLogOverlay" class="modal-overlay hidden">
-      <div class="event-log-modal">
-        <h2 id="eventLogTitle">Event log</h2>
-        <ol id="eventLog"></ol>
-        <button id="eventLogBackButton" type="button">Back</button>
+      <div class="map-ui-overlay-frame">
+        <div class="map-ui-overlay-panel">
+          <div class="event-log-modal">
+            <h2 id="eventLogTitle">Event log</h2>
+            <ol id="eventLog"></ol>
+            <button id="eventLogBackButton" type="button">Back</button>
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- Диалог сдачи возвращает в главное меню только по подтверждению. -->
     <section id="surrenderOverlay" class="modal-overlay hidden">
-      <div class="surrender-modal">
-        <p id="surrenderText"></p>
-        <div>
-          <button id="surrenderConfirmButton" type="button"></button>
-          <button id="surrenderCancelButton" type="button"></button>
+      <div class="map-ui-overlay-frame">
+        <div class="map-ui-overlay-panel">
+          <div class="surrender-modal">
+            <p id="surrenderText"></p>
+            <div>
+              <button id="surrenderConfirmButton" type="button"></button>
+              <button id="surrenderCancelButton" type="button"></button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- Служебный dialog для простых сообщений вроде skip и victory. -->
     <dialog id="eventDialog" class="event-dialog">
-      <form method="dialog">
-        <img id="eventDialogImage" alt="" hidden />
-        <p id="eventDialogText"></p>
-        <button type="submit">OK</button>
-      </form>
+      <div class="map-ui-overlay-frame">
+        <div class="map-ui-overlay-panel">
+          <form class="event-dialog-panel" method="dialog">
+            <img id="eventDialogImage" alt="" hidden />
+            <p id="eventDialogText"></p>
+            <button type="submit">OK</button>
+          </form>
+        </div>
+      </div>
     </dialog>
 
     <script type="module">

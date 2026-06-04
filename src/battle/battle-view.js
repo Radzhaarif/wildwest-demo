@@ -62,8 +62,23 @@ const DEFAULT_BATTLE_LAYOUT = {
   viewportPaddingPx: 8,
   allowUpscale: true,
   upscaleFactor: 0.5,
-  minScale: 0.5,
+  minScale: 0.1,
 };
+const BATTLE_POPUP_MENU_GAP_PX = 14;
+const BATTLE_POPUP_INVENTORY_GAP_PX = 10;
+const BATTLE_POPUP_PADDING_PX = 16;
+const BATTLE_POPUP_RADIUS_PX = 16;
+const BATTLE_POPUP_SHIFT_PX = -18;
+const BATTLE_POPUP_EDGE_GAP_PX = 18;
+const BATTLE_POPUP_INVENTORY_SLOT_PX = 108;
+const BATTLE_POPUP_TOP_BUTTON_SIZE_PX = 64;
+const BATTLE_POPUP_TOP_BUTTON_RADIUS_PX = 14;
+const BATTLE_POPUP_INVENTORY_QUANTITY_FONT_PX = 24;
+const BATTLE_POPUP_INVENTORY_QUANTITY_OFFSET_X_PX = 5;
+const BATTLE_POPUP_INVENTORY_QUANTITY_OFFSET_Y_PX = 3;
+const BATTLE_POPUP_INVENTORY_QUANTITY_MIN_WIDTH_PX = 20;
+const BATTLE_POPUP_INVENTORY_COLUMNS = 6;
+const BATTLE_POPUP_INVENTORY_VERTICAL_OFFSET_RATIO = 0.25;
 const ASSET_CACHE_BUSTER = Date.now();
 let battleTooltipHideTimeoutId = null;
 let battleTooltipShowTimeoutId = null;
@@ -440,10 +455,13 @@ function positionBattleMiniMenu(context, renderTargets) {
   const skullRect = skullSlot?.getBoundingClientRect();
 
   if (menuRect && Number.isFinite(menuRect.left) && Number.isFinite(menuRect.top)) {
-    overlay.style.setProperty("--battle-mini-menu-anchor-left", `${menuRect.left}px`);
-    overlay.style.setProperty("--battle-mini-menu-anchor-top", `${menuRect.top}px`);
-    overlay.style.setProperty("--battle-mini-menu-anchor-width", `${menuRect.width}px`);
-    overlay.style.setProperty("--battle-mini-menu-anchor-height", `${menuRect.height}px`);
+    const anchorSize = Math.max(menuRect.width, menuRect.height);
+    const anchorLeft = menuRect.left + (menuRect.width - anchorSize) / 2;
+    const anchorTop = menuRect.top + (menuRect.height - anchorSize) / 2;
+    overlay.style.setProperty("--battle-mini-menu-anchor-left", `${anchorLeft}px`);
+    overlay.style.setProperty("--battle-mini-menu-anchor-top", `${anchorTop}px`);
+    overlay.style.setProperty("--battle-mini-menu-anchor-width", `${anchorSize}px`);
+    overlay.style.setProperty("--battle-mini-menu-anchor-height", `${anchorSize}px`);
   }
 
   if (skullRect && Number.isFinite(skullRect.left) && Number.isFinite(skullRect.top)) {
@@ -538,12 +556,45 @@ function positionBattleInventory(context, renderTargets) {
     return;
   }
 
-  overlay.style.setProperty("--battle-inventory-anchor-left", `${bagRect.left}px`);
-  overlay.style.setProperty("--battle-inventory-anchor-top", `${bagRect.top}px`);
-  overlay.style.setProperty("--battle-inventory-anchor-width", `${bagRect.width}px`);
-  overlay.style.setProperty("--battle-inventory-anchor-height", `${bagRect.height}px`);
-  overlay.style.setProperty("--battle-inventory-panel-left", `${bagRect.right + 14}px`);
-  overlay.style.setProperty("--battle-inventory-panel-top", `${bagRect.top}px`);
+  const battleScale = getBattleRenderedScale(renderTargets?.panel);
+  const panelGap = BATTLE_POPUP_MENU_GAP_PX * battleScale;
+  const slotSize = BATTLE_POPUP_INVENTORY_SLOT_PX * battleScale;
+  const inventoryGap = BATTLE_POPUP_INVENTORY_GAP_PX * battleScale;
+  const padding = BATTLE_POPUP_PADDING_PX * battleScale;
+  const edgeGap = BATTLE_POPUP_EDGE_GAP_PX * battleScale;
+  const slotCount = renderTargets?.handItems?.querySelectorAll(".battle-scaffold-inventory-slot").length
+    || getBattleHandItemIds(context).length;
+  const rowCount = Math.max(1, Math.ceil(slotCount / BATTLE_POPUP_INVENTORY_COLUMNS));
+  const panelWidth = BATTLE_POPUP_INVENTORY_COLUMNS * slotSize
+    + (BATTLE_POPUP_INVENTORY_COLUMNS - 1) * inventoryGap
+    + 2 * padding
+    + 2;
+  const panelHeight = rowCount * slotSize
+    + (rowCount - 1) * inventoryGap
+    + 2 * padding
+    + 2;
+  const frameRect = renderTargets?.frame?.getBoundingClientRect();
+  const minPanelLeft = Number.isFinite(frameRect?.left) ? frameRect.left + edgeGap : edgeGap;
+  const maxPanelLeft = Number.isFinite(frameRect?.right)
+    ? frameRect.right - panelWidth - edgeGap
+    : window.innerWidth - panelWidth - edgeGap;
+  const minPanelTop = Number.isFinite(frameRect?.top) ? frameRect.top + edgeGap : edgeGap;
+  const preferredPanelLeft = bagRect.right + panelGap;
+  const panelLeft = maxPanelLeft >= minPanelLeft
+    ? Math.min(Math.max(preferredPanelLeft, minPanelLeft), maxPanelLeft)
+    : minPanelLeft;
+  const preferredPanelTop = bagRect.top - panelHeight * BATTLE_POPUP_INVENTORY_VERTICAL_OFFSET_RATIO;
+  const panelTop = Math.max(preferredPanelTop, minPanelTop);
+  const anchorSize = Math.max(bagRect.width, bagRect.height);
+  const anchorLeft = bagRect.left + (bagRect.width - anchorSize) / 2;
+  const anchorTop = bagRect.top + (bagRect.height - anchorSize) / 2;
+
+  overlay.style.setProperty("--battle-inventory-anchor-left", `${anchorLeft}px`);
+  overlay.style.setProperty("--battle-inventory-anchor-top", `${anchorTop}px`);
+  overlay.style.setProperty("--battle-inventory-anchor-width", `${anchorSize}px`);
+  overlay.style.setProperty("--battle-inventory-anchor-height", `${anchorSize}px`);
+  overlay.style.setProperty("--battle-inventory-panel-left", `${panelLeft}px`);
+  overlay.style.setProperty("--battle-inventory-panel-top", `${panelTop}px`);
 }
 
 function createBattleLogOverlay(context) {
@@ -5247,6 +5298,40 @@ function closeScaffold(overlay) {
   overlay.remove();
 }
 
+function applyBattlePopoverScale(element, scale) {
+  if (!element) {
+    return;
+  }
+
+  const safeScale = Number.isFinite(scale) && scale > 0 ? scale : 1;
+  element.style.setProperty("--battle-current-scale", String(safeScale));
+  element.style.setProperty("--battle-popup-menu-gap", `${BATTLE_POPUP_MENU_GAP_PX * safeScale}px`);
+  element.style.setProperty("--battle-popup-inventory-gap", `${BATTLE_POPUP_INVENTORY_GAP_PX * safeScale}px`);
+  element.style.setProperty("--battle-popup-padding", `${BATTLE_POPUP_PADDING_PX * safeScale}px`);
+  element.style.setProperty("--battle-popup-radius", `${BATTLE_POPUP_RADIUS_PX * safeScale}px`);
+  element.style.setProperty("--battle-popup-shift", `${BATTLE_POPUP_SHIFT_PX * safeScale}px`);
+  element.style.setProperty("--battle-popup-edge-gap", `${BATTLE_POPUP_EDGE_GAP_PX * safeScale}px`);
+  element.style.setProperty("--battle-popup-slot-size", `${BATTLE_POPUP_INVENTORY_SLOT_PX * safeScale}px`);
+  element.style.setProperty("--battle-popup-top-button-size", `${BATTLE_POPUP_TOP_BUTTON_SIZE_PX * safeScale}px`);
+  element.style.setProperty("--battle-popup-top-button-radius", `${BATTLE_POPUP_TOP_BUTTON_RADIUS_PX * safeScale}px`);
+  element.style.setProperty(
+    "--battle-popup-quantity-font-size",
+    `${BATTLE_POPUP_INVENTORY_QUANTITY_FONT_PX * safeScale}px`,
+  );
+  element.style.setProperty(
+    "--battle-popup-quantity-offset-x",
+    `${BATTLE_POPUP_INVENTORY_QUANTITY_OFFSET_X_PX * safeScale}px`,
+  );
+  element.style.setProperty(
+    "--battle-popup-quantity-offset-y",
+    `${BATTLE_POPUP_INVENTORY_QUANTITY_OFFSET_Y_PX * safeScale}px`,
+  );
+  element.style.setProperty(
+    "--battle-popup-quantity-min-width",
+    `${BATTLE_POPUP_INVENTORY_QUANTITY_MIN_WIDTH_PX * safeScale}px`,
+  );
+}
+
 function setupBattleViewportScale(context, overlay, frame, panel, renderTargets, afterApply) {
   const applyScale = () => {
     if (!overlay?.isConnected || !frame?.isConnected || !panel?.isConnected) {
@@ -5272,6 +5357,8 @@ function setupBattleViewportScale(context, overlay, frame, panel, renderTargets,
     frame.style.setProperty("--battle-design-height", `${layout.designHeightPx}px`);
     frame.style.setProperty("--battle-scale", String(scale));
     overlay.style.setProperty("--battle-current-scale", String(scale));
+    applyBattlePopoverScale(renderTargets.miniMenuOverlay, scale);
+    applyBattlePopoverScale(renderTargets.inventoryOverlay, scale);
     panel.style.setProperty("--battle-design-width", `${layout.designWidthPx}px`);
     panel.style.setProperty("--battle-design-height", `${layout.designHeightPx}px`);
     panel.style.setProperty("--battle-scale", String(scale));

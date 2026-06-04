@@ -1,5 +1,13 @@
 {
   // UI-only configuration for the campaign map. Gameplay map generation stays in data/maps/*.jsonc.
+  "layout": {
+    "designWidthPx": 1500,
+    "designHeightPx": 860,
+    "viewportPaddingPx": 8,
+    "allowUpscale": true,
+    "upscaleFactor": 0.5,
+    "minScale": 0.1
+  },
   "topButtons": {
     "surrender": {
       "textKey": "ui.surrender",
