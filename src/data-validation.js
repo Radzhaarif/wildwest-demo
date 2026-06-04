@@ -689,6 +689,7 @@ function validateBattleUiConfigObject(config, source, issues, requiredTextKeys, 
   }
 
   validateBattleHandItemIds(config.handItemIds, `${source}.handItemIds`, issues, requiredItemIds);
+  validateBattleLayoutConfig(config.layout, `${source}.layout`, issues);
   validateBattleBoardConfig(config.board, `${source}.board`, issues);
   if (config.limits !== undefined && (!config.limits || typeof config.limits !== "object")) {
     issues.push(`${source}.limits: must be an object`);
@@ -725,6 +726,21 @@ function validateBattleUiTopButtons(topButtons, path, issues, requiredTextKeys) 
       requireNumberInRange(buttonConfig.iconSizePx, `${prefix}.iconSizePx`, 1, Infinity, issues);
     }
   }
+}
+
+function validateBattleLayoutConfig(layout, path, issues) {
+  if (!layout || typeof layout !== "object") {
+    issues.push(`${path}: must be an object`);
+    return;
+  }
+  requireIntegerInRange(layout.designWidthPx, `${path}.designWidthPx`, 1, Infinity, issues);
+  requireIntegerInRange(layout.designHeightPx, `${path}.designHeightPx`, 1, Infinity, issues);
+  requireNumberInRange(layout.viewportPaddingPx, `${path}.viewportPaddingPx`, 0, Infinity, issues);
+  if (typeof layout.allowUpscale !== "boolean") {
+    issues.push(`${path}.allowUpscale: expected boolean`);
+  }
+  requireNumberInRange(layout.upscaleFactor, `${path}.upscaleFactor`, 0, 1, issues);
+  requireNumberInRange(layout.minScale, `${path}.minScale`, 0.1, 2, issues);
 }
 
 function validateBattleHandItemIds(handItemIds, path, issues, requiredItemIds) {

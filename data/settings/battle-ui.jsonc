@@ -55,6 +55,14 @@
       "iconSizePx": 60
     }
   },
+  "layout": {
+    "designWidthPx": 1500,
+    "designHeightPx": 860,
+    "viewportPaddingPx": 8,
+    "allowUpscale": true,
+    "upscaleFactor": 0.5,
+    "minScale": 0.5
+  },
   "shuffleButton": {
     "textKey": "battle.shuffle.button",
     "icon": "data/Assets/icons/mix.png",

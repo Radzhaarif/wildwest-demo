@@ -9,7 +9,7 @@ This folder contains the isolated battle module. The map can call `startBattle()
 - `battle-data.js` - battle data loading boundary.
 - `battle-engine.js` - pure battle and match-3 logic without DOM.
 - `battle-view.js` - DOM view boundary for the temporary battle screen.
-- `data/settings/battle-ui.jsonc` - battle-screen presentation config: UI text keys, icon paths, top-button icon sizes, battle-window background, board size, progress bar colors, hint priority, and animation timings.
+- `data/settings/battle-ui.jsonc` - battle-screen presentation config: UI text keys, icon paths, top-button icon sizes, battle-window background, virtual layout size and scaling, board size, progress bar colors, hint priority, and animation timings.
 - `data/settings/battle-ui.example.jsonc` - commented example that explains each battle UI config field.
 
 ## Current Match-3 Engine
@@ -55,6 +55,7 @@ The engine does not update the map, touch DOM, animate anything, run enemy AI, o
 - a 12x9 match-3 board generated from `category: "match-3"` items, while created `rare_match-3` items can still join matches by shared `type`;
 - battle UI icons and labels loaded from `data/settings/battle-ui.jsonc`;
 - battle-window background loaded from `data/settings/battle-ui.jsonc`;
+- battle window layout uses `battle-ui.layout`: the screen is built inside a stable virtual size and scaled as one panel to fit the browser viewport, with soft upscale on larger screens. `.battle-scaffold-frame` owns the scaled layout size, while `.battle-scaffold-panel` owns the unscaled virtual contents;
 - battle menu buttons `ui.surrender`, `menu.settings`, and `ui.eventLog` are opened from the `little_menu` slot in the special-item column; their icons and `iconSizePx` are configured in `topButtons`;
 - while the mini menu is open, the battle window is heavily dimmed and the battle runtime is paused; clicking the menu button area again or any empty dimmed area closes the menu and resumes the runtime;
 - the battle log button now lives in the mini menu; short battle messages are no longer shown inside the enemy info panel;

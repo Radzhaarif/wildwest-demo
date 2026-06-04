@@ -56,6 +56,14 @@ const DEFAULT_TOP_ACTION_BUTTONS = {
 const DEFAULT_CLOCK_WARNING_SECONDS = [1, 3, 5, 10, 15, 20, 30];
 const DEFAULT_CLOCK_WARNING_CHANGE_MS = 1000;
 const DEFAULT_CLOCK_WARNING_CHANGE_SCALE = 1.5;
+const DEFAULT_BATTLE_LAYOUT = {
+  designWidthPx: 1500,
+  designHeightPx: 860,
+  viewportPaddingPx: 8,
+  allowUpscale: true,
+  upscaleFactor: 0.5,
+  minScale: 0.5,
+};
 const ASSET_CACHE_BUSTER = Date.now();
 let battleTooltipHideTimeoutId = null;
 let battleTooltipShowTimeoutId = null;
@@ -156,6 +164,8 @@ function showBattleScaffold(context, root) {
     const panel = document.createElement("div");
     panel.className = "battle-scaffold-panel";
     panel.style.backgroundImage = `url("${resolveAssetPath(getBattleUiConfig(context).backgrounds.battleWindow)}")`;
+    const frame = document.createElement("div");
+    frame.className = "battle-scaffold-frame";
 
     const fxLayer = document.createElement("div");
     fxLayer.className = "battle-scaffold-fx-layer";
@@ -254,7 +264,8 @@ function showBattleScaffold(context, root) {
     leftBottom.append(shuffleButton);
     layout.append(leftColumn, rightColumn, leftBottom);
     panel.append(layout);
-    overlay.append(panel, miniMenuOverlay, inventoryOverlay, logOverlay, fxLayer);
+    frame.append(panel);
+    overlay.append(frame, miniMenuOverlay, inventoryOverlay, logOverlay, fxLayer);
     root.append(overlay);
 
     const alignBattleSideWidgetsToBoardRightEdge = () => {
@@ -264,9 +275,10 @@ function showBattleScaffold(context, root) {
       if (!Number.isFinite(boardRect.width) || !Number.isFinite(buttonRect.width) || !Number.isFinite(leftColumnRect.left)) {
         return;
       }
-      const offset = Math.max(0, boardRect.right - leftColumnRect.left - buttonRect.width + 200);
+      const battleScale = getBattleRenderedScale(panel);
+      const offset = Math.max(0, (boardRect.right - leftColumnRect.left - buttonRect.width) / battleScale + 200);
       leftBottom.style.setProperty("--battle-shuffle-container-left-offset", `${offset}px`);
-      const specialItemsOffset = boardRect.left - leftColumnRect.left - 125;
+      const specialItemsOffset = (boardRect.left - leftColumnRect.left) / battleScale - 125;
       specialItems.style.setProperty("--battle-special-items-left-offset", `${specialItemsOffset}px`);
     };
 
@@ -291,11 +303,21 @@ function showBattleScaffold(context, root) {
       logOverlay,
       battleFxLayer: fxLayer,
       overlay,
+      frame,
+      panel,
       resolve,
       lifecycleToken,
       attemptToken,
     };
     context.battleRenderTargets = renderTargets;
+    renderTargets.cleanupBattleViewportScale = setupBattleViewportScale(
+      context,
+      overlay,
+      frame,
+      panel,
+      renderTargets,
+      alignBattleSideWidgetsToBoardRightEdge,
+    );
     attachBattlePointerTracker(context, overlay);
     attachBattleLanguageChangeListener(context, renderTargets);
 
@@ -5225,6 +5247,131 @@ function closeScaffold(overlay) {
   overlay.remove();
 }
 
+function setupBattleViewportScale(context, overlay, frame, panel, renderTargets, afterApply) {
+  const applyScale = () => {
+    if (!overlay?.isConnected || !frame?.isConnected || !panel?.isConnected) {
+      return;
+    }
+
+    const layout = getBattleLayoutConfig(context);
+    const viewport = getBattleViewportSize();
+    const availableWidth = Math.max(1, viewport.width - layout.viewportPaddingPx * 2);
+    const availableHeight = Math.max(1, viewport.height - layout.viewportPaddingPx * 2);
+    const fitScale = Math.min(
+      availableWidth / layout.designWidthPx,
+      availableHeight / layout.designHeightPx,
+    );
+    const scale = fitScale > 1
+      ? (layout.allowUpscale ? 1 + (fitScale - 1) * layout.upscaleFactor : 1)
+      : Math.max(fitScale, layout.minScale);
+
+    overlay.style.setProperty("--battle-viewport-padding", `${layout.viewportPaddingPx}px`);
+    frame.style.width = `${layout.designWidthPx * scale}px`;
+    frame.style.height = `${layout.designHeightPx * scale}px`;
+    frame.style.setProperty("--battle-design-width", `${layout.designWidthPx}px`);
+    frame.style.setProperty("--battle-design-height", `${layout.designHeightPx}px`);
+    frame.style.setProperty("--battle-scale", String(scale));
+    overlay.style.setProperty("--battle-current-scale", String(scale));
+    panel.style.setProperty("--battle-design-width", `${layout.designWidthPx}px`);
+    panel.style.setProperty("--battle-design-height", `${layout.designHeightPx}px`);
+    panel.style.setProperty("--battle-scale", String(scale));
+    panel.dataset.battleScale = String(scale);
+    renderTargets.battleScale = scale;
+
+    requestAnimationFrame(() => {
+      if (!shouldContinueBattle(context, renderTargets)) {
+        return;
+      }
+      if (typeof afterApply === "function") {
+        afterApply();
+      }
+      if (context.battleState?.isMiniMenuOpen) {
+        positionBattleMiniMenu(context, renderTargets);
+      }
+      if (context.battleState?.isInventoryOpen) {
+        positionBattleInventory(context, renderTargets);
+      }
+    });
+  };
+
+  const resizeTarget = window.visualViewport || window;
+  resizeTarget.addEventListener("resize", applyScale);
+  window.addEventListener("orientationchange", applyScale);
+  context.cleanupBattleViewportScale = () => {
+    resizeTarget.removeEventListener("resize", applyScale);
+    window.removeEventListener("orientationchange", applyScale);
+  };
+  applyScale();
+  return context.cleanupBattleViewportScale;
+}
+
+function getBattleViewportSize() {
+  if (typeof window === "undefined") {
+    return { width: DEFAULT_BATTLE_LAYOUT.designWidthPx, height: DEFAULT_BATTLE_LAYOUT.designHeightPx };
+  }
+  const visualViewport = window.visualViewport;
+  return {
+    width: Number(visualViewport?.width) || window.innerWidth || document.documentElement.clientWidth || DEFAULT_BATTLE_LAYOUT.designWidthPx,
+    height: Number(visualViewport?.height) || window.innerHeight || document.documentElement.clientHeight || DEFAULT_BATTLE_LAYOUT.designHeightPx,
+  };
+}
+
+function getBattleLayoutConfig(context) {
+  const layout = getBattleUiConfig(context).layout || {};
+  const designWidthPx = getPositiveBattleLayoutNumber(
+    layout.designWidthPx,
+    DEFAULT_BATTLE_LAYOUT.designWidthPx,
+  );
+  const designHeightPx = getPositiveBattleLayoutNumber(
+    layout.designHeightPx,
+    DEFAULT_BATTLE_LAYOUT.designHeightPx,
+  );
+  const viewportPaddingPx = Math.max(0, getFiniteBattleLayoutNumber(
+    layout.viewportPaddingPx,
+    DEFAULT_BATTLE_LAYOUT.viewportPaddingPx,
+  ));
+  const upscaleFactor = clampBattleLayoutNumber(
+    getFiniteBattleLayoutNumber(layout.upscaleFactor, DEFAULT_BATTLE_LAYOUT.upscaleFactor),
+    0,
+    1,
+  );
+  const minScale = clampBattleLayoutNumber(
+    getFiniteBattleLayoutNumber(layout.minScale, DEFAULT_BATTLE_LAYOUT.minScale),
+    0.1,
+    2,
+  );
+
+  return {
+    designWidthPx,
+    designHeightPx,
+    viewportPaddingPx,
+    allowUpscale: typeof layout.allowUpscale === "boolean"
+      ? layout.allowUpscale
+      : DEFAULT_BATTLE_LAYOUT.allowUpscale,
+    upscaleFactor,
+    minScale,
+  };
+}
+
+function getPositiveBattleLayoutNumber(value, fallback) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function getFiniteBattleLayoutNumber(value, fallback) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function clampBattleLayoutNumber(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function getBattleRenderedScale(panel) {
+  const parsed = Number(panel?.dataset?.battleScale || panel?.style?.getPropertyValue("--battle-scale"));
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+}
+
 function startBattleLifecycle(context) {
   cancelBattleLifecycle(context);
   const token = { cancelled: false };
@@ -5313,6 +5460,10 @@ function normalizeBattleRenderTargets(context, renderTargets = {}) {
 
 function cleanupBattleScaffold(context, overlay) {
   hideBattleTooltip();
+  if (typeof context.cleanupBattleViewportScale === "function") {
+    context.cleanupBattleViewportScale();
+  }
+  context.cleanupBattleViewportScale = null;
   if (typeof context.unsubscribeLanguageChange === "function") {
     context.unsubscribeLanguageChange();
   }
@@ -5557,6 +5708,10 @@ function getBattleUiConfig(context) {
       icon: "data/Assets/icons/mix.png",
       iconSizePx: 64,
       ...(config.shuffleButton || {}),
+    },
+    layout: {
+      ...DEFAULT_BATTLE_LAYOUT,
+      ...(config.layout || {}),
     },
     handItemIds: Array.isArray(config.handItemIds) ? config.handItemIds : DEFAULT_HAND_ITEM_IDS,
     icons: {
