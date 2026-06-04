@@ -55,8 +55,9 @@ The engine does not update the map, touch DOM, animate anything, run enemy AI, o
 - a 12x9 match-3 board generated from `category: "match-3"` items, while created `rare_match-3` items can still join matches by shared `type`;
 - battle UI icons and labels loaded from `data/settings/battle-ui.jsonc`;
 - battle-window background loaded from `data/settings/battle-ui.jsonc`;
-- top-level battle buttons outside the battle panel: `ui.surrender`, `menu.settings`, and `ui.eventLog`; their icons and `iconSizePx` are configured in `topButtons`;
-- a battle log button outside the battle panel, placed like the map log button; short battle messages are no longer shown inside the enemy info panel;
+- battle menu buttons `ui.surrender`, `menu.settings`, and `ui.eventLog` are opened from the `little_menu` slot in the special-item column; their icons and `iconSizePx` are configured in `topButtons`;
+- while the mini menu is open, the battle window is heavily dimmed and the battle runtime is paused; clicking the menu button area again or any empty dimmed area closes the menu and resumes the runtime;
+- the battle log button now lives in the mini menu; short battle messages are no longer shown inside the enemy info panel;
 - settings pause the battle runtime while the settings overlay is open;
 - click-to-select and adjacent-cell swap;
 - animated swap for two selected cells, with duration from `data/settings/battle-ui.jsonc`;

@@ -4,9 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Map Module Prototype</title>
-    <link rel="stylesheet" href="./src/styles.css?v=2026-06-03-ultimate-to-bottom" />
+    <link rel="stylesheet" href="./src/styles.css?v=2026-06-04-startup-preloader" />
   </head>
   <body>
+    <section id="loadingOverlay" class="loading-overlay" aria-live="polite" aria-busy="true">
+      <div class="loading-panel">
+        <p class="eyebrow">Wild West</p>
+        <h2 id="loadingTitle">Loading</h2>
+        <div class="loading-progress" aria-hidden="true">
+          <span id="loadingProgressBar"></span>
+        </div>
+        <p id="loadingProgressText" class="loading-progress-text">0%</p>
+        <p id="loadingStatus" class="loading-status">Preparing game</p>
+      </div>
+    </section>
+
     <!-- Главное меню локализуется и управляется из src/map-module.js через id. -->
     <section id="mainMenu" class="main-menu">
       <div class="menu-content">

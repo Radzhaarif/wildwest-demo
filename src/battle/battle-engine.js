@@ -1267,6 +1267,34 @@ function pickBattleGeneratedItem(dropPool, itemCatalog, options = {}) {
   return applyBattleDropTransforms(itemCatalog, itemId, options);
 }
 
+export function pickBattleGoldLootItem(itemCatalog, options = {}) {
+  const excludedItemId = options.excludeItemId || options.sourceItemId || "";
+  const lootPool = getBattleGoldLootPool(itemCatalog)
+    .filter((itemId) => itemId !== excludedItemId);
+  if (lootPool.length === 0) {
+    return null;
+  }
+
+  const random = typeof options.random === "function" ? options.random : Math.random;
+  const maxAttempts = Math.max(8, lootPool.length * 3);
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    const itemId = pickRandomItem(lootPool, random);
+    const transformedItemId = applyBattleInventoryTransforms(itemCatalog, itemId, options.playerState, random);
+    if (transformedItemId !== excludedItemId) {
+      return transformedItemId;
+    }
+  }
+
+  return null;
+}
+
+function getBattleGoldLootPool(itemCatalog) {
+  return getBattleItemDefinitions(itemCatalog)
+    .filter((item) => Number(item?.goldloot) === 1)
+    .map((item) => item.itemId)
+    .filter(Boolean);
+}
+
 function applyBattleDropTransforms(itemCatalog, itemId, options = {}) {
   const random = typeof options.random === "function" ? options.random : Math.random;
   const enemyResult = applyBattleEnemyConvertTransforms(itemCatalog, itemId, options, random);

@@ -12,6 +12,16 @@ const REQUIRED_LOCALE_KEYS = [
   "menu.title",
   "menu.start",
   "menu.settings",
+  "loading.title",
+  "loading.settings",
+  "loading.locale",
+  "loading.validation",
+  "loading.assets",
+  "loading.menuAssets",
+  "loading.mapAssets",
+  "loading.runAssets",
+  "loading.failed",
+  "loading.error",
   "settings.musicVolume",
   "settings.soundVolume",
   "settings.language",
@@ -101,7 +111,7 @@ export async function validateGameData(campaign, itemCatalog, experienceTable, o
     }
   }
 
-  await validateBattleConfigs(battleEnemyIds, issues, requiredTextKeys, requiredItemIds);
+  const battleConfigCache = await validateBattleConfigs(battleEnemyIds, issues, requiredTextKeys, requiredItemIds);
   const mapUiConfig = await validateMapUiConfig(issues, requiredTextKeys);
 
   try {
@@ -121,7 +131,7 @@ export async function validateGameData(campaign, itemCatalog, experienceTable, o
     throw new Error(issues.map((issue) => `- ${issue}`).join("\n"));
   }
 
-  return { mapConfigCache, itemCatalogById, mapUiConfig };
+  return { mapConfigCache, itemCatalogById, mapUiConfig, battleConfigCache };
 }
 
 function validateItemCatalog(itemCatalog, issues, requiredTextKeys) {
@@ -341,13 +351,18 @@ function collectBattleEnemyIds(mapConfig, battleEnemyIds) {
 }
 
 async function validateBattleConfigs(enemyIds, issues, requiredTextKeys, requiredItemIds) {
-  await validateBattleUiConfig(issues, requiredTextKeys, requiredItemIds);
+  const battleConfigCache = {
+    battleUiConfig: await validateBattleUiConfig(issues, requiredTextKeys, requiredItemIds),
+    enemyConfigCache: new Map(),
+  };
 
   for (const enemyId of enemyIds) {
     const enemyUrl = getEnemyConfigUrl(enemyId);
     try {
+      const enemyConfig = await loadJsonc(enemyUrl);
+      battleConfigCache.enemyConfigCache.set(enemyUrl, enemyConfig);
       validateEnemyConfig(
-        await loadJsonc(enemyUrl),
+        enemyConfig,
         enemyUrl,
         issues,
         requiredTextKeys,
@@ -357,6 +372,8 @@ async function validateBattleConfigs(enemyIds, issues, requiredTextKeys, require
       issues.push(formatLoadIssue(enemyUrl, error));
     }
   }
+
+  return battleConfigCache;
 }
 
 function getEnemyConfigUrl(enemyId) {
@@ -367,8 +384,10 @@ async function validateBattleUiConfig(issues, requiredTextKeys, requiredItemIds)
   try {
     const battleUiConfig = await loadJsonc(BATTLE_UI_CONFIG_URL);
     validateBattleUiConfigObject(battleUiConfig, BATTLE_UI_CONFIG_URL, issues, requiredTextKeys, requiredItemIds);
+    return battleUiConfig;
   } catch (error) {
     issues.push(formatLoadIssue(BATTLE_UI_CONFIG_URL, error));
+    return null;
   }
 }
 

@@ -4,6 +4,7 @@ import { renderInlineRichText } from "../rich-text.js";
 const MAX_CASCADE_STEPS = 30;
 const CLOCK_ITEM_ID = "item_time";
 const LITTLE_MENU_ITEM_ID = "little_menu";
+const BAG_ITEM_ID = "bag";
 const SKULL_ITEM_ID = "item_skull";
 const SWAP_ITEM_ID = "item_swap";
 const DEFAULT_LIGHT_PROJECTILE_ICON = "data/Assets/icons/light_red.png";
@@ -20,6 +21,7 @@ const MIN_DAMAGE_PROJECTILES = 1;
 const MAX_DAMAGE_PROJECTILES = 12;
 const SPECIAL_ITEM_IDS = ["item_skull", "item_swap", "item_time"];
 const GOLD_ITEM_ID = "gold";
+const ACTIVE_BATTLE_ITEM_IDS = [...SPECIAL_ITEM_IDS, GOLD_ITEM_ID];
 const DEFAULT_HAND_ITEM_IDS = [
   "item_Shield",
   "item_Bandage",
@@ -114,39 +116,40 @@ function showBattleScaffold(context, root) {
     overlay.className = "battle-scaffold-overlay";
     overlay.setAttribute("aria-label", "Battle test scaffold");
 
-  const topActions = document.createElement("div");
-  topActions.className = "battle-top-actions";
+    const topActions = document.createElement("div");
+    topActions.className = "battle-top-actions battle-mini-menu-panel";
 
-  const surrenderButton = createBattleTopActionButton(context, "surrender");
-  const settingsButton = createBattleTopActionButton(context, "settings");
-  const logButton = createBattleTopActionButton(context, "log", "battle-log-button");
+    const surrenderButton = createBattleTopActionButton(context, "surrender");
+    const settingsButton = createBattleTopActionButton(context, "settings");
+    const logButton = createBattleTopActionButton(context, "log", "battle-log-button");
 
-  const surrenderConfig = getBattleTopButtonConfig(context, "surrender");
-  const settingsConfig = getBattleTopButtonConfig(context, "settings");
-  const logConfig = getBattleTopButtonConfig(context, "log");
+    const surrenderConfig = getBattleTopButtonConfig(context, "surrender");
+    const settingsConfig = getBattleTopButtonConfig(context, "settings");
+    const logConfig = getBattleTopButtonConfig(context, "log");
 
-  attachBattleTooltip(context, surrenderButton, {
-    getContent: () => ({
-      name: translate(context.request.locale, surrenderConfig.textKey),
-      description: translate(context.request.locale, surrenderConfig.textKey),
-      icon: surrenderConfig.icon,
-    }),
-  });
-  attachBattleTooltip(context, settingsButton, {
-    getContent: () => ({
-      name: translate(context.request.locale, settingsConfig.textKey),
-      description: translate(context.request.locale, settingsConfig.textKey),
-      icon: settingsConfig.icon,
-    }),
-  });
-  attachBattleTooltip(context, logButton, {
-    getContent: () => ({
-      name: translate(context.request.locale, logConfig.textKey),
-      description: translate(context.request.locale, logConfig.textKey),
-      icon: logConfig.icon,
-    }),
-  });
+    attachBattleTooltip(context, surrenderButton, {
+      getContent: () => ({
+        name: translate(context.request.locale, surrenderConfig.textKey),
+        description: translate(context.request.locale, surrenderConfig.textKey),
+        icon: surrenderConfig.icon,
+      }),
+    });
+    attachBattleTooltip(context, settingsButton, {
+      getContent: () => ({
+        name: translate(context.request.locale, settingsConfig.textKey),
+        description: translate(context.request.locale, settingsConfig.textKey),
+        icon: settingsConfig.icon,
+      }),
+    });
+    attachBattleTooltip(context, logButton, {
+      getContent: () => ({
+        name: translate(context.request.locale, logConfig.textKey),
+        description: translate(context.request.locale, logConfig.textKey),
+        icon: logConfig.icon,
+      }),
+    });
     topActions.append(surrenderButton, settingsButton, logButton);
+    const miniMenuOverlay = createBattleMiniMenuOverlay(topActions, context);
 
     const logOverlay = createBattleLogOverlay(context);
 
@@ -185,6 +188,7 @@ function showBattleScaffold(context, root) {
     const handItems = document.createElement("div");
     handItems.className = "battle-scaffold-hand-items";
     handItems.className = "battle-scaffold-hand-items battle-scaffold-hand-items-hidden";
+    const inventoryOverlay = createBattleInventoryOverlay(handItems, context);
 
     const enemyVisual = createEnemyVisual(context);
 
@@ -250,7 +254,7 @@ function showBattleScaffold(context, root) {
     leftBottom.append(shuffleButton);
     layout.append(leftColumn, rightColumn, leftBottom);
     panel.append(layout);
-    overlay.append(topActions, panel, logOverlay, fxLayer);
+    overlay.append(panel, miniMenuOverlay, inventoryOverlay, logOverlay, fxLayer);
     root.append(overlay);
 
     const alignBattleSideWidgetsToBoardRightEdge = () => {
@@ -281,6 +285,8 @@ function showBattleScaffold(context, root) {
       surrenderButton,
       settingsButton,
       logButton,
+      miniMenuOverlay,
+      inventoryOverlay,
       shuffleButton,
       logOverlay,
       battleFxLayer: fxLayer,
@@ -300,15 +306,18 @@ function showBattleScaffold(context, root) {
     requestAnimationFrame(alignBattleSideWidgetsToBoardRightEdge);
 
     logButton.addEventListener("click", () => {
+      closeBattleMiniMenu(context, renderTargets);
       renderBattleLog(logOverlay, context);
       logOverlay.classList.remove("hidden");
     });
 
     settingsButton.addEventListener("click", () => {
+      closeBattleMiniMenu(context, renderTargets, { resume: false });
       openBattleSettings(context, renderTargets);
     });
 
     surrenderButton.addEventListener("click", () => {
+      closeBattleMiniMenu(context, renderTargets, { resume: false });
       openBattleSurrender(context, renderTargets);
     });
 
@@ -316,6 +325,203 @@ function showBattleScaffold(context, root) {
       handleManualBattleShuffle(context, renderTargets);
     });
   });
+}
+
+function createBattleMiniMenuOverlay(panel, context) {
+  const overlay = document.createElement("div");
+  overlay.className = "battle-mini-menu-overlay";
+  overlay.setAttribute("aria-hidden", "true");
+  overlay.setAttribute("role", "presentation");
+
+  const menuAnchor = document.createElement("button");
+  menuAnchor.type = "button";
+  menuAnchor.className = "battle-mini-menu-anchor";
+  menuAnchor.setAttribute(
+    "aria-label",
+    translate(context.request.locale, "ui.battleMenu")
+      || translate(context.request.locale, "menu.settings")
+      || "Menu",
+  );
+  const menuAnchorIcon = document.createElement("img");
+  menuAnchorIcon.src = resolveAssetPath("data/Assets/icons/little_menu.png");
+  menuAnchorIcon.alt = "";
+  menuAnchorIcon.loading = "lazy";
+  menuAnchor.append(menuAnchorIcon);
+  menuAnchor.addEventListener("click", (event) => {
+    event.stopPropagation();
+    closeBattleMiniMenu(context, context.battleRenderTargets);
+  });
+
+  panel.addEventListener("click", (event) => {
+    event.stopPropagation();
+  });
+
+  overlay.addEventListener("click", () => {
+    closeBattleMiniMenu(context, context.battleRenderTargets);
+  });
+
+  overlay.append(menuAnchor, panel);
+  return overlay;
+}
+
+function toggleBattleMiniMenu(context, renderTargets) {
+  const activeRenderTargets = normalizeBattleRenderTargets(context, renderTargets);
+  if (context.battleState.isMiniMenuOpen) {
+    closeBattleMiniMenu(context, activeRenderTargets);
+    return;
+  }
+  openBattleMiniMenu(context, activeRenderTargets);
+}
+
+function openBattleMiniMenu(context, renderTargets) {
+  if (!shouldContinueBattle(context, renderTargets)) {
+    return;
+  }
+
+  closeBattleInventory(context, renderTargets, { resume: false });
+  context.battleState.isMiniMenuOpen = true;
+  pauseBattleRuntime(context);
+  hideBattleTooltip();
+  positionBattleMiniMenu(context, renderTargets);
+  renderTargets?.miniMenuOverlay?.classList.add("is-open");
+  renderTargets?.miniMenuOverlay?.setAttribute("aria-hidden", "false");
+  renderBattleInventory(renderTargets.specialItems, renderTargets.handItems, context, renderTargets);
+}
+
+function closeBattleMiniMenu(context, renderTargets, options = {}) {
+  const activeRenderTargets = normalizeBattleRenderTargets(context, renderTargets);
+  if (!context?.battleState?.isMiniMenuOpen) {
+    return;
+  }
+
+  context.battleState.isMiniMenuOpen = false;
+  hideBattleTooltip();
+  activeRenderTargets?.miniMenuOverlay?.classList.remove("is-open");
+  activeRenderTargets?.miniMenuOverlay?.setAttribute("aria-hidden", "true");
+  renderBattleInventory(activeRenderTargets.specialItems, activeRenderTargets.handItems, context, activeRenderTargets);
+
+  if (options.resume !== false && !context.battleState.isInventoryOpen && shouldContinueBattle(context, activeRenderTargets)) {
+    resumeBattleRuntime(context, activeRenderTargets);
+  }
+}
+
+function positionBattleMiniMenu(context, renderTargets) {
+  const overlay = renderTargets?.miniMenuOverlay;
+  const specialItemsElement = renderTargets?.specialItems;
+  if (!overlay || !specialItemsElement) {
+    return;
+  }
+
+  const menuSlot = specialItemsElement.querySelector(`[data-item-id="${LITTLE_MENU_ITEM_ID}"]`);
+  const skullSlot = specialItemsElement.querySelector(`[data-item-id="${SKULL_ITEM_ID}"]`);
+  const menuRect = menuSlot?.getBoundingClientRect();
+  const skullRect = skullSlot?.getBoundingClientRect();
+
+  if (menuRect && Number.isFinite(menuRect.left) && Number.isFinite(menuRect.top)) {
+    overlay.style.setProperty("--battle-mini-menu-anchor-left", `${menuRect.left}px`);
+    overlay.style.setProperty("--battle-mini-menu-anchor-top", `${menuRect.top}px`);
+    overlay.style.setProperty("--battle-mini-menu-anchor-width", `${menuRect.width}px`);
+    overlay.style.setProperty("--battle-mini-menu-anchor-height", `${menuRect.height}px`);
+  }
+
+  if (skullRect && Number.isFinite(skullRect.left) && Number.isFinite(skullRect.top)) {
+    overlay.style.setProperty("--battle-mini-menu-panel-left", `${skullRect.left}px`);
+    overlay.style.setProperty("--battle-mini-menu-panel-top", `${skullRect.top}px`);
+  }
+}
+
+function createBattleInventoryOverlay(panel, context) {
+  const overlay = document.createElement("div");
+  overlay.className = "battle-inventory-overlay";
+  overlay.setAttribute("aria-hidden", "true");
+  overlay.setAttribute("role", "presentation");
+
+  const bagAnchor = document.createElement("button");
+  bagAnchor.type = "button";
+  bagAnchor.className = "battle-inventory-anchor";
+  bagAnchor.setAttribute("aria-label", translate(context.request.locale, "ui.bag") || "Bag");
+  const bagAnchorIcon = document.createElement("img");
+  bagAnchorIcon.src = resolveAssetPath("data/Assets/icons/bag.png");
+  bagAnchorIcon.alt = "";
+  bagAnchorIcon.loading = "lazy";
+  bagAnchor.append(bagAnchorIcon);
+  bagAnchor.addEventListener("click", (event) => {
+    event.stopPropagation();
+    closeBattleInventory(context, context.battleRenderTargets);
+  });
+
+  panel.addEventListener("click", (event) => {
+    event.stopPropagation();
+  });
+
+  overlay.addEventListener("click", () => {
+    closeBattleInventory(context, context.battleRenderTargets);
+  });
+
+  overlay.append(bagAnchor, panel);
+  return overlay;
+}
+
+function toggleBattleInventory(context, renderTargets) {
+  const activeRenderTargets = normalizeBattleRenderTargets(context, renderTargets);
+  if (context.battleState.isInventoryOpen) {
+    closeBattleInventory(context, activeRenderTargets);
+    return;
+  }
+  openBattleInventory(context, activeRenderTargets);
+}
+
+function openBattleInventory(context, renderTargets) {
+  if (!shouldContinueBattle(context, renderTargets)) {
+    return;
+  }
+
+  closeBattleMiniMenu(context, renderTargets, { resume: false });
+  context.battleState.isInventoryOpen = true;
+  pauseBattleRuntime(context);
+  hideBattleTooltip();
+  positionBattleInventory(context, renderTargets);
+  renderTargets?.inventoryOverlay?.classList.add("is-open");
+  renderTargets?.inventoryOverlay?.setAttribute("aria-hidden", "false");
+  renderBattleInventory(renderTargets.specialItems, renderTargets.handItems, context, renderTargets);
+}
+
+function closeBattleInventory(context, renderTargets, options = {}) {
+  const activeRenderTargets = normalizeBattleRenderTargets(context, renderTargets);
+  if (!context?.battleState?.isInventoryOpen) {
+    return;
+  }
+
+  context.battleState.isInventoryOpen = false;
+  hideBattleTooltip();
+  activeRenderTargets?.inventoryOverlay?.classList.remove("is-open");
+  activeRenderTargets?.inventoryOverlay?.setAttribute("aria-hidden", "true");
+  renderBattleInventory(activeRenderTargets.specialItems, activeRenderTargets.handItems, context, activeRenderTargets);
+
+  if (options.resume !== false && !context.battleState.isMiniMenuOpen && shouldContinueBattle(context, activeRenderTargets)) {
+    resumeBattleRuntime(context, activeRenderTargets);
+  }
+}
+
+function positionBattleInventory(context, renderTargets) {
+  const overlay = renderTargets?.inventoryOverlay;
+  const specialItemsElement = renderTargets?.specialItems;
+  if (!overlay || !specialItemsElement) {
+    return;
+  }
+
+  const bagSlot = specialItemsElement.querySelector(`[data-item-id="${BAG_ITEM_ID}"]`);
+  const bagRect = bagSlot?.getBoundingClientRect();
+  if (!bagRect || !Number.isFinite(bagRect.left) || !Number.isFinite(bagRect.top)) {
+    return;
+  }
+
+  overlay.style.setProperty("--battle-inventory-anchor-left", `${bagRect.left}px`);
+  overlay.style.setProperty("--battle-inventory-anchor-top", `${bagRect.top}px`);
+  overlay.style.setProperty("--battle-inventory-anchor-width", `${bagRect.width}px`);
+  overlay.style.setProperty("--battle-inventory-anchor-height", `${bagRect.height}px`);
+  overlay.style.setProperty("--battle-inventory-panel-left", `${bagRect.right + 14}px`);
+  overlay.style.setProperty("--battle-inventory-panel-top", `${bagRect.top}px`);
 }
 
 function createBattleLogOverlay(context) {
@@ -625,6 +831,8 @@ function restartCurrentBattle(context, renderTargets, banner) {
   context.battleState.activeSpecialItemId = null;
   context.battleState.specialSwapCell = null;
   context.battleState.noMovesMessageVisible = false;
+  context.battleState.isMiniMenuOpen = false;
+  context.battleState.isInventoryOpen = false;
   context.battleState.ragePausedUntil = 0;
   context.battleState.pendingRageAction = false;
   context.battleState.isResolving = false;
@@ -696,6 +904,9 @@ function createEnemyVisual(context) {
   const aggressionOverlay = document.createElement("div");
   aggressionOverlay.className = "battle-scaffold-enemy-meter-overlay battle-scaffold-enemy-aggression-overlay";
 
+  const damageOverlay = document.createElement("div");
+  damageOverlay.className = "battle-scaffold-enemy-damage-overlay";
+
   const currentStage = context.engine.getCurrentBattleStage(
     context.battleData.enemyConfig,
     context.battleState.enemyState,
@@ -705,7 +916,7 @@ function createEnemyVisual(context) {
   enemyImage.src = resolvedAppearance;
   enemyImage.dataset.appearance = resolvedAppearance;
   enemyImage.alt = "";
-  visual.append(healthOverlay, enemyImage, aggressionOverlay);
+  visual.append(healthOverlay, enemyImage, damageOverlay, aggressionOverlay);
   return visual;
 }
 
@@ -775,6 +986,15 @@ function renderBattleStats(enemyStatsElement, playerMetersElement, ultimateTextE
     healthFeedback: enemyAggressionFeedback,
   });
 
+  const enemyDamageContainer = enemyVisual?.querySelector(".battle-scaffold-enemy-damage-overlay") || enemyStatsElement;
+  upsertEnemyDamageBadge(context, enemyDamageContainer, {
+    stat: "enemy-damage",
+    label: textLabels.enemyDamage.label,
+    description: textLabels.enemyDamage.description,
+    icon: uiConfig.icons.enemyDamage,
+    value: enemyState.aggression.damage,
+  });
+
   const enemyValuesContainer = context.battleRenderTargets?.enemyHeaderValues || enemyStatsElement;
   const oldEnemyValueRow = enemyStatsElement.querySelector(".battle-scaffold-value-row");
   if (oldEnemyValueRow && enemyValuesContainer !== enemyStatsElement) {
@@ -782,13 +1002,6 @@ function renderBattleStats(enemyStatsElement, playerMetersElement, ultimateTextE
   }
   const enemyValueRow = enemyValuesContainer.querySelector(".battle-scaffold-value-row");
   const enemyValues = [
-    {
-      stat: "enemy-damage",
-      label: textLabels.enemyDamage.label,
-      description: textLabels.enemyDamage.description,
-      icon: uiConfig.icons.enemyDamage,
-      value: enemyState.aggression.damage,
-    },
     {
       stat: "enemy-rage",
       label: textLabels.enemyRage.label,
@@ -1836,7 +2049,8 @@ function getBattleStatProjectileConfig(context, modifier, normalizedStatDelta, o
 }
 
 function getBattlePlayerHealthSourceElements(context) {
-  const enemyDamageElement = getBattleEnemyStatRoot(context)?.querySelector('[data-battle-stat="enemy-damage"]');
+  const enemyDamageElement = context?.battleRenderTargets?.enemyVisual?.querySelector('[data-battle-stat="enemy-damage"]')
+    || getBattleEnemyStatRoot(context)?.querySelector('[data-battle-stat="enemy-damage"]');
   if (enemyDamageElement) {
     const enemyDamageIcon = enemyDamageElement.querySelector("img");
     if (enemyDamageIcon) {
@@ -1942,13 +2156,69 @@ function createEnemyValue(context, { label, icon, value, stat }) {
   return item;
 }
 
+function upsertEnemyDamageBadge(context, container, { label, description, icon, value, stat }) {
+  if (!container) {
+    return;
+  }
+
+  const existingBadge = container.querySelector('[data-battle-stat="enemy-damage"]');
+  if (!existingBadge) {
+    container.replaceChildren(createEnemyDamageBadge(context, { label, description, icon, value, stat }));
+    return;
+  }
+
+  existingBadge.setAttribute("aria-label", label);
+  existingBadge.dataset.battleTooltipName = label;
+  existingBadge.dataset.battleTooltipDescription = description;
+  existingBadge.dataset.battleTooltipIcon = icon || "";
+
+  const iconElement = existingBadge.querySelector("img");
+  if (iconElement) {
+    iconElement.src = resolveAssetPath(icon);
+  }
+  const valueElement = existingBadge.querySelector("strong");
+  if (valueElement) {
+    valueElement.textContent = String(value);
+  }
+}
+
+function createEnemyDamageBadge(context, { label, description, icon, value, stat }) {
+  const badge = document.createElement("div");
+  badge.className = "battle-scaffold-enemy-damage-badge";
+  badge.dataset.battleStat = stat || "enemy-damage";
+  badge.dataset.battleTooltipName = label;
+  badge.dataset.battleTooltipDescription = description;
+  badge.dataset.battleTooltipIcon = icon || "";
+  badge.setAttribute("aria-label", label);
+
+  const iconElement = document.createElement("img");
+  iconElement.src = resolveAssetPath(icon);
+  iconElement.alt = "";
+
+  const valueElement = document.createElement("strong");
+  valueElement.textContent = String(value);
+
+  attachBattleTooltip(context, badge, {
+    name: () => badge.dataset.battleTooltipName || "",
+    description: () => badge.dataset.battleTooltipDescription || "",
+    icon: () => badge.dataset.battleTooltipIcon || "",
+  });
+
+  badge.append(iconElement, valueElement);
+  return badge;
+}
+
 function renderBattleInventory(specialItemsElement, handItemsElement, context, renderTargets = null) {
   const littleMenuSlot = createInventorySlot(context, LITTLE_MENU_ITEM_ID, {
     iconOverride: "data/Assets/icons/little_menu.png",
     showQuantity: false,
     name: translate(context.request.locale, "ui.battleMenu") || translate(context.request.locale, "menu.settings") || "Menu",
     description: "",
+    onClick: () => toggleBattleMiniMenu(context, renderTargets),
   });
+  if (context.battleState.isMiniMenuOpen) {
+    littleMenuSlot.classList.add("is-active");
+  }
   const specialSlots = SPECIAL_ITEM_IDS.map((itemId) => createInventorySlot(
       context,
       itemId,
@@ -1956,13 +2226,19 @@ function renderBattleInventory(specialItemsElement, handItemsElement, context, r
         onClick: (slot) => handleSpecialItemClick(context, itemId, slot, renderTargets),
       },
     ));
-  const goldSlot = createInventorySlot(context, GOLD_ITEM_ID);
-  const bagSlot = createInventorySlot(context, "bag", {
+  const goldSlot = createInventorySlot(context, GOLD_ITEM_ID, {
+    onClick: (slot) => handleGoldItemClick(context, slot, renderTargets),
+  });
+  const bagSlot = createInventorySlot(context, BAG_ITEM_ID, {
     iconOverride: "data/Assets/icons/bag.png",
     showQuantity: false,
     name: translate(context.request.locale, "ui.bag") || "Bag",
     description: "",
+    onClick: () => toggleBattleInventory(context, renderTargets),
   });
+  if (context.battleState.isInventoryOpen) {
+    bagSlot.classList.add("is-active");
+  }
 
   specialItemsElement.replaceChildren(
     littleMenuSlot,
@@ -1991,9 +2267,10 @@ function createInventorySlot(context, itemId, options = {}) {
   const activeSpecialItemId = context.battleState.activeSpecialItemId;
   const clockCooldownSeconds = isClock ? getClockCooldownSeconds(context) : 0;
   const isActiveSpecial = activeSpecialItemId === itemId;
-  const isBlockedByOtherSpecial = Boolean(activeSpecialItemId && activeSpecialItemId !== itemId && SPECIAL_ITEM_IDS.includes(itemId));
+  const isBattleActiveItem = ACTIVE_BATTLE_ITEM_IDS.includes(itemId);
+  const isBlockedByOtherSpecial = Boolean(activeSpecialItemId && activeSpecialItemId !== itemId && isBattleActiveItem);
   const isClockUnavailable = isClock && (clockCooldownSeconds > 0 || getInventoryQuantity(context.battleState.playerState, itemId) <= 0);
-  const isSpecialUnavailable = SPECIAL_ITEM_IDS.includes(itemId)
+  const isSpecialUnavailable = isBattleActiveItem
     && !isActiveSpecial
     && (isBlockedByOtherSpecial || getInventoryQuantity(context.battleState.playerState, itemId) <= 0);
 
@@ -3391,6 +3668,53 @@ function handleSpecialItemClick(context, itemId, slot, renderTargets) {
   handleToggleActiveSpecial(context, itemId, slot, renderTargets);
 }
 
+function handleGoldItemClick(context, slot, renderTargets) {
+  resetBattleIdleTimer(context, renderTargets);
+  const uiConfig = getBattleUiConfig(context);
+  const activeItemId = context.battleState.activeSpecialItemId;
+
+  if (activeItemId === GOLD_ITEM_ID) {
+    clearActiveBattleSpecial(context);
+    clearBattleGoldTargetPreview(context);
+    if (renderTargets) {
+      renderBattleInventory(renderTargets.specialItems, renderTargets.handItems, context, renderTargets);
+      renderBattleBoard(
+        renderTargets.boardElement,
+        context,
+        renderTargets.status,
+        renderTargets.enemyStats,
+        renderTargets.playerMeters,
+        renderTargets.ultimateText,
+      );
+    }
+    return;
+  }
+
+  if (activeItemId || getInventoryQuantity(context.battleState.playerState, GOLD_ITEM_ID) <= 0) {
+    showFloatMessage(
+      slot,
+      translate(context.request.locale, uiConfig.textKeys.clockUnavailable),
+      uiConfig.feedback.floatMessageMs,
+    );
+    return;
+  }
+
+  context.battleState.activeSpecialItemId = GOLD_ITEM_ID;
+  context.battleState.specialSwapCell = null;
+  renderActiveBattleSpecialCursor(context);
+  if (renderTargets) {
+    renderBattleInventory(renderTargets.specialItems, renderTargets.handItems, context, renderTargets);
+    renderBattleBoard(
+      renderTargets.boardElement,
+      context,
+      renderTargets.status,
+      renderTargets.enemyStats,
+      renderTargets.playerMeters,
+      renderTargets.ultimateText,
+    );
+  }
+}
+
 function handleToggleActiveSpecial(context, itemId, slot, renderTargets) {
   resetBattleIdleTimer(context, renderTargets);
   const uiConfig = getBattleUiConfig(context);
@@ -3529,6 +3853,7 @@ function removeActiveBattleSpecialCursor(context) {
 function clearActiveBattleSpecial(context) {
   context.battleState.activeSpecialItemId = null;
   context.battleState.specialSwapCell = null;
+  clearBattleGoldTargetPreview(context);
   removeActiveBattleSpecialCursor(context);
 }
 
@@ -3576,6 +3901,16 @@ function renderBattleBoard(
         iconWrap.append(icon);
       } else {
         iconWrap.textContent = itemId || "?";
+      }
+
+      if (context.battleState.activeSpecialItemId === GOLD_ITEM_ID) {
+        cell.classList.add("is-gold-target");
+        cell.addEventListener("mouseenter", () => {
+          showBattleGoldTargetPreview(context, iconWrap, item, { disabled: isBoxed });
+        });
+        cell.addEventListener("mouseleave", () => {
+          clearBattleGoldTargetPreview(context);
+        });
       }
 
       cell.addEventListener("click", async () => {
@@ -3710,6 +4045,38 @@ function renderBattleVines(boardElement, context) {
   }
 }
 
+function showBattleGoldTargetPreview(context, iconWrap, item, options = {}) {
+  clearBattleGoldTargetPreview(context);
+
+  const marker = document.createElement("span");
+  marker.className = "battle-gold-target-preview";
+  const price = options.disabled ? null : getBattleGoldPrice(item);
+  if (price === null) {
+    marker.classList.add("is-disabled");
+    marker.textContent = "X";
+  } else {
+    marker.textContent = String(price);
+  }
+
+  iconWrap.append(marker);
+  context.battleGoldTargetPreview = marker;
+}
+
+function clearBattleGoldTargetPreview(context) {
+  context?.battleGoldTargetPreview?.remove();
+  if (context) {
+    context.battleGoldTargetPreview = null;
+  }
+}
+
+function getBattleGoldPrice(item) {
+  const price = Number(item?.goldprice);
+  if (!Number.isFinite(price) || price <= 0) {
+    return null;
+  }
+  return Math.floor(price);
+}
+
 function getBattleWallAnchor(wall) {
   const from = wall?.from;
   const to = wall?.to;
@@ -3735,6 +4102,90 @@ function getBattleWallAnchor(wall) {
     };
   }
   return null;
+}
+
+async function handleGoldBoardClick(context, cell, renderTargets) {
+  if (!shouldContinueBattle(context, renderTargets)) {
+    return;
+  }
+
+  const { boardElement, statusElement, enemyStatsElement, playerMetersElement, ultimateTextElement } = renderTargets;
+  resetBattleIdleTimer(context, renderTargets);
+  clearBattleGoldTargetPreview(context);
+
+  const itemId = context.battleState.board?.[cell.row]?.[cell.col];
+  const item = context.engine.getBattleItemDefinition(context.request.itemCatalog, itemId);
+  const price = getBattleGoldPrice(item);
+  const currentGold = getInventoryQuantity(context.battleState.playerState, GOLD_ITEM_ID);
+
+  if (price === null) {
+    await animateBattleShakeCells(boardElement, [cell], getBattleAnimationConfig(context).invalidShakeMs);
+    if (shouldContinueBattle(context, renderTargets)) {
+      setBattleStatus(context, statusElement, translate(context.request.locale, getBattleUiConfig(context).textKeys.clockUnavailable));
+    }
+    return;
+  }
+
+  if (currentGold < price) {
+    await animateBattleShakeCells(boardElement, [cell], getBattleAnimationConfig(context).invalidShakeMs);
+    if (shouldContinueBattle(context, renderTargets)) {
+      setBattleStatus(context, statusElement, translate(context.request.locale, "ui.notEnoughGold"));
+    }
+    return;
+  }
+
+  const nextItemId = context.engine.pickBattleGoldLootItem(context.request.itemCatalog, {
+    sourceItemId: itemId,
+    playerState: context.battleState.playerState,
+    random: Math.random,
+  });
+  if (!nextItemId) {
+    await animateBattleShakeCells(boardElement, [cell], getBattleAnimationConfig(context).invalidShakeMs);
+    if (shouldContinueBattle(context, renderTargets)) {
+      setBattleStatus(context, statusElement, translate(context.request.locale, getBattleUiConfig(context).textKeys.clockUnavailable));
+    }
+    return;
+  }
+
+  context.battleState.isResolving = true;
+  context.battleState.selectedCell = null;
+  context.battleState.specialSwapCell = null;
+  changeInventoryQuantity(context.battleState.playerState, GOLD_ITEM_ID, -price);
+  context.battleState.board[cell.row][cell.col] = nextItemId;
+  clearActiveBattleSpecial(context);
+  renderBattleInventory(context.battleRenderTargets.specialItems, context.battleRenderTargets.handItems, context, context.battleRenderTargets);
+  renderBattleBoard(boardElement, context, statusElement, enemyStatsElement, playerMetersElement, ultimateTextElement);
+
+  const firstMatches = context.engine.findBattleMatches(context.battleState.board, context.request.itemCatalog, {
+    boxes: context.battleState.boxes,
+    vines: context.battleState.vines,
+  });
+
+  if (firstMatches.length > 0) {
+    const result = await resolveBattleCascades(context.battleState.board, context, {
+      boardElement,
+      statusElement,
+      enemyStatsElement,
+      playerMetersElement,
+      ultimateTextElement,
+      bonusCell: cell,
+      lifecycleToken: renderTargets.lifecycleToken,
+      attemptToken: renderTargets.attemptToken,
+    });
+    if (result.cancelled || !shouldContinueBattle(context, renderTargets)) {
+      return;
+    }
+    context.battleState.board = result.board;
+    context.battleState.lastMoveSummary = result;
+    setBattleStatus(context, statusElement, formatMoveStatus(context, result, context.battleState.enemyState));
+  } else {
+    setBattleStatus(context, statusElement, translateBattleText(context, "freeSwapDone"));
+  }
+
+  context.battleState.isResolving = false;
+  renderBattleStats(enemyStatsElement, playerMetersElement, ultimateTextElement, context);
+  renderBattleInventory(context.battleRenderTargets.specialItems, context.battleRenderTargets.handItems, context, context.battleRenderTargets);
+  await finishBattleMoveIfNeeded(context, renderTargets);
 }
 
 async function handleSkullBoardClick(context, cell, renderTargets) {
@@ -4039,6 +4490,11 @@ async function handleBattleCellClick(context, cell, renderTargets) {
 
   if (isBattleCellBoxed(context, cell)) {
     await handleBattleBoxedCellClick(context, cell, renderTargets);
+    return;
+  }
+
+  if (context.battleState.activeSpecialItemId === GOLD_ITEM_ID) {
+    await handleGoldBoardClick(context, cell, renderTargets);
     return;
   }
 
@@ -4846,6 +5302,7 @@ function normalizeBattleRenderTargets(context, renderTargets = {}) {
   normalized.boardElement = renderTargets.boardElement || fullTargets.boardElement;
   normalized.specialItems = renderTargets.specialItems || fullTargets.specialItems;
   normalized.handItems = renderTargets.handItems || fullTargets.handItems;
+  normalized.inventoryOverlay = renderTargets.inventoryOverlay || fullTargets.inventoryOverlay;
   normalized.overlay = renderTargets.overlay || fullTargets.overlay;
   normalized.resolve = renderTargets.resolve || fullTargets.resolve;
   normalized.lifecycleToken = renderTargets.lifecycleToken || fullTargets.lifecycleToken;
@@ -4925,6 +5382,7 @@ function assertBattleEngine(engine) {
     "applyBattleUltimateEffects",
     "applyBattleKamikazePlayerDamage",
     "applyBattleKamikazeEnemySelfDamage",
+    "pickBattleGoldLootItem",
     "getBattlePlayerMaxHealth",
     "getBattleHealHealth",
     "tickBattleRage",
@@ -4966,6 +5424,12 @@ function ensureBattleStateShape(context) {
   }
   if (!("pendingRageAction" in battleState)) {
     battleState.pendingRageAction = false;
+  }
+  if (!("isMiniMenuOpen" in battleState)) {
+    battleState.isMiniMenuOpen = false;
+  }
+  if (!("isInventoryOpen" in battleState)) {
+    battleState.isInventoryOpen = false;
   }
   if (!Array.isArray(battleState.walls)) {
     battleState.walls = [];

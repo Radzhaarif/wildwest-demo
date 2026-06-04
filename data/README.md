@@ -66,7 +66,8 @@
 2. Игра читает `current-settings.json`.
 3. Если в браузере есть сохраненные настройки в `localStorage`, они перекрывают пользовательские настройки из файла. Структурные поля `languages` и `rewardAnimationMs` всегда берутся из JSON-файлов, чтобы их можно было менять без очистки `localStorage`.
 4. Загружается локаль `data/locales/<language>.json`.
-5. Показывается главное меню.
+5. Показывается экран загрузки и предзагружаются базовые ассеты меню: фон главного меню, курсоры и звуки из настроек.
+6. Показывается главное меню.
 
 При нажатии `START`:
 
@@ -74,11 +75,13 @@
 2. Читается `data/settings/items.jsonc`.
 3. Читается `data/player/experience-table.jsonc`.
 4. До скрытия главного меню запускается проверка данных: кампания, каталог предметов, таблица опыта, карты из кампании, враги из активных battle-точек, `data/settings/battle-ui.jsonc`, стартовое состояние игрока и все локали из `settings.languages`.
-5. Если проверка не прошла, игра показывает окно с понятным списком ошибок и не начинает забег.
-6. Если проверка прошла, `default-player-state.json` копируется в состояние игры в памяти.
-7. В глобальный лог добавляется новый разделитель забега с номером забега и результатом проверки данных.
-8. Загружается стартовая карта из `campaign.startMapId`.
-9. Генерируется карта и запускается вступительная прокрутка сверху вниз.
+5. Если проверка прошла, перед скрытием главного меню предзагружаются локальные ассеты активной кампании: картинки карт, иконки событий, `items.jsonc` icon/bigIcon/sound_effect, `map-ui`, `battle-ui`, фоны боев, изображения врагов, награды, звуки и другие пути из `data/Assets`.
+6. Если часть картинок или звуков не загрузилась, игра пишет список проблем в консоль и продолжает запуск. JSON-ошибки остаются фатальными через валидатор.
+7. Если проверка не прошла, игра показывает окно с понятным списком ошибок и не начинает забег.
+8. Если проверка прошла, `default-player-state.json` копируется в состояние игры в памяти.
+9. В глобальный лог добавляется новый разделитель забега с номером забега и результатом проверки данных.
+10. Загружается стартовая карта из `campaign.startMapId`.
+11. Генерируется карта и запускается вступительная прокрутка сверху вниз.
 
 Важно: браузер не записывает изменения обратно в JSON-файлы. Текущее состояние игрока и выбранные настройки живут в памяти браузера и `localStorage`.
 
@@ -754,6 +757,8 @@ This is UI feedback only and must not change combat math.
 `item_skull` and `item_swap` are active-use battle items. Clicking one consumes one item and shows its small marker near the cursor. Clicking the same active item again cancels the mode and refunds the item. While one of these modes is active, the other special item and `item_time` are unavailable.
 
 `item_skull` activates the clicked board cell and the eight neighboring cells. These cells apply their normal effects except `aggression`, then disappear and trigger gravity/refill/cascades. `item_swap` lets the player select any two board cells and swap them freely, even when the swap does not create a match. New cells produced by refill are filled from lower rows upward, so the visual refill reads from bottom to top.
+
+`gold` is also an active-use battle tool. Clicking the gold slot takes gold "in hand" without spending it yet. While gold is active, hovering a board item shows its `goldprice`; if the item has no valid `goldprice`, the hover marker shows a red `X` and the item cannot be changed. Clicking a valid target spends that `goldprice`, replaces the item with a random item from `data/settings/items.jsonc` where `goldloot: 1`, then applies the same player inventory `transform_chance` rules used by ordinary battle drops. The final result must differ from the source `itemId`: using gold on `granate` cannot leave `granate` in the same cell, even if `granate` itself has `goldloot: 1`. This keeps upgrades such as normal knife -> powered knife consistent with the rest of battle generation without making gold feel like a paid no-op.
 
 ## Map UI Config
 

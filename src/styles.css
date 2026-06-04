@@ -39,6 +39,68 @@ body {
   display: none !important;
 }
 
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    linear-gradient(90deg, rgba(12, 8, 5, 0.94), rgba(26, 17, 10, 0.86)),
+    #140d09;
+  color: var(--text);
+}
+
+.loading-panel {
+  display: grid;
+  gap: 14px;
+  width: min(520px, 100%);
+  padding: 24px;
+  border: 1px solid rgba(255, 210, 95, 0.38);
+  border-radius: 10px;
+  background: rgba(30, 20, 13, 0.86);
+  box-shadow:
+    0 22px 70px rgba(0, 0, 0, 0.48),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+}
+
+.loading-panel h2 {
+  margin: 0;
+  font-size: clamp(28px, 5vw, 46px);
+  line-height: 1;
+}
+
+.loading-progress {
+  height: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 210, 95, 0.34);
+  border-radius: 999px;
+  background: rgba(9, 6, 4, 0.64);
+}
+
+.loading-progress span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #b56c28, #ffcf74);
+  box-shadow: 0 0 18px rgba(255, 207, 116, 0.36);
+  transition: width 140ms ease;
+}
+
+.loading-progress-text,
+.loading-status {
+  margin: 0;
+  color: var(--muted);
+}
+
+.loading-progress-text {
+  font-weight: 800;
+  color: var(--accent-strong);
+}
+
 button,
 select {
   font: inherit;
@@ -1323,6 +1385,142 @@ button.reward-item {
   gap: 10px;
 }
 
+.battle-mini-menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 74;
+  display: block;
+  opacity: 0;
+  pointer-events: none;
+  background: rgba(5, 3, 2, 0.58);
+  backdrop-filter: blur(4px) brightness(0.68);
+  transition: opacity 180ms ease;
+}
+
+.battle-mini-menu-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.battle-mini-menu-overlay .battle-top-actions {
+  position: absolute;
+  top: var(--battle-mini-menu-panel-top, 50%);
+  right: auto;
+  bottom: auto;
+  left: var(--battle-mini-menu-panel-left, clamp(18px, 8vw, 132px));
+  z-index: 1;
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid rgba(255, 238, 194, 0.36);
+  border-radius: 16px;
+  background: rgba(37, 25, 16, 0.78);
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(6px);
+  transform: translateX(-18px);
+  transition: transform 180ms ease;
+}
+
+.battle-mini-menu-overlay.is-open .battle-top-actions {
+  transform: translateX(0);
+}
+
+.battle-mini-menu-anchor {
+  position: absolute;
+  top: var(--battle-mini-menu-anchor-top, 16px);
+  left: var(--battle-mini-menu-anchor-left, 16px);
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: var(--battle-mini-menu-anchor-width, 78px);
+  height: var(--battle-mini-menu-anchor-height, 78px);
+  padding: 0;
+  border: 1px solid rgba(255, 238, 194, 0.24);
+  border-radius: 8px;
+  background: rgba(255, 220, 165, 0.18);
+  box-shadow:
+    inset 0 0 0 3px rgba(255, 241, 169, 0.9),
+    0 0 18px rgba(255, 241, 169, 0.5);
+  cursor: var(--cursor-active), pointer;
+}
+
+.battle-mini-menu-anchor img {
+  max-width: 82%;
+  max-height: 82%;
+  object-fit: contain;
+}
+
+.battle-inventory-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 74;
+  --battle-slot-size: clamp(78px, 10.5vh, 108px);
+  display: block;
+  opacity: 0;
+  pointer-events: none;
+  background: rgba(5, 3, 2, 0.42);
+  backdrop-filter: blur(3px) brightness(0.76);
+  transition: opacity 180ms ease;
+}
+
+.battle-inventory-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.battle-inventory-anchor {
+  position: absolute;
+  top: var(--battle-inventory-anchor-top, 16px);
+  left: var(--battle-inventory-anchor-left, 16px);
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: var(--battle-inventory-anchor-width, 78px);
+  height: var(--battle-inventory-anchor-height, 78px);
+  padding: 0;
+  border: 1px solid rgba(255, 238, 194, 0.24);
+  border-radius: 8px;
+  background: rgba(255, 220, 165, 0.18);
+  box-shadow:
+    inset 0 0 0 3px rgba(255, 241, 169, 0.9),
+    0 0 18px rgba(255, 241, 169, 0.5);
+  cursor: var(--cursor-active), pointer;
+}
+
+.battle-inventory-anchor img {
+  max-width: 82%;
+  max-height: 82%;
+  object-fit: contain;
+}
+
+.battle-inventory-overlay .battle-scaffold-hand-items {
+  position: absolute;
+  top: var(--battle-inventory-panel-top, 50%);
+  left: var(--battle-inventory-panel-left, 120px);
+  z-index: 1;
+  display: grid !important;
+  grid-template-columns: repeat(6, var(--battle-slot-size, 72px));
+  gap: 10px;
+  max-width: calc(100vw - var(--battle-inventory-panel-left, 120px) - 18px);
+  padding: 16px;
+  overflow-x: auto;
+  border: 1px solid rgba(255, 238, 194, 0.36);
+  border-radius: 16px;
+  background: rgba(37, 25, 16, 0.78);
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(6px);
+  transform: translateX(-18px);
+  transition: transform 180ms ease;
+}
+
+.battle-inventory-overlay.is-open .battle-scaffold-hand-items {
+  transform: translateX(0);
+}
+
 .battle-top-button {
   height: 64px;
   width: 64px;
@@ -1456,6 +1654,7 @@ button.reward-item {
   }
 
 .battle-scaffold-right {
+  --battle-enemy-info-offset-y: 111px;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 10px;
@@ -1479,8 +1678,9 @@ button.reward-item {
   }
 
 .battle-scaffold-enemy-header {
+  position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   gap: 14px;
   align-items: center;
   min-height: 74px;
@@ -1499,9 +1699,13 @@ button.reward-item {
 
 .battle-scaffold-enemy-title {
   display: grid;
-  justify-items: start;
+  grid-column: 1;
+  justify-self: center;
+  justify-items: center;
   min-width: 0;
-  text-align: left;
+  max-width: calc(100% - 150px);
+  text-align: center;
+  z-index: 1;
 }
 
 .battle-scaffold-enemy-header h2 {
@@ -1516,19 +1720,32 @@ button.reward-item {
 }
 
 .battle-scaffold-enemy-header-values {
+  position: absolute;
+  left: 14px;
+  bottom: 7px;
+  z-index: 2;
   display: grid;
-  justify-items: end;
+  justify-items: start;
 }
 
 .battle-scaffold-enemy-header-values .battle-scaffold-value-row {
-  justify-content: end;
+  justify-content: start;
   gap: 24px;
   margin: 0;
 }
 
 .battle-scaffold-enemy-header-values .battle-scaffold-value {
-  grid-template-columns: 34px minmax(40px, max-content);
-  gap: 6px;
+  grid-template-columns: 1fr;
+  gap: 2px;
+  justify-items: center;
+}
+
+.battle-scaffold-enemy-header-values .battle-scaffold-value img {
+  width: 38px;
+  height: 38px;
+  animation: battleEnemyRageIdleTremble 1.8s ease-in-out infinite;
+  transform-origin: center;
+  will-change: transform;
 }
 
 .battle-scaffold-enemy-visual {
@@ -1537,7 +1754,7 @@ button.reward-item {
   display: grid;
   place-items: end center;
   min-height: 0;
-  height: 100%;
+  height: calc(100% + var(--battle-enemy-info-offset-y, 0px));
   padding: 58px 16px 54px;
   overflow: hidden;
   border: 1px solid rgba(58, 36, 20, 0.44);
@@ -1570,6 +1787,55 @@ button.reward-item {
 
 .battle-scaffold-enemy-aggression-overlay {
   bottom: 10px;
+}
+
+.battle-scaffold-enemy-damage-overlay {
+  position: absolute;
+  left: -2px;
+  bottom: 72px;
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.battle-scaffold-enemy-damage-badge {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: clamp(70px, 10vh, 96px);
+  height: clamp(70px, 10vh, 96px);
+  cursor: var(--cursor-help), help;
+  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.4));
+}
+
+.battle-scaffold-enemy-damage-badge img {
+  display: block;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  cursor: var(--cursor-help), help;
+}
+
+.battle-scaffold-enemy-damage-badge strong {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  color: #fff7e7;
+  font-size: clamp(24px, 3.84vh, 38px);
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  pointer-events: none;
+  transform: translateY(8px);
+  text-shadow:
+    -2px -2px 0 #2c2018,
+    2px -2px 0 #2c2018,
+    -2px 2px 0 #2c2018,
+    2px 2px 0 #2c2018,
+    0 7px 12px rgba(0, 0, 0, 0.55);
 }
 
 .battle-scaffold-enemy-meter-overlay .battle-scaffold-meter {
@@ -1608,11 +1874,13 @@ button.reward-item {
 .battle-scaffold-enemy-info {
   box-sizing: border-box;
   display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   align-items: stretch;
   align-content: stretch;
-  min-height: 0;
+  min-height: clamp(176px, 23vh, 264px);
   height: 100%;
   align-self: stretch;
+  transform: translateY(var(--battle-enemy-info-offset-y, 0px));
   padding: 10px;
   border: 1px solid rgba(255, 238, 194, 0.28);
   border-radius: 8px;
@@ -1681,7 +1949,7 @@ button.reward-item {
 }
 
 .battle-scaffold-ultimate {
-  min-height: 0;
+  min-height: 100%;
   height: auto;
   align-self: stretch;
   box-sizing: border-box;
@@ -1817,6 +2085,36 @@ button.reward-item {
   max-height: 100%;
   object-fit: contain;
   pointer-events: none;
+}
+
+.battle-gold-target-preview {
+  position: absolute;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  min-width: 54px;
+  height: 54px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 238, 194, 0.64);
+  border-radius: 999px;
+  background: rgba(39, 25, 11, 0.82);
+  color: #ffe08a;
+  font-size: 40px;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow:
+    -1px -1px 0 #2c2018,
+    1px -1px 0 #2c2018,
+    -1px 1px 0 #2c2018,
+    1px 1px 0 #2c2018;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.42);
+  pointer-events: none;
+}
+
+.battle-gold-target-preview.is-disabled {
+  border-color: rgba(255, 96, 84, 0.76);
+  background: rgba(50, 10, 8, 0.88);
+  color: #ff5548;
 }
 
 .battle-cell-icon::after {
@@ -2637,6 +2935,29 @@ button.reward-item {
 
   80% {
     transform: translateX(0) scale(var(--battle-clock-warning-scale, 1.5));
+  }
+}
+
+@keyframes battleEnemyRageIdleTremble {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  20% {
+    transform: translate(-0.8px, 0.6px) rotate(-1deg);
+  }
+
+  40% {
+    transform: translate(0.7px, -0.5px) rotate(0.8deg);
+  }
+
+  60% {
+    transform: translate(-0.5px, -0.4px) rotate(-0.7deg);
+  }
+
+  80% {
+    transform: translate(0.6px, 0.5px) rotate(0.9deg);
   }
 }
 

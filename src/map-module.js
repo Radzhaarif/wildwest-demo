@@ -1,5 +1,6 @@
 import { BATTLE_CONTRACT_VERSION } from "./battle/battle-contract.js";
 import { createAudioController } from "./audio-module.js";
+import { collectAssetPaths, preloadAssets } from "./asset-preloader.js";
 import { loadJson, loadJsonc } from "./data-loader.js";
 import { validateGameData } from "./data-validation.js?v=2026-06-02-boss-event";
 import { generateMap, getMapLevelSummary } from "./map/map-generation.js";
@@ -14,6 +15,25 @@ const DEFAULT_SETTINGS_URL = `${DATA_ROOT}/settings/default-settings.json`;
 const CURRENT_SETTINGS_URL = `${DATA_ROOT}/settings/current-settings.json`;
 const SETTINGS_STORAGE_KEY = "roguelikeCurrentSettings";
 const ASSET_CACHE_BUSTER = Date.now();
+const STARTUP_ASSET_PATHS = [
+  "data/Assets/backgrounds/main_menu.png",
+  "data/Assets/cursor/ready/cursor.png",
+  "data/Assets/cursor/ready/cursor_activ.png",
+  "data/Assets/cursor/ready/cursor_q.png",
+  "data/Assets/cursor/ready/hand-finger.png",
+  "data/Assets/cursor/ready/hand.png",
+  "data/Assets/cursor/ready/hand_take.png",
+  "data/Assets/cursor/ready/up_down.png",
+];
+const FALLBACK_MAP_EVENT_ICON_PATHS = [
+  "data/Assets/icons/battle.png",
+  "data/Assets/icons/boss.png",
+  "data/Assets/icons/reward.png",
+  "data/Assets/icons/heal.png",
+  "data/Assets/icons/shop.png",
+  "data/Assets/icons/skip.png",
+  "data/Assets/icons/dialog.png",
+];
 const languageChangeListeners = new Set();
 const mapItemTooltipClassName = "item-tooltip";
 const BATTLE_TOOLTIP_FALLBACK_MS = 3000;
@@ -44,6 +64,7 @@ const state = {
   mapConfig: null,
   mapConfigCache: new Map(),
   mapUiConfig: null,
+  battleConfigCache: null,
   itemCatalog: null,
   itemCatalogById: new Map(),
   experienceTable: null,
@@ -90,6 +111,11 @@ const mapAnimationState = {
 // нужно обновить, иначе обработчики событий и рендер оверлеев отвалятся.
 const elements = {
   mainMenu: document.querySelector("#mainMenu"),
+  loadingOverlay: document.querySelector("#loadingOverlay"),
+  loadingTitle: document.querySelector("#loadingTitle"),
+  loadingStatus: document.querySelector("#loadingStatus"),
+  loadingProgressBar: document.querySelector("#loadingProgressBar"),
+  loadingProgressText: document.querySelector("#loadingProgressText"),
   mainMenuTitle: document.querySelector("#mainMenuTitle"),
   startGameButton: document.querySelector("#startGameButton"),
   settingsButton: document.querySelector("#settingsButton"),
@@ -278,13 +304,24 @@ async function boot() {
   // boot готовит только меню: кампания и состояние игрока не грузятся до START.
   // Так главное меню остается быстрым, а новый запуск игры всегда заново берет
   // default-player-state.json.
+  showLoadingOverlay({
+    title: loadingText("loading.title", "Loading"),
+    status: loadingText("loading.settings", "Loading settings"),
+  });
   await loadSettings();
+  updateLoadingOverlay({
+    loaded: 1,
+    total: 4,
+    status: loadingText("loading.locale", "Loading locale"),
+  });
   state.locale = await loadJson(getLocaleUrl(state.language));
   setupAudio();
   applyAudioSettings();
+  await preloadStartupAssets();
   updateLocalizedUi();
   renderMenu();
   playMusic(resolveAssetPath(state.settings.audio.mainMenuMusic));
+  hideLoadingOverlay();
 }
 
 async function reloadDataAndStart() {
@@ -299,17 +336,180 @@ async function reloadDataAndStart() {
   });
   state.mapConfigCache = validation.mapConfigCache;
   state.mapUiConfig = validation.mapUiConfig;
+  state.battleConfigCache = validation.battleConfigCache;
   state.itemCatalogById = validation.itemCatalogById;
+  await preloadGameAssets(loadingText("loading.mapAssets", "Preparing map assets"));
   renderMapTopActionButtons();
   await resetPlayerState();
   const safeIndex = Math.min(state.campaignIndex, state.campaign.maps.length - 1);
   await startCampaignMap(Math.max(safeIndex, 0));
+  hideLoadingOverlay();
+}
+
+async function preloadStartupAssets() {
+  await runAssetPreload(
+    collectAssetPaths(
+      STARTUP_ASSET_PATHS,
+      state.defaultSettings,
+      state.settings,
+    ),
+    {
+      title: loadingText("loading.title", "Loading"),
+      status: loadingText("loading.menuAssets", "Loading menu assets"),
+    },
+  );
+}
+
+async function preloadGameAssets(status) {
+  const enemyConfigs = state.battleConfigCache?.enemyConfigCache
+    ? [...state.battleConfigCache.enemyConfigCache.values()]
+    : [];
+  const mapConfigs = state.mapConfigCache
+    ? [...state.mapConfigCache.values()]
+    : [];
+
+  await runAssetPreload(
+    collectAssetPaths(
+      STARTUP_ASSET_PATHS,
+      FALLBACK_MAP_EVENT_ICON_PATHS,
+      state.settings,
+      state.campaign,
+      state.itemCatalog,
+      state.experienceTable,
+      state.mapUiConfig,
+      state.battleConfigCache?.battleUiConfig,
+      mapConfigs,
+      enemyConfigs,
+    ),
+    {
+      title: loadingText("loading.title", "Loading"),
+      status,
+    },
+  );
+}
+
+async function runAssetPreload(assetPaths, options = {}) {
+  showLoadingOverlay({
+    title: options.title || loadingText("loading.title", "Loading"),
+    status: options.status || loadingText("loading.assets", "Loading assets"),
+  });
+
+  const result = await preloadAssets(assetPaths, {
+    resolveAssetPath,
+    concurrency: 8,
+    onProgress: ({ loaded, total, current, failed }) => {
+      updateLoadingOverlay({
+        loaded,
+        total,
+        status: getAssetPreloadStatus(options.status, current, failed),
+      });
+    },
+  });
+
+  if (result.failed.length > 0) {
+    console.warn("Asset preload failed", result.failed);
+    updateLoadingOverlay({
+      loaded: result.loaded,
+      total: result.total,
+      status: formatTextWithFallback(
+        "loading.failed",
+        "Failed assets: {count}",
+        { count: result.failed.length },
+      ),
+    });
+  }
+
+  return result;
+}
+
+function showLoadingOverlay({ title, status } = {}) {
+  if (!elements.loadingOverlay) {
+    return;
+  }
+  elements.loadingOverlay.classList.remove("hidden");
+  elements.loadingOverlay.setAttribute("aria-busy", "true");
+  if (elements.loadingTitle) {
+    elements.loadingTitle.textContent = title || loadingText("loading.title", "Loading");
+  }
+  updateLoadingOverlay({
+    loaded: 0,
+    total: 1,
+    status: status || loadingText("loading.assets", "Loading assets"),
+  });
+}
+
+function hideLoadingOverlay() {
+  if (!elements.loadingOverlay) {
+    return;
+  }
+  elements.loadingOverlay.classList.add("hidden");
+  elements.loadingOverlay.setAttribute("aria-busy", "false");
+}
+
+function showLoadingError(error) {
+  showLoadingOverlay({
+    title: loadingText("loading.error", "Loading error"),
+    status: error?.message || String(error),
+  });
+  updateLoadingOverlay({
+    loaded: 0,
+    total: 1,
+    status: error?.message || String(error),
+  });
+}
+
+function updateLoadingOverlay({ loaded = 0, total = 1, status = "" } = {}) {
+  const safeTotal = Math.max(1, Number(total) || 1);
+  const safeLoaded = Math.max(0, Math.min(Number(loaded) || 0, safeTotal));
+  const percent = Math.round((safeLoaded / safeTotal) * 100);
+  if (elements.loadingProgressBar) {
+    elements.loadingProgressBar.style.width = `${percent}%`;
+  }
+  if (elements.loadingProgressText) {
+    elements.loadingProgressText.textContent = `${percent}% (${safeLoaded}/${safeTotal})`;
+  }
+  if (elements.loadingStatus && status) {
+    elements.loadingStatus.textContent = status;
+  }
+}
+
+function getAssetPreloadStatus(baseStatus, current, failed) {
+  if (failed?.length) {
+    return formatTextWithFallback(
+      "loading.failed",
+      "Failed assets: {count}",
+      { count: failed.length },
+    );
+  }
+  if (!current) {
+    return baseStatus || loadingText("loading.assets", "Loading assets");
+  }
+  return `${baseStatus || loadingText("loading.assets", "Loading assets")}: ${getAssetFileName(current)}`;
+}
+
+function getAssetFileName(assetPath) {
+  const normalized = String(assetPath || "").replaceAll("\\", "/");
+  return normalized.split("/").pop() || normalized;
+}
+
+function loadingText(key, fallback) {
+  return state.locale?.[key] || fallback;
+}
+
+function formatTextWithFallback(key, fallback, values) {
+  return Object.entries(values).reduce((text, [name, value]) => {
+    return text.replaceAll(`{${name}}`, String(value));
+  }, state.locale?.[key] || fallback);
 }
 
 async function startGame() {
   // Новый старт всегда сбрасывает игрока из default-player-state.json. Файл
   // current-player-state.json сейчас не используется как источник сохранения.
   elements.startGameButton.disabled = true;
+  showLoadingOverlay({
+    title: translate("menu.start"),
+    status: loadingText("loading.validation", "Checking data"),
+  });
   try {
     const campaign = await loadJsonc(CAMPAIGN_URL);
     const itemCatalog = await loadJsonc(ITEM_CATALOG_URL);
@@ -322,7 +522,9 @@ async function startGame() {
     state.experienceTable = experienceTable;
     state.mapConfigCache = validation.mapConfigCache;
     state.mapUiConfig = validation.mapUiConfig;
+    state.battleConfigCache = validation.battleConfigCache;
     state.itemCatalogById = validation.itemCatalogById;
+    await preloadGameAssets(loadingText("loading.runAssets", "Preparing run assets"));
     renderMapTopActionButtons();
     await resetPlayerState();
     state.hasStartedGame = true;
@@ -350,6 +552,7 @@ async function startGame() {
     elements.campaignStatus.textContent = error.message;
     showDialog(`${translate("validation.failed")}\n${error.message}`);
   } finally {
+    hideLoadingOverlay();
     elements.startGameButton.disabled = false;
   }
 }
@@ -472,7 +675,7 @@ function startMenuMusicAfterInteraction() {
 }
 
 function renderMenu() {
-  elements.mainMenu.style.backgroundImage = `url("${DATA_ROOT}/Assets/backgrounds/main_menu.png")`;
+  elements.mainMenu.style.backgroundImage = `url("${resolveAssetPath(`${DATA_ROOT}/Assets/backgrounds/main_menu.png`)}")`;
   renderLanguageOptions();
   elements.mainMenuTitle.textContent = translate("menu.title");
   elements.startGameButton.textContent = translate("menu.start");
@@ -3068,6 +3271,7 @@ function appendAssetCacheBuster(path) {
 
 boot().catch((error) => {
   console.error(error);
+  showLoadingError(error);
   elements.campaignStatus.textContent = error.message;
 });
 
