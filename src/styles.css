@@ -111,10 +111,9 @@ select {
   position: fixed;
   inset: 0;
   z-index: 50;
-  display: grid;
-  align-items: center;
-  justify-items: start;
-  padding: clamp(24px, 6vw, 84px);
+  display: block;
+  overflow: hidden;
+  padding: 0;
   background-color: #1b120c;
   background-position: center;
   background-size: cover;
@@ -129,14 +128,39 @@ select {
     linear-gradient(0deg, rgba(12, 8, 5, 0.42), transparent 35%);
 }
 
-.menu-content {
+.main-menu-frame {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: var(--map-ui-design-width, 1500px);
+  height: var(--map-ui-design-height, 860px);
+  pointer-events: none;
+  transform: translateY(-50%) scale(var(--map-ui-current-scale, 1));
+  transform-origin: left center;
+  will-change: transform;
+}
+
+.main-menu-panel {
   position: relative;
-  width: min(430px, 100%);
+  width: var(--map-ui-design-width, 1500px);
+  height: var(--map-ui-design-height, 860px);
+  pointer-events: none;
+}
+
+.menu-content {
+  position: absolute;
+  top: 50%;
+  left: 84px;
+  width: 430px;
+  max-width: calc(var(--map-ui-design-width, 1500px) - 168px);
+  pointer-events: auto;
+  transform: translateY(-50%);
 }
 
 .menu-content h1 {
   margin-bottom: 28px;
-  font-size: clamp(44px, 7vw, 92px);
+  font-size: 92px;
+  line-height: 0.95;
 }
 
 .menu-actions,

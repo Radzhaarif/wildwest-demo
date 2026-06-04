@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Map Module Prototype</title>
-    <link rel="stylesheet" href="./src/styles.css?v=2026-06-05-map-ui-scale-fix" />
+    <link rel="stylesheet" href="./src/styles.css?v=2026-06-05-main-menu-scale" />
   </head>
   <body>
     <section id="loadingOverlay" class="loading-overlay" aria-live="polite" aria-busy="true">
@@ -21,12 +21,16 @@
 
     <!-- Главное меню локализуется и управляется из src/map-module.js через id. -->
     <section id="mainMenu" class="main-menu">
-      <div class="menu-content">
-        <p class="eyebrow">Roguelike match-3</p>
-        <h1 id="mainMenuTitle">Wild West</h1>
-        <div id="mainMenuActions" class="menu-actions">
-          <button id="startGameButton" type="button">START</button>
-          <button id="settingsButton" type="button">Settings</button>
+      <div class="main-menu-frame">
+        <div class="main-menu-panel">
+          <div class="menu-content">
+            <p class="eyebrow">Roguelike match-3</p>
+            <h1 id="mainMenuTitle">Wild West</h1>
+            <div id="mainMenuActions" class="menu-actions">
+              <button id="startGameButton" type="button">START</button>
+              <button id="settingsButton" type="button">Settings</button>
+            </div>
+          </div>
         </div>
       </div>
     </section>

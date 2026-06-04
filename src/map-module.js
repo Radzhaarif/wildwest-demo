@@ -889,6 +889,8 @@ function applyMapUiScale() {
     : Math.max(fitScale, layout.minScale);
 
   document.documentElement.style.setProperty("--map-ui-current-scale", String(scale));
+  document.documentElement.style.setProperty("--map-ui-design-width", `${layout.designWidthPx}px`);
+  document.documentElement.style.setProperty("--map-ui-design-height", `${layout.designHeightPx}px`);
   document.documentElement.style.setProperty("--map-ui-viewport-padding", `${layout.viewportPaddingPx}px`);
   applyMapPermanentUiScale(elements.mapUiFrame, layout, scale);
   for (const frame of getMapUiOverlayFrames()) {
