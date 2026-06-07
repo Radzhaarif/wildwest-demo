@@ -341,6 +341,9 @@ export function createAudioController({ resolveAssetPath }) {
     if (!trackId) {
       return "";
     }
+    if (/^(?:blob:|data:)/i.test(trackId)) {
+      return trackId;
+    }
     const separator = trackId.includes("?") ? "&" : "?";
     return `${trackId}${separator}v=${Date.now()}`;
   }

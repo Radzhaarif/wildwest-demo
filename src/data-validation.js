@@ -431,6 +431,27 @@ function validateMapUiLayout(layout, path, issues) {
   }
   requireNumberInRange(layout.upscaleFactor, `${path}.upscaleFactor`, 0, 1, issues);
   requireNumberInRange(layout.minScale, `${path}.minScale`, 0.1, 2, issues);
+  if (layout.hudScaleReductionDivisor !== undefined) {
+    requireNumberInRange(layout.hudScaleReductionDivisor, `${path}.hudScaleReductionDivisor`, 1, Infinity, issues);
+  }
+  if (layout.topButtonsScaleReductionDivisor !== undefined) {
+    requireNumberInRange(layout.topButtonsScaleReductionDivisor, `${path}.topButtonsScaleReductionDivisor`, 1, Infinity, issues);
+  }
+  if (layout.mainMenuScaleReductionDivisor !== undefined) {
+    requireNumberInRange(layout.mainMenuScaleReductionDivisor, `${path}.mainMenuScaleReductionDivisor`, 1, Infinity, issues);
+  }
+  if (layout.mainMenuScaleMultiplier !== undefined) {
+    requireNumberInRange(layout.mainMenuScaleMultiplier, `${path}.mainMenuScaleMultiplier`, 0.1, Infinity, issues);
+  }
+  if (layout.settingsMenuScaleReductionDivisor !== undefined) {
+    requireNumberInRange(layout.settingsMenuScaleReductionDivisor, `${path}.settingsMenuScaleReductionDivisor`, 1, Infinity, issues);
+  }
+  if (layout.settingsMenuScaleMultiplier !== undefined) {
+    requireNumberInRange(layout.settingsMenuScaleMultiplier, `${path}.settingsMenuScaleMultiplier`, 0.1, Infinity, issues);
+  }
+  if (layout.settingsMenuFontScale !== undefined) {
+    requireNumberInRange(layout.settingsMenuFontScale, `${path}.settingsMenuFontScale`, 0.1, Infinity, issues);
+  }
 }
 
 function validateMapUiDialog(dialog, path, issues) {

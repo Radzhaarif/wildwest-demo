@@ -1,6 +1,6 @@
 import { BATTLE_CONTRACT_VERSION } from "./battle/battle-contract.js";
 import { createAudioController } from "./audio-module.js";
-import { collectAssetPaths, preloadAssets } from "./asset-preloader.js";
+import { collectAssetPaths, getCachedAssetUrl, preloadAssets } from "./asset-preloader.js";
 import { loadJson, loadJsonc } from "./data-loader.js";
 import { validateGameData } from "./data-validation.js?v=2026-06-02-boss-event";
 import { generateMap, getMapLevelSummary } from "./map/map-generation.js";
@@ -58,6 +58,13 @@ const DEFAULT_MAP_UI_LAYOUT = {
   allowUpscale: true,
   upscaleFactor: 0.5,
   minScale: 0.1,
+  hudScaleReductionDivisor: 1.5,
+  topButtonsScaleReductionDivisor: 1.5,
+  mainMenuScaleReductionDivisor: 1.5,
+  mainMenuScaleMultiplier: 1.2,
+  settingsMenuScaleReductionDivisor: 1.5,
+  settingsMenuScaleMultiplier: 1.2,
+  settingsMenuFontScale: 1.5,
 };
 
 // Runtime-состояние всей текущей сессии. Важно: это не зеркальная копия файлов
@@ -326,9 +333,9 @@ async function boot() {
     status: loadingText("loading.locale", "Loading locale"),
   });
   state.locale = await loadJson(getLocaleUrl(state.language));
+  await preloadStartupAssets();
   setupAudio();
   applyAudioSettings();
-  await preloadStartupAssets();
   updateLocalizedUi();
   renderMenu();
   playMusic(resolveAssetPath(state.settings.audio.mainMenuMusic));
@@ -887,8 +894,19 @@ function applyMapUiScale() {
   const scale = fitScale > 1
     ? (layout.allowUpscale ? 1 + (fitScale - 1) * layout.upscaleFactor : 1)
     : Math.max(fitScale, layout.minScale);
+  const settingsMenuScale = getReducedMapUiScale(scale, layout.settingsMenuScaleReductionDivisor)
+    * layout.settingsMenuScaleMultiplier;
+  const settingsMenuLocalScale = settingsMenuScale / Math.max(0.001, scale);
 
   document.documentElement.style.setProperty("--map-ui-current-scale", String(scale));
+  document.documentElement.style.setProperty("--map-hud-scale", String(getReducedMapUiScale(scale, layout.hudScaleReductionDivisor)));
+  document.documentElement.style.setProperty("--map-top-buttons-scale", String(getReducedMapUiScale(scale, layout.topButtonsScaleReductionDivisor)));
+  document.documentElement.style.setProperty(
+    "--main-menu-scale",
+    String(getReducedMapUiScale(scale, layout.mainMenuScaleReductionDivisor) * layout.mainMenuScaleMultiplier),
+  );
+  document.documentElement.style.setProperty("--settings-menu-local-scale", String(settingsMenuLocalScale));
+  document.documentElement.style.setProperty("--settings-menu-font-scale", String(layout.settingsMenuFontScale));
   document.documentElement.style.setProperty("--map-ui-design-width", `${layout.designWidthPx}px`);
   document.documentElement.style.setProperty("--map-ui-design-height", `${layout.designHeightPx}px`);
   document.documentElement.style.setProperty("--map-ui-viewport-padding", `${layout.viewportPaddingPx}px`);
@@ -960,6 +978,34 @@ function getMapUiLayoutConfig() {
     0.1,
     2,
   );
+  const hudScaleReductionDivisor = Math.max(1, getFiniteNumber(
+    layout.hudScaleReductionDivisor,
+    DEFAULT_MAP_UI_LAYOUT.hudScaleReductionDivisor,
+  ));
+  const topButtonsScaleReductionDivisor = Math.max(1, getFiniteNumber(
+    layout.topButtonsScaleReductionDivisor,
+    DEFAULT_MAP_UI_LAYOUT.topButtonsScaleReductionDivisor,
+  ));
+  const mainMenuScaleReductionDivisor = Math.max(1, getFiniteNumber(
+    layout.mainMenuScaleReductionDivisor,
+    DEFAULT_MAP_UI_LAYOUT.mainMenuScaleReductionDivisor,
+  ));
+  const mainMenuScaleMultiplier = Math.max(0.1, getFiniteNumber(
+    layout.mainMenuScaleMultiplier,
+    DEFAULT_MAP_UI_LAYOUT.mainMenuScaleMultiplier,
+  ));
+  const settingsMenuScaleReductionDivisor = Math.max(1, getFiniteNumber(
+    layout.settingsMenuScaleReductionDivisor,
+    DEFAULT_MAP_UI_LAYOUT.settingsMenuScaleReductionDivisor,
+  ));
+  const settingsMenuScaleMultiplier = Math.max(0.1, getFiniteNumber(
+    layout.settingsMenuScaleMultiplier,
+    DEFAULT_MAP_UI_LAYOUT.settingsMenuScaleMultiplier,
+  ));
+  const settingsMenuFontScale = Math.max(0.1, getFiniteNumber(
+    layout.settingsMenuFontScale,
+    DEFAULT_MAP_UI_LAYOUT.settingsMenuFontScale,
+  ));
   return {
     designWidthPx,
     designHeightPx,
@@ -969,7 +1015,21 @@ function getMapUiLayoutConfig() {
       : DEFAULT_MAP_UI_LAYOUT.allowUpscale,
     upscaleFactor,
     minScale,
+    hudScaleReductionDivisor,
+    topButtonsScaleReductionDivisor,
+    mainMenuScaleReductionDivisor,
+    mainMenuScaleMultiplier,
+    settingsMenuScaleReductionDivisor,
+    settingsMenuScaleMultiplier,
+    settingsMenuFontScale,
   };
+}
+
+function getReducedMapUiScale(scale, reductionDivisor) {
+  if (scale >= 1) {
+    return scale;
+  }
+  return 1 - (1 - scale) / Math.max(1, reductionDivisor);
 }
 
 function getFiniteNumber(value, fallback) {
@@ -3373,6 +3433,10 @@ function resolveAssetPath(path) {
   }
 
   const normalized = path.replaceAll("\\", "/");
+  const cachedUrl = getCachedAssetUrl(normalized);
+  if (cachedUrl) {
+    return cachedUrl;
+  }
 
   if (normalized.startsWith("data/")) {
     return appendAssetCacheBuster(`./${normalized}`);

@@ -6,7 +6,14 @@
     "viewportPaddingPx": 8,
     "allowUpscale": true,
     "upscaleFactor": 0.5,
-    "minScale": 0.1
+    "minScale": 0.1,
+    "hudScaleReductionDivisor": 1.5,
+    "topButtonsScaleReductionDivisor": 1.5,
+    "mainMenuScaleReductionDivisor": 1.5,
+    "mainMenuScaleMultiplier": 1.2,
+    "settingsMenuScaleReductionDivisor": 1.5,
+    "settingsMenuScaleMultiplier": 1.2,
+    "settingsMenuFontScale": 1.5
   },
   "topButtons": {
     "surrender": {

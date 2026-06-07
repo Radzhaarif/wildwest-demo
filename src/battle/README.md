@@ -8,7 +8,25 @@ This folder contains the isolated battle module. The map can call `startBattle()
 - `battle-module.js` - public entry point through `startBattle(request, options)`.
 - `battle-data.js` - battle data loading boundary.
 - `battle-engine.js` - pure battle and match-3 logic without DOM.
-- `battle-view.js` - DOM view boundary for the temporary battle screen.
+- `battle-config.js` - battle UI config access layer: defaults, board/layout/animation/sound getters, clock-warning parsing, and asset path cache busting.
+- `battle-formatters.js` - battle text helpers: locale lookup, battle text-key lookup, status template formatting, time formatting, and tooltip labels.
+- `battle-player-items.js` - player item/inventory helpers: item labels, item descriptions, configured hand slots, inventory quantity lookup, and quantity mutation.
+- `battle-state.js` - battle state/stage layer: state shape initialization, attempt board setup, reserve board, current stage index, stage convert effects, and walls/boxes/vines sync.
+- `battle-scaffold-view.js` - battle screen scaffold: modal DOM shell, renderTargets, viewport scale, resize handling, and DOM cleanup.
+- `battle-runtime.js` - battle lifecycle, attempt tokens, rage/idle runtime timers, pause/resume helpers.
+- `battle-animations.js` - low-level board DOM animations: swap, shake, blocked click, shuffle, cell lookup, and shared animation state helpers.
+- `battle-board-view.js` - board DOM rendering: cells, icons, walls, boxes, vines, board messages, gold target preview, and board layout variables.
+- `battle-board-actions.js` - board input/action layer: ordinary swap, skull, glove, gold, battery, boxed/vined blocked clicks, and passive turn damage after accepted swaps.
+- `battle-stats-view.js` - enemy/player stat HUD rendering: enemy visual, HP/aggression/shield/damage/rage timer, player health/heal meters, and rage warning icon state.
+- `battle-inventory-view.js` - battle inventory and active-item HUD rendering: skull/glove/clock/gold/bag slots, header mini-menu button, clock cooldown display, active special cursor, and unavailable float messages.
+- `battle-shuffle-flow.js` - idle/no-moves/manual shuffle flow: idle move hint, no-moves board message, manual shuffle damage, board reshuffle, and shuffle button language/state.
+- `battle-outcome-flow.js` - settings/surrender/outcome flow: settings pause/resume, surrender callbacks, victory/defeat banners, restart, scaffold result, and finish cleanup handoff.
+- `battle-rage-flow.js` - enemy rage scenario flow: countdown tick, pending rage, ultimate effect order, kamikaze handling, rage cascade handoff, and rage-effect classifiers.
+- `battle-popovers.js` - battle popover layer: mini-menu, inventory bag, battle log, and shared battle tooltip.
+- `battle-feedback-view.js` - feedback state and basic stat-change visuals: suppression, pending deltas, icon shake, and floating numbers.
+- `battle-projectiles-view.js` - projectile and rage visual layer: stat-change lights, rage target lights, transform target highlights, and kamikaze burst visuals.
+- `battle-resolution.js` - cascade/death/drop resolution layer: match cascade loop, activated-item death animation, reserve refill movement, and item activation sounds.
+- `battle-view.js` - battle-screen facade: scenario orchestration, engine calls, and thin wrappers for extracted flow/view layers.
 - `data/settings/battle-ui.jsonc` - battle-screen presentation config: UI text keys, icon paths, top-button icon sizes, battle-window background, virtual layout size and scaling, board size, progress bar colors, hint priority, and animation timings.
 - `data/settings/battle-ui.example.jsonc` - commented example that explains each battle UI config field.
 
@@ -51,17 +69,33 @@ The engine does not update the map, touch DOM, animate anything, run enemy AI, o
 
 `battle-view.js` currently shows a temporary modal with:
 
+- battle scaffold DOM, render target creation, viewport scaling and DOM cleanup delegated to `battle-scaffold-view.js`; `battle-view.js` keeps thin wrappers because outcome, popovers and other layers still use the old scaffold helper names;
 - enemy name and `enemyId`;
 - a 12x9 match-3 board generated from `category: "match-3"` items, while created `rare_match-3` items can still join matches by shared `type`;
 - battle UI icons and labels loaded from `data/settings/battle-ui.jsonc`;
+- battle UI defaults and config getters are delegated to `battle-config.js`; `battle-view.js` keeps only scenario orchestration and passes those getters to extracted layers;
+- battle text formatting is delegated to `battle-formatters.js`; `battle-view.js` keeps thin wrappers because extracted layers still use the old formatter names through deps;
+- player item and inventory helpers are delegated to `battle-player-items.js`; `battle-view.js` keeps thin wrappers for the old helper names used by board, popover and inventory layers;
+- battle state/stage helpers are delegated to `battle-state.js`; `battle-view.js` no longer owns attempt board setup, reserve-board refresh, stage convert lookup, or walls/boxes/vines sync;
 - battle-window background loaded from `data/settings/battle-ui.jsonc`;
 - battle window layout uses `battle-ui.layout`: the screen is built inside a stable virtual size and scaled as one panel to fit the browser viewport, with soft upscale on larger screens. `.battle-scaffold-frame` owns the scaled layout size, while `.battle-scaffold-panel` owns the unscaled virtual contents;
-- battle menu buttons `ui.surrender`, `menu.settings`, and `ui.eventLog` are opened from the `little_menu` slot in the special-item column; their icons and `iconSizePx` are configured in `topButtons`;
+- battle menu buttons `ui.surrender`, `menu.settings`, and `ui.eventLog` are opened from the `little_menu` button in the enemy header; their icons and `iconSizePx` are configured in `topButtons`;
 - while the mini menu is open, the battle window is heavily dimmed and the battle runtime is paused; clicking the menu button area again or any empty dimmed area closes the menu and resumes the runtime;
 - the battle log button now lives in the mini menu; short battle messages are no longer shown inside the enemy info panel;
 - settings pause the battle runtime while the settings overlay is open;
+- runtime lifecycle, attempt tokens, pause/resume, rage interval and idle hint timer are delegated to `battle-runtime.js`; `battle-view.js` keeps view-specific callbacks only as thin facade wrappers;
 - click-to-select and adjacent-cell swap;
 - animated swap for two selected cells, with duration from `data/settings/battle-ui.jsonc`;
+- low-level board animations are delegated to `battle-animations.js`; `battle-view.js` still owns when player/battle scenarios ask for those animations;
+- board DOM rendering is delegated to `battle-board-view.js`; board click actions are delegated to `battle-board-actions.js`, while `battle-view.js` keeps thin wrappers and the higher-level scaffold orchestration;
+- enemy/player stat HUD rendering is delegated to `battle-stats-view.js`; `battle-view.js` keeps thin wrappers because runtime, rage and resolution layers still call the old stat update names;
+- inventory/special-item HUD rendering is delegated to `battle-inventory-view.js`; `battle-view.js` keeps thin wrappers for the old inventory names because popovers, board actions, runtime and cleanup still call that facade contract;
+- idle hint, no-moves warning and manual shuffle flow are delegated to `battle-shuffle-flow.js`; `battle-view.js` keeps thin wrappers because runtime and scaffold code still call the old flow names;
+- settings, surrender, victory/defeat, restart and final scaffold result are delegated to `battle-outcome-flow.js`; `battle-view.js` keeps thin wrappers because board/rage helpers still call the old outcome names;
+- rage countdown, pending rage, ultimate effect order, kamikaze handling, rage cascade handoff and rage-effect classifiers are delegated to `battle-rage-flow.js`; `battle-view.js` keeps thin wrappers because runtime, projectiles and scaffold code still call the old rage names;
+- rage helper wrappers in `battle-view.js` are intentionally only delegation points now; old unreachable fallback bodies after wrapper `return` were removed, and wrappers/imports with no callsites were deleted so `battle-rage-flow.js` stays the single source of truth for rage effect classification and current rage/stage lookups;
+- mini-menu, bag inventory, battle log and battle tooltip are delegated to `battle-popovers.js`; `battle-view.js` passes only action callbacks and runtime dependencies;
+- health/aggression/heal feedback state and floating-number/icon-shake animation are delegated to `battle-feedback-view.js`; stat-change projectiles, rage-specific projectile sequences, transform target highlights and kamikaze burst visuals are delegated to `battle-projectiles-view.js`;
 - invalid-swap shake animation before the pieces return to their old places;
 - invalid swap rollback when no match appears;
 - idle move hint: after 5 seconds without player input, the first cell of an available move shakes;
@@ -71,7 +105,7 @@ The engine does not update the map, touch DOM, animate anything, run enemy AI, o
 - enemy walls: `wall > 0` creates cell-sized visual blockers between cells and prevents ordinary swaps across those edges; when a blocked swap is attempted, the selected item icon and the blocking wall shake. Walls are generated once at battle start and stay fixed until the battle ends;
 - enemy boxes: `box > 0` creates cell-sized covers over random cells; a boxed cell cannot be selected, swapped, matched, used as a battery target, suggested as an available move, counted for passive `dmgperturn`, transformed by an ultimate, or counted for ultimate damage, while the item under the box remains fixed in the board matrix. Boxes are generated once at battle start and stay fixed until the battle ends. Items filling cells below a box animate from the box position instead of the top edge of the field;
 - enemy vines: `vines > 0` creates cell-sized covers over random non-box cells; a vined cell cannot be selected for ordinary swap, used as a battery target, suggested as an available move, or moved by manual shuffle. Items still fall under vines, can be activated by ordinary combinations, skull can activate the covered item, and glove can freely move it out so it becomes normal again outside the vined cell;
-- match removal, gravity, refill, and automatic cascades;
+- match removal, gravity, refill, activated-item death animations, item activation sounds, and automatic cascade resolution are delegated to `battle-resolution.js`;
 - an invisible reserve board above the visible field: when visible items disappear, lower reserve items fall into the visible board and the reserve board receives new random items for future falls;
 - item icons are detached from square cells: cells and icons are separate direct children of the same board grid, with icons placed in the same grid row/column above the square backgrounds; the square visual is drawn by `.battle-scaffold-cell::before`, while the cell itself stays transparent and unfiltered so static icons remain above the square layer;
 - cascade movement keeps the square board backgrounds fixed and animates only item icons; the active fall-speed setting is `animations.boardDropMs` in milliseconds per board row, and `animations.newItemSpawnOffsetPx` controls how many pixels above the visible board the first new item starts;
