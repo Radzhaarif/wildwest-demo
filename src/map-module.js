@@ -15,6 +15,7 @@ const DEFAULT_SETTINGS_URL = `${DATA_ROOT}/settings/default-settings.json`;
 const CURRENT_SETTINGS_URL = `${DATA_ROOT}/settings/current-settings.json`;
 const SETTINGS_STORAGE_KEY = "roguelikeCurrentSettings";
 const ASSET_CACHE_BUSTER = Date.now();
+const MODULE_CACHE_BUSTER = Date.now();
 const STARTUP_ASSET_PATHS = [
   "data/Assets/backgrounds/main_menu.png",
   "data/Assets/cursor/ready/cursor.png",
@@ -113,6 +114,7 @@ const state = {
 const audioController = createAudioController({ resolveAssetPath });
 let mapItemTooltipHideTimeoutId = null;
 let mapItemTooltipShowTimeoutId = null;
+let battleModulePreloadPromise = null;
 const mapAnimationState = {
   active: false,
   rafId: 0,
@@ -358,6 +360,7 @@ async function reloadDataAndStart() {
   state.itemCatalogById = validation.itemCatalogById;
   applyMapUiScale();
   await preloadGameAssets(loadingText("loading.mapAssets", "Preparing map assets"));
+  await preloadBattleCode(loadingText("loading.battleCode", "Preparing battle code"));
   renderMapTopActionButtons();
   await resetPlayerState();
   const safeIndex = Math.min(state.campaignIndex, state.campaign.maps.length - 1);
@@ -439,6 +442,24 @@ async function runAssetPreload(assetPaths, options = {}) {
   }
 
   return result;
+}
+
+async function preloadBattleCode(status) {
+  showLoadingOverlay({
+    title: loadingText("loading.title", "Loading"),
+    status,
+  });
+  const battleModule = await importBattleModule();
+  if (typeof battleModule.preloadBattleModule === "function") {
+    await battleModule.preloadBattleModule();
+  }
+}
+
+function importBattleModule() {
+  if (!battleModulePreloadPromise) {
+    battleModulePreloadPromise = import(`./battle/battle-module.js?v=${MODULE_CACHE_BUSTER}`);
+  }
+  return battleModulePreloadPromise;
 }
 
 function showLoadingOverlay({ title, status } = {}) {
@@ -544,6 +565,7 @@ async function startGame() {
     state.battleConfigCache = validation.battleConfigCache;
     state.itemCatalogById = validation.itemCatalogById;
     await preloadGameAssets(loadingText("loading.runAssets", "Preparing run assets"));
+    await preloadBattleCode(loadingText("loading.battleCode", "Preparing battle code"));
     renderMapTopActionButtons();
     await resetPlayerState();
     state.hasStartedGame = true;
@@ -2217,7 +2239,7 @@ async function openBattleModule(node) {
   try {
     const request = createBattleRequest(node);
     exposeLegacyContextAlias(request);
-    const { startBattle } = await import(`./battle/battle-module.js?v=${Date.now()}`);
+    const { startBattle } = await importBattleModule();
     const result = await startBattle(request, {
       loaders: { loadJsonc },
       callbacks: {

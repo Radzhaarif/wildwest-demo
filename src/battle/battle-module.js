@@ -1,21 +1,36 @@
+const BATTLE_MODULE_CACHE_BUSTER = Date.now();
+let battleModulePreloadPromise = null;
+
+export function preloadBattleModule() {
+  if (!battleModulePreloadPromise) {
+    battleModulePreloadPromise = Promise.all([
+      importBattleContract(),
+      importBattleData(),
+      importBattleEngine(),
+      importBattleView(),
+    ]);
+  }
+  return battleModulePreloadPromise;
+}
+
 export async function startBattle(request, options = {}) {
   const callbacks = options.callbacks || {};
   const [{ BATTLE_CONTRACT_VERSION }, { loadBattleData }] = await Promise.all([
-    import(`./battle-contract.js?v=${Date.now()}`),
-    import(`./battle-data.js?v=${Date.now()}`),
+    importBattleContract(),
+    importBattleData(),
   ]);
 
   assertBattleRequest(request, BATTLE_CONTRACT_VERSION);
 
   const battleData = await loadBattleData(request, options.loaders);
-  const battleEngine = await import(`./battle-engine.js?v=${Date.now()}`);
+  const battleEngine = await importBattleEngine();
   const context = {
     request,
     battleData,
     battleState: battleEngine.createInitialBattleState(request, battleData),
   };
   exposeLegacyBattleContext(context);
-  const { createBattleView } = await import(`./battle-view.js?v=${Date.now()}`);
+  const { createBattleView } = await importBattleView();
   const battleView = createBattleView({
     root: options.root,
     engine: battleEngine,
@@ -44,6 +59,22 @@ export async function startBattle(request, options = {}) {
       });
     }
   }
+}
+
+function importBattleContract() {
+  return import(`./battle-contract.js?v=${BATTLE_MODULE_CACHE_BUSTER}`);
+}
+
+function importBattleData() {
+  return import(`./battle-data.js?v=${BATTLE_MODULE_CACHE_BUSTER}`);
+}
+
+function importBattleEngine() {
+  return import(`./battle-engine.js?v=${BATTLE_MODULE_CACHE_BUSTER}`);
+}
+
+function importBattleView() {
+  return import(`./battle-view.js?v=${BATTLE_MODULE_CACHE_BUSTER}`);
 }
 
 function exposeLegacyBattleContext(context) {

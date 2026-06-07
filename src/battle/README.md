@@ -139,7 +139,7 @@ This screen intentionally does not run enemy AI or implement every possible ulti
 
 `src/map-module.js` builds a `BattleRequest` for `battle` nodes and calls `startBattle()`.
 
-During active MVP work, `map-module.js` loads `battle-module.js` dynamically, and `battle-module.js` loads `battle-engine.js` plus `battle-view.js` dynamically. This prevents stale browser ES-module cache from breaking the main menu while the battle files change quickly.
+During active MVP work, `map-module.js` loads `battle-module.js` dynamically with a stable per-page cache-buster. After START, the map calls `preloadBattleModule()` before showing the run map, so `battle-contract.js`, `battle-data.js`, `battle-engine.js`, `battle-view.js`, and their static dependencies are already fetched and parsed before the first battle click. The cache-buster stays stable for the page lifetime so prewarm and real battle entry reuse the same ES modules while still avoiding stale modules after a page refresh.
 
 The map marks a battle node completed only after `victory`. If the enemy has a `reward` payload, the map first shows the shared reward overlay and completes the node only after the player clicks `ui.claimReward`.
 
