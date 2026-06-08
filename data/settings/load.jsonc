@@ -1,0 +1,51 @@
+{
+  "background": {
+    "color": "#ffffff"
+  },
+  "logo": {
+    "image": "data/Assets/logo.png",
+    "fadeInMs": 1000,
+    "minVisibleMs": 2500,
+    "fit": "contain",
+    "widthVw": 100,
+    "heightVh": 100,
+    "responsive": {
+      "designWidthPx": 900,
+      "designHeightPx": 520,
+      "shrinkSpeed": 0.5,
+      "minWidthVw": 78,
+      "minHeightVh": 72,
+      "compactReservedBottomPx": 52
+    }
+  },
+  "wave": {
+    "enabled": true,
+    "delayMs": 750,
+    "durationMs": 1500,
+    "widthPct": 28,
+    "opacity": 0.72,
+    "repeat": false
+  },
+  "progress": {
+    "enabled": true,
+    "widthVw": 72,
+    "heightPx": 12,
+    "bottomPx": 48,
+    "trackColor": "rgba(0, 0, 0, 0.14)",
+    "fillColor": "#111111",
+    "radiusPx": 999,
+    "showPercent": false
+  },
+  "caption": {
+    "enabled": true,
+    "textKey": "loading.title",
+    "fallback": "Loading",
+    "bottomPx": 22,
+    "fontSizePx": 18,
+    "color": "rgba(0, 0, 0, 0.62)"
+  },
+  "details": {
+    "showCurrentFile": false,
+    "showStatusText": false
+  }
+}

@@ -4,18 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Map Module Prototype</title>
-    <link rel="stylesheet" href="./src/styles.css?v=2026-06-05-battle-special-slots-light-bag" />
+    <link rel="stylesheet" href="./src/styles.css?v=2026-06-08-forced-landscape" />
   </head>
   <body>
+    <div id="gameOrientationRoot" class="game-orientation-root">
     <section id="loadingOverlay" class="loading-overlay" aria-live="polite" aria-busy="true">
+      <div class="loading-logo-stage" aria-hidden="true">
+        <img id="loadingLogo" class="loading-logo" alt="" />
+        <span id="loadingWave" class="loading-wave"></span>
+      </div>
       <div class="loading-panel">
-        <p class="eyebrow">Wild West</p>
         <h2 id="loadingTitle">Loading</h2>
+        <p id="loadingStatus" class="loading-status">Preparing game</p>
         <div class="loading-progress" aria-hidden="true">
           <span id="loadingProgressBar"></span>
         </div>
         <p id="loadingProgressText" class="loading-progress-text">0%</p>
-        <p id="loadingStatus" class="loading-status">Preparing game</p>
       </div>
     </section>
 
@@ -227,6 +231,7 @@
         </div>
       </div>
     </dialog>
+    </div>
 
     <script type="module">
       // Cache-buster нужен, чтобы после правок src/map-module.js браузер не держал старый ES-модуль.

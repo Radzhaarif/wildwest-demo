@@ -53,6 +53,7 @@
 - `data/player/player-state.example.jsonc` - пример состояния игрока с комментариями.
 - `data/settings/default-settings.json` - настройки по умолчанию.
 - `data/settings/current-settings.json` - стартовые текущие настройки из файла.
+- `data/settings/load.jsonc` - оформление первого экрана загрузки: логотип, фон, волна, progress bar, подпись и минимальное время показа.
 - `data/settings/settings.example.jsonc` - пример настроек с комментариями.
 - `data/locales/en.json`, `data/locales/ru.json`, `data/locales/new_ru.json` - локализации в формате простой пары `ключ: текст`.
 
@@ -65,28 +66,41 @@
 1. Игра читает `default-settings.json`.
 2. Игра читает `current-settings.json`.
 3. Если в браузере есть сохраненные настройки в `localStorage`, они перекрывают пользовательские настройки из файла. Структурные поля `languages` и `rewardAnimationMs` всегда берутся из JSON-файлов, чтобы их можно было менять без очистки `localStorage`.
-4. Загружается локаль `data/locales/<language>.json`.
-5. Показывается экран загрузки и предзагружаются базовые ассеты меню: фон главного меню, курсоры и звуки из настроек. Ассеты скачиваются в общий RAM-кэш как `blob:` URL, а изображения дополнительно декодируются и удерживаются в памяти для быстрого повторного использования.
-6. Показывается главное меню.
+4. Игра читает `data/settings/load.jsonc` и применяет оформление loading-screen. Если файл не загрузился, используется встроенный fallback.
+5. Загружается локаль `data/locales/<language>.json`.
+6. Читаются `data/settings/campaign.jsonc`, `data/settings/items.jsonc` и `data/player/experience-table.jsonc`.
+7. До показа главного меню запускается проверка данных: кампания, каталог предметов, таблица опыта, карты из кампании, враги из активных battle-точек, `data/settings/battle-ui.jsonc`, стартовое состояние игрока и все локали из `settings.languages`.
+8. Если проверка прошла, предзагружаются локальные ассеты активной кампании: картинки карт, иконки событий, `items.jsonc` icon/bigIcon/sound_effect, `map-ui`, `battle-ui`, фоны боев, изображения врагов, награды, звуки, ассеты меню, логотип загрузки и другие пути из `data/Assets`. Ассеты скачиваются в общий RAM-кэш как `blob:` URL, а изображения дополнительно декодируются и удерживаются в памяти для быстрого повторного использования.
+9. До показа главного меню заранее загружается код боевого модуля: `battle-module.js`, `battle-engine.js`, `battle-view.js` и зависимости. Сам бой при этом не создается заранее.
+10. Если часть картинок или звуков не загрузилась, игра пишет список проблем в консоль и продолжает запуск. JSON-ошибки остаются фатальными через валидатор.
+11. Показывается главное меню.
 
 При нажатии `START`:
 
-1. Читается `data/settings/campaign.jsonc`.
-2. Читается `data/settings/items.jsonc`.
-3. Читается `data/player/experience-table.jsonc`.
-4. До скрытия главного меню запускается проверка данных: кампания, каталог предметов, таблица опыта, карты из кампании, враги из активных battle-точек, `data/settings/battle-ui.jsonc`, стартовое состояние игрока и все локали из `settings.languages`.
-5. Если проверка прошла, перед скрытием главного меню предзагружаются локальные ассеты активной кампании: картинки карт, иконки событий, `items.jsonc` icon/bigIcon/sound_effect, `map-ui`, `battle-ui`, фоны боев, изображения врагов, награды, звуки и другие пути из `data/Assets`. После предзагрузки карта и бой получают уже cached URL из `src/asset-preloader.js`, а не каждый раз новый cache-buster URL.
-6. До показа карты заранее загружается код боевого модуля: `battle-module.js`, `battle-engine.js`, `battle-view.js` и зависимости. Это убирает задержку первого открытия battle-точки; сам бой при этом не создается заранее.
-7. Если часть картинок или звуков не загрузилась, игра пишет список проблем в консоль и продолжает запуск. JSON-ошибки остаются фатальными через валидатор.
-8. Если проверка не прошла, игра показывает окно с понятным списком ошибок и не начинает забег.
-9. Если проверка прошла, `default-player-state.json` копируется в состояние игры в памяти.
-10. В глобальный лог добавляется новый разделитель забега с номером забега и результатом проверки данных.
-11. Загружается стартовая карта из `campaign.startMapId`.
-12. Генерируется карта и запускается вступительная прокрутка сверху вниз.
+1. Игра использует уже загруженные и проверенные данные. Если по какой-то причине данные не готовы, START выполняет аварийную догрузку тем же путем, что и boot.
+2. `default-player-state.json` копируется в состояние игры в памяти.
+3. В глобальный лог добавляется новый разделитель забега с номером забега и результатом проверки данных.
+4. Загружается стартовая карта из `campaign.startMapId`.
+5. Генерируется карта и запускается вступительная прокрутка сверху вниз.
 
 Важно: браузер не записывает изменения обратно в JSON-файлы. Текущее состояние игрока и выбранные настройки живут в памяти браузера и `localStorage`.
 
 Лог событий намеренно глобальный для текущей сессии браузера: при новом START он не очищается, а получает новый разделитель забега. Это помогает сравнивать несколько попыток подряд.
+
+## Экран загрузки
+
+Первый loading-screen настраивается в `data/settings/load.jsonc`.
+
+- `background.color` - цвет фона, сейчас белый.
+- `logo.image` - путь к логотипу.
+- `logo.fadeInMs` - время плавного появления логотипа.
+- `logo.minVisibleMs` - минимальное время показа экрана загрузки, даже если все уже загрузилось быстрее.
+- `logo.responsive` - адаптив логотипа: эталонный экран, скорость уменьшения, минимальный размер в `vw/vh` и нижний резерв под progress bar на низких экранах.
+- `wave` - белая волна по логотипу: включение, задержка, длительность, ширина, прозрачность и повтор.
+- `progress` - нижняя полоса прогресса: включение, размер, отступ от низа, цвета и показ процентов.
+- `caption` - общая подпись внизу. Конкретный файл или этап загрузки не показывается, если `details.showCurrentFile` и `details.showStatusText` равны `false`.
+
+Логотип лежит в `data/Assets/logo.png` и попадает в общий RAM-кэш ассетов.
 
 ## Кампания
 
@@ -774,6 +788,7 @@ Map overlay UI uses its own `layout` scale in `data/settings/map-ui.jsonc`. Over
 Current responsibilities:
 
 - `layout` controls the adaptive scale of map UI. `viewportPaddingPx` keeps a safe edge gap, `allowUpscale` enables growth on large screens, `upscaleFactor` controls how much of the extra room is used, and `minScale` is the emergency lower bound for small windows.
+- `orientation` управляет принудительным landscape-режимом на телефонах. Если `forceLandscapeOnPhones=true`, устройство похоже на телефон, есть touch/coarse pointer и viewport портретный, весь игровой слой визуально поворачивается на `rotateDegrees`, а карта и бой считают размеры окна как горизонтальные.
 - `layout.*ScaleReductionDivisor` weakens shrink for specific UI groups. For example, when the common scale would shrink by 45%, divisor `1.5` shrinks that group by 30% instead. `mainMenuScaleMultiplier` additionally increases the main menu after this shrink calculation; the current value `1.2` makes the title and buttons 20% larger. `settingsMenuScaleReductionDivisor` and `settingsMenuScaleMultiplier` do the same for the settings window, but as an extra scale inside the already centered overlay, so reward, shop, heal and dialog windows keep their previous geometry. `settingsMenuFontScale` changes only fonts and inner controls of the settings window; the current value `1.5` makes settings text one and a half times larger without changing the configured panel width.
 - `topButtons` controls map top-right button text keys, icon paths and icon sizes.
 - `topButtons.*.iconSizePx` controls the icon size only; CSS keeps the button itself square and clamps the icon inside the slot.

@@ -370,10 +370,17 @@ export function getBattleViewportSize(deps) {
     return { width: deps.DEFAULT_BATTLE_LAYOUT.designWidthPx, height: deps.DEFAULT_BATTLE_LAYOUT.designHeightPx };
   }
   const visualViewport = window.visualViewport;
-  return {
+  const viewport = {
     width: Number(visualViewport?.width) || window.innerWidth || document.documentElement.clientWidth || deps.DEFAULT_BATTLE_LAYOUT.designWidthPx,
     height: Number(visualViewport?.height) || window.innerHeight || document.documentElement.clientHeight || deps.DEFAULT_BATTLE_LAYOUT.designHeightPx,
   };
+  if (document.documentElement.classList.contains("is-forced-landscape")) {
+    return {
+      width: viewport.height,
+      height: viewport.width,
+    };
+  }
+  return viewport;
 }
 
 export function getBattleLayoutConfig(deps, context) {

@@ -15,6 +15,13 @@
     "settingsMenuScaleMultiplier": 1.2,
     "settingsMenuFontScale": 1.5
   },
+  "orientation": {
+    "forceLandscapeOnPhones": true,
+    "requireTouch": true,
+    "maxPhoneShortSidePx": 620,
+    "maxPhoneLongSidePx": 980,
+    "rotateDegrees": 90
+  },
   "topButtons": {
     "surrender": {
       "textKey": "ui.surrender",

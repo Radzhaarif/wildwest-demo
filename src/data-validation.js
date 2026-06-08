@@ -409,6 +409,7 @@ function validateMapUiConfigObject(config, source, issues, requiredTextKeys) {
   }
 
   validateMapUiLayout(config.layout, `${source}.layout`, issues);
+  validateMapUiOrientation(config.orientation, `${source}.orientation`, issues);
   validateMapUiTopButtons(config.topButtons, `${source}.topButtons`, issues, requiredTextKeys);
   validateMapUiNodes(config.nodes, `${source}.nodes`, issues);
   validateMapUiDialog(config.dialog, `${source}.dialog`, issues);
@@ -451,6 +452,31 @@ function validateMapUiLayout(layout, path, issues) {
   }
   if (layout.settingsMenuFontScale !== undefined) {
     requireNumberInRange(layout.settingsMenuFontScale, `${path}.settingsMenuFontScale`, 0.1, Infinity, issues);
+  }
+}
+
+function validateMapUiOrientation(orientation, path, issues) {
+  if (orientation === undefined) {
+    return;
+  }
+  if (!orientation || typeof orientation !== "object") {
+    issues.push(`${path}: must be an object when present`);
+    return;
+  }
+  if (orientation.forceLandscapeOnPhones !== undefined && typeof orientation.forceLandscapeOnPhones !== "boolean") {
+    issues.push(`${path}.forceLandscapeOnPhones: must be a boolean`);
+  }
+  if (orientation.requireTouch !== undefined && typeof orientation.requireTouch !== "boolean") {
+    issues.push(`${path}.requireTouch: must be a boolean`);
+  }
+  if (orientation.maxPhoneShortSidePx !== undefined) {
+    requireNumberInRange(orientation.maxPhoneShortSidePx, `${path}.maxPhoneShortSidePx`, 1, Infinity, issues);
+  }
+  if (orientation.maxPhoneLongSidePx !== undefined) {
+    requireNumberInRange(orientation.maxPhoneLongSidePx, `${path}.maxPhoneLongSidePx`, 1, Infinity, issues);
+  }
+  if (orientation.rotateDegrees !== undefined) {
+    requireNumberInRange(orientation.rotateDegrees, `${path}.rotateDegrees`, -270, 270, issues);
   }
 }
 

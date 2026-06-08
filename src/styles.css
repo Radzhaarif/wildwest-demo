@@ -35,6 +35,65 @@ body {
   cursor: var(--cursor-default), auto;
 }
 
+.game-orientation-root {
+  min-height: 100vh;
+}
+
+html.is-forced-landscape,
+html.is-forced-landscape body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+}
+
+html.is-forced-landscape .game-orientation-root {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 100vh;
+  width: 100dvh;
+  height: 100vw;
+  height: 100dvw;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--bg);
+  transform: translate(-50%, -50%) rotate(var(--forced-landscape-rotation, 90deg));
+  transform-origin: center;
+}
+
+html.is-forced-landscape .loading-overlay,
+html.is-forced-landscape .main-menu,
+html.is-forced-landscape .app-shell,
+html.is-forced-landscape .map-ui-frame,
+html.is-forced-landscape .modal-overlay,
+html.is-forced-landscape .shop-overlay,
+html.is-forced-landscape .reward-overlay,
+html.is-forced-landscape .map-dialog-overlay,
+html.is-forced-landscape .battle-scaffold-overlay {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+html.is-forced-landscape .event-dialog[open] {
+  inset: auto;
+  top: 50%;
+  left: 50%;
+  width: 100vh;
+  width: 100dvh;
+  height: 100vw;
+  height: 100dvw;
+  transform: translate(-50%, -50%) rotate(var(--forced-landscape-rotation, 90deg));
+  transform-origin: center;
+}
+
+html.is-forced-landscape .map-viewport {
+  height: 100%;
+  min-height: 100%;
+}
+
 .hidden {
   display: none !important;
 }
@@ -43,41 +102,100 @@ body {
   position: fixed;
   inset: 0;
   z-index: 20000;
+  display: block;
+  overflow: hidden;
+  padding: 0;
+  background: var(--loading-background, #ffffff);
+  color: #111;
+}
+
+.loading-logo-stage {
+  position: absolute;
+  inset: 0;
   display: grid;
   place-items: center;
-  padding: 24px;
-  background:
-    linear-gradient(90deg, rgba(12, 8, 5, 0.94), rgba(26, 17, 10, 0.86)),
-    #140d09;
-  color: var(--text);
+  padding: 24px 24px var(--loading-effective-reserved-bottom, var(--loading-reserved-bottom, 112px));
+  overflow: hidden;
+}
+
+.loading-logo {
+  width: auto;
+  height: auto;
+  max-width: min(var(--loading-logo-target-width, var(--loading-logo-width, 100vw)), calc(100vw - 48px));
+  max-height: min(
+    var(--loading-logo-target-height, var(--loading-logo-height, 100vh)),
+    calc(100vh - var(--loading-effective-reserved-bottom, var(--loading-reserved-bottom, 112px)) - 24px)
+  );
+  object-fit: var(--loading-logo-fit, contain);
+  opacity: 0;
+}
+
+.loading-overlay.is-loading-animated .loading-logo {
+  animation: loadingLogoFadeIn var(--loading-logo-fade-ms, 2000ms) ease-out forwards;
+}
+
+.loading-wave {
+  position: absolute;
+  inset-block: -10%;
+  left: calc(-1 * var(--loading-wave-width, 28vw) - 10vw);
+  width: var(--loading-wave-width, 28vw);
+  transform: skewX(-18deg);
+  opacity: var(--loading-wave-opacity, 0.72);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.22),
+    rgba(255, 255, 255, 0.92),
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0)
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.loading-overlay.is-loading-animated .loading-wave {
+  animation: loadingLogoWave var(--loading-wave-ms, 1400ms) ease-in-out var(--loading-wave-delay-ms, 2000ms) both;
+}
+
+.loading-wave.is-repeating {
+  animation-iteration-count: infinite;
 }
 
 .loading-panel {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  z-index: 2;
   display: grid;
-  gap: 14px;
-  width: min(520px, 100%);
-  padding: 24px;
-  border: 1px solid rgba(255, 210, 95, 0.38);
-  border-radius: 10px;
-  background: rgba(30, 20, 13, 0.86);
-  box-shadow:
-    0 22px 70px rgba(0, 0, 0, 0.48),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(5px);
+  width: min(var(--loading-progress-width, 72vw), calc(100vw - 48px));
+  min-width: min(240px, calc(100vw - 48px));
+  max-width: 760px;
+  transform: translateX(-50%);
+  pointer-events: none;
 }
 
 .loading-panel h2 {
+  position: absolute;
+  left: 50%;
+  bottom: var(--loading-caption-bottom, 22px);
   margin: 0;
-  font-size: clamp(28px, 5vw, 46px);
-  line-height: 1;
+  transform: translateX(-50%);
+  color: var(--loading-caption-color, rgba(0, 0, 0, 0.62));
+  font-size: var(--loading-caption-font-size, 18px);
+  font-weight: 700;
+  line-height: 1.15;
+  white-space: nowrap;
 }
 
 .loading-progress {
-  height: 14px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--loading-progress-bottom, 48px);
+  height: var(--loading-progress-height, 12px);
   overflow: hidden;
-  border: 1px solid rgba(255, 210, 95, 0.34);
-  border-radius: 999px;
-  background: rgba(9, 6, 4, 0.64);
+  border-radius: var(--loading-progress-radius, 999px);
+  background: var(--loading-progress-track, rgba(0, 0, 0, 0.14));
 }
 
 .loading-progress span {
@@ -85,20 +203,131 @@ body {
   width: 0;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #b56c28, #ffcf74);
-  box-shadow: 0 0 18px rgba(255, 207, 116, 0.36);
+  background: var(--loading-progress-fill, #111111);
   transition: width 140ms ease;
 }
 
 .loading-progress-text,
 .loading-status {
+  display: none;
   margin: 0;
-  color: var(--muted);
 }
 
 .loading-progress-text {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--loading-progress-bottom, 48px) + var(--loading-progress-height, 12px) + 8px);
+  transform: translateX(-50%);
+  color: var(--loading-caption-color, rgba(0, 0, 0, 0.62));
   font-weight: 800;
-  color: var(--accent-strong);
+  white-space: nowrap;
+}
+
+.loading-overlay.is-progress-visible .loading-progress {
+  display: block;
+}
+
+.loading-overlay:not(.is-progress-visible) .loading-progress {
+  display: none;
+}
+
+.loading-overlay.is-percent-visible .loading-progress-text {
+  display: block;
+}
+
+.loading-overlay.is-caption-hidden .loading-panel h2 {
+  display: none;
+}
+
+.loading-overlay.is-status-visible .loading-status {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--loading-progress-bottom, 48px) + var(--loading-progress-height, 12px) + 14px);
+  display: block;
+  max-width: min(720px, calc(100vw - 48px));
+  transform: translateX(-50%);
+  color: var(--loading-caption-color, rgba(0, 0, 0, 0.62));
+  text-align: center;
+  white-space: nowrap;
+}
+
+@media (max-height: 520px) {
+  .loading-overlay {
+    --loading-effective-reserved-bottom: min(var(--loading-reserved-bottom, 112px), var(--loading-compact-reserved-bottom, 52px));
+  }
+
+  .loading-logo-stage {
+    padding: 12px 24px var(--loading-effective-reserved-bottom, 76px);
+  }
+
+  .loading-logo {
+    max-width: min(var(--loading-logo-width, 100vw), calc(100vw - 32px));
+    max-height: min(var(--loading-logo-height, 100vh), calc(100vh - var(--loading-effective-reserved-bottom, 76px) - 12px));
+  }
+
+  .loading-panel {
+    width: min(58vw, calc(100vw - 96px), 560px);
+    min-width: min(160px, calc(100vw - 96px));
+  }
+
+  .loading-progress {
+    bottom: max(28px, calc(var(--loading-progress-bottom, 48px) - 16px));
+    height: max(8px, calc(var(--loading-progress-height, 12px) - 3px));
+  }
+
+  .loading-panel h2 {
+    bottom: max(8px, calc(var(--loading-caption-bottom, 22px) - 8px));
+    font-size: max(13px, calc(var(--loading-caption-font-size, 18px) - 4px));
+  }
+
+  .loading-progress-text {
+    bottom: calc(max(28px, calc(var(--loading-progress-bottom, 48px) - 16px)) + max(8px, calc(var(--loading-progress-height, 12px) - 3px)) + 6px);
+  }
+
+  .loading-overlay.is-status-visible .loading-status {
+    bottom: calc(max(28px, calc(var(--loading-progress-bottom, 48px) - 16px)) + max(8px, calc(var(--loading-progress-height, 12px) - 3px)) + 10px);
+    max-width: min(560px, calc(100vw - 96px));
+    font-size: 13px;
+  }
+}
+
+@media (max-height: 360px) {
+  .loading-overlay {
+    --loading-effective-reserved-bottom: min(var(--loading-reserved-bottom, 112px), max(42px, calc(var(--loading-compact-reserved-bottom, 52px) - 8px)));
+  }
+
+  .loading-panel {
+    width: min(52vw, calc(100vw - 120px), 460px);
+    min-width: min(140px, calc(100vw - 120px));
+  }
+
+  .loading-progress {
+    bottom: max(24px, calc(var(--loading-progress-bottom, 48px) - 22px));
+    height: max(7px, calc(var(--loading-progress-height, 12px) - 4px));
+  }
+
+  .loading-panel h2 {
+    bottom: max(6px, calc(var(--loading-caption-bottom, 22px) - 12px));
+    font-size: max(12px, calc(var(--loading-caption-font-size, 18px) - 5px));
+  }
+}
+
+@keyframes loadingLogoFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes loadingLogoWave {
+  from {
+    left: calc(-1 * var(--loading-wave-width, 28vw) - 10vw);
+  }
+  to {
+    left: 110vw;
+  }
 }
 
 button,

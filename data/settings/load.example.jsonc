@@ -1,0 +1,80 @@
+{
+  // Цвет фона загрузочного экрана.
+  "background": {
+    "color": "#ffffff"
+  },
+
+  // Логотип загрузки. Путь пишется от data/.
+  // fadeInMs - время плавного появления логотипа.
+  // minVisibleMs - минимальное время показа загрузочного экрана, даже если загрузка закончилась быстрее.
+  // fit - CSS object-fit для логотипа: contain или cover.
+  // widthVw/heightVh - размер зоны логотипа в процентах от viewport.
+  "logo": {
+    "image": "data/Assets/logo.png",
+    "fadeInMs": 2000,
+    "minVisibleMs": 3000,
+    "fit": "contain",
+    "widthVw": 100,
+    "heightVh": 100,
+
+    // Адаптация размера логотипа на маленьких экранах.
+    // designWidthPx/designHeightPx - эталонный экран, на котором логотип считается нормального размера.
+    // shrinkSpeed - скорость уменьшения: 1 = уменьшается строго вместе с экраном, 0.5 = теряет размер в два раза медленнее.
+    // minWidthVw/minHeightVh - минимальный размер логотипа в процентах от текущего viewport.
+    // compactReservedBottomPx - сколько места снизу оставить под progress bar и подпись на низких экранах.
+    // Чем меньше compactReservedBottomPx, тем крупнее логотип, но тем ближе он подходит к нижней полосе.
+    "responsive": {
+      "designWidthPx": 900,
+      "designHeightPx": 520,
+      "shrinkSpeed": 0.42,
+      "minWidthVw": 78,
+      "minHeightVh": 72,
+      "compactReservedBottomPx": 52
+    }
+  },
+
+  // Белая волна поверх логотипа.
+  // delayMs обычно равен fadeInMs, чтобы волна шла после появления логотипа.
+  // durationMs - длительность прохода волны.
+  // widthPct - ширина светлой полосы в процентах от ширины экрана.
+  // opacity - прозрачность волны.
+  // repeat - true включает бесконечный повтор, false проигрывает волну один раз.
+  "wave": {
+    "enabled": true,
+    "delayMs": 2000,
+    "durationMs": 1400,
+    "widthPct": 28,
+    "opacity": 0.72,
+    "repeat": false
+  },
+
+  // Нижняя полоса прогресса.
+  // showPercent=false скрывает цифры процентов и оставляет только полоску.
+  "progress": {
+    "enabled": true,
+    "widthVw": 72,
+    "heightPx": 12,
+    "bottomPx": 48,
+    "trackColor": "rgba(0, 0, 0, 0.14)",
+    "fillColor": "#111111",
+    "radiusPx": 999,
+    "showPercent": false
+  },
+
+  // Общая подпись под загрузкой. Конкретный файл или этап не показываем.
+  // textKey берется из локали; fallback используется до загрузки локали или если ключа нет.
+  "caption": {
+    "enabled": true,
+    "textKey": "loading.title",
+    "fallback": "Loading",
+    "bottomPx": 22,
+    "fontSizePx": 18,
+    "color": "rgba(0, 0, 0, 0.62)"
+  },
+
+  // Детализация статуса. Для красивого logo-screen обычно false.
+  "details": {
+    "showCurrentFile": false,
+    "showStatusText": false
+  }
+}
