@@ -967,12 +967,14 @@ button:disabled {
   /* Общий затемняющий слой для настроек, лога и подтверждения сдачи. */
   position: fixed;
   inset: 0;
-  z-index: 70;
+  z-index: 90;
   display: grid;
   place-items: center;
   padding: 0;
   overflow: hidden;
-  background: rgba(9, 7, 6, 0.72);
+  background: rgba(5, 3, 2, 0.58);
+  -webkit-backdrop-filter: blur(4px) brightness(0.68);
+  backdrop-filter: blur(4px) brightness(0.68);
 }
 
 .modal-overlay.hidden {

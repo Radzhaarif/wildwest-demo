@@ -58,6 +58,7 @@ export function shouldContinueBattle(context, renderTargets) {
 }
 
 export function startBattleRuntime(context, renderTargets, handlers) {
+  context.battleRuntimePause = null;
   stopBattleRuntime(context);
   if (!shouldContinueBattle(context, renderTargets)) {
     return;
@@ -98,10 +99,12 @@ export function stopBattleRuntime(context) {
 }
 
 export function pauseBattleRuntime(context) {
+  beginBattleRuntimePause(context);
   stopBattleRuntime(context);
 }
 
 export function resumeBattleRuntime(context, renderTargets, handlers) {
+  finishBattleRuntimePause(context);
   if (context.battleState.isComplete || context.battleRuntime || !shouldContinueBattle(context, renderTargets)) {
     return;
   }
@@ -145,4 +148,31 @@ function resolveBattleRuntimeHandlers(context, handlers, requireTick) {
     throw new Error("Battle runtime handlers are missing.");
   }
   return runtimeHandlers || null;
+}
+
+function beginBattleRuntimePause(context) {
+  if (context.battleRuntimePause) {
+    return;
+  }
+  const startedAt = Date.now();
+  context.battleRuntimePause = {
+    startedAt,
+    ragePausedUntilAtStart: Number(context.battleState?.ragePausedUntil) || 0,
+  };
+}
+
+function finishBattleRuntimePause(context) {
+  const pauseState = context.battleRuntimePause;
+  if (!pauseState) {
+    return;
+  }
+
+  const now = Date.now();
+  const elapsedMs = Math.max(0, now - pauseState.startedAt);
+  const currentRagePausedUntil = Number(context.battleState?.ragePausedUntil) || 0;
+  const hadActiveClockPause = pauseState.ragePausedUntilAtStart > pauseState.startedAt;
+  if (hadActiveClockPause && currentRagePausedUntil > pauseState.startedAt && elapsedMs > 0) {
+    context.battleState.ragePausedUntil = currentRagePausedUntil + elapsedMs;
+  }
+  context.battleRuntimePause = null;
 }

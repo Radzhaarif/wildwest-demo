@@ -64,7 +64,7 @@ import {
   startBattleLifecycle,
   startBattleRuntime,
   stopBattleRuntime,
-} from "./battle-runtime.js";
+} from "./battle-runtime.js?v=2026-06-08-clock-pause";
 import {
   applyBattlePopoverScale as applyBattlePopoverScaleView,
   cleanupBattleScaffold as cleanupBattleScaffoldView,
@@ -126,7 +126,7 @@ import {
   renderBattleInventory as renderBattleInventoryView,
   updateBattleClockCooldownDisplay as updateBattleClockCooldownDisplayInventory,
   updateBattleHeaderMenuButton as updateBattleHeaderMenuButtonInventory,
-} from "./battle-inventory-view.js";
+} from "./battle-inventory-view.js?v=2026-06-08-clock-pause";
 import {
   areBattleBoardsEqual as areBattleBoardsEqualShuffle,
   createNoMovesBattleShuffle as createNoMovesBattleShuffleFlow,

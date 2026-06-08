@@ -26,6 +26,7 @@ export function renderBattleInventory(deps, specialItemsElement, handItemsElemen
     goldSlot,
     bagSlot,
   );
+  updateBattleClockCooldownDisplay(deps, context, specialItemsElement);
   updateBattleHeaderMenuButton(deps, context, renderTargets);
   alignBattleBagSlotToHealMeter(deps, renderTargets);
   handItemsElement.replaceChildren(
@@ -117,21 +118,25 @@ export function getBattleMenuLabel(deps, context) {
 
 export function updateBattleClockCooldownDisplay(deps, context, specialItemsElement) {
   if (!specialItemsElement) {
+    clearBattleClockCooldownRefresh(context);
     return 0;
   }
 
   const slot = specialItemsElement.querySelector(`[data-item-id="${deps.CLOCK_ITEM_ID}"]`);
   if (!slot) {
-    return;
+    clearBattleClockCooldownRefresh(context);
+    return 0;
   }
 
-  const cooldownValue = getClockCooldownSeconds(context);
+  const { remainingMs, seconds: cooldownValue } = getClockCooldownState(context);
   let cooldownNode = slot.querySelector(".battle-scaffold-clock-cooldown");
+  syncBattleClockSlotVisualState(deps, context, slot, cooldownValue);
 
   if (cooldownValue <= 0) {
     if (cooldownNode) {
       cooldownNode.remove();
     }
+    clearBattleClockCooldownRefresh(context);
     return cooldownValue;
   }
 
@@ -142,6 +147,7 @@ export function updateBattleClockCooldownDisplay(deps, context, specialItemsElem
   }
 
   cooldownNode.textContent = String(cooldownValue);
+  scheduleBattleClockCooldownRefresh(deps, context, specialItemsElement, remainingMs);
 
   return cooldownValue;
 }
@@ -222,7 +228,7 @@ function createInventorySlot(deps, context, itemId, options = {}) {
   }
   const isClock = itemId === deps.CLOCK_ITEM_ID;
   const activeSpecialItemId = context.battleState.activeSpecialItemId;
-  const clockCooldownSeconds = isClock ? getClockCooldownSeconds(context) : 0;
+  const clockCooldownSeconds = isClock ? getClockCooldownState(context).seconds : 0;
   const isActiveSpecial = activeSpecialItemId === itemId;
   const isBattleActiveItem = deps.ACTIVE_BATTLE_ITEM_IDS.includes(itemId);
   const isBlockedByOtherSpecial = Boolean(activeSpecialItemId && activeSpecialItemId !== itemId && isBattleActiveItem);
@@ -377,9 +383,53 @@ function handleClockClick(deps, context, slot, renderTargets) {
   }
 }
 
-function getClockCooldownSeconds(context) {
-  const remainingMs = (context.battleState.ragePausedUntil || 0) - Date.now();
-  return Math.max(0, Math.ceil(remainingMs / 1000));
+function getClockCooldownState(context) {
+  const remainingMs = Math.max(0, (context.battleState.ragePausedUntil || 0) - getClockCooldownNow(context));
+  return {
+    remainingMs,
+    seconds: remainingMs > 0 ? Math.ceil(remainingMs / 1000) : 0,
+  };
+}
+
+function getClockCooldownNow(context) {
+  const pauseState = context?.battleRuntimePause;
+  const ragePausedUntil = Number(context?.battleState?.ragePausedUntil) || 0;
+  if (pauseState?.startedAt && ragePausedUntil > pauseState.startedAt) {
+    return pauseState.startedAt;
+  }
+  return Date.now();
+}
+
+function syncBattleClockSlotVisualState(deps, context, slot, cooldownSeconds) {
+  const quantity = deps.getInventoryQuantity(context.battleState.playerState, deps.CLOCK_ITEM_ID);
+  const isUnavailable = cooldownSeconds > 0
+    || quantity <= 0
+    || Boolean(context.battleState.activeSpecialItemId);
+  slot.classList.toggle("is-disabled", isUnavailable);
+}
+
+function scheduleBattleClockCooldownRefresh(deps, context, specialItemsElement, remainingMs) {
+  clearBattleClockCooldownRefresh(context);
+  if (typeof window === "undefined" || !specialItemsElement?.isConnected || remainingMs <= 0) {
+    return;
+  }
+
+  const delayMs = Math.max(50, Math.min(250, remainingMs + 25));
+  context.battleClockCooldownTimeoutId = window.setTimeout(() => {
+    context.battleClockCooldownTimeoutId = null;
+    if (!specialItemsElement.isConnected) {
+      return;
+    }
+    updateBattleClockCooldownDisplay(deps, context, specialItemsElement);
+  }, delayMs);
+}
+
+function clearBattleClockCooldownRefresh(context) {
+  if (typeof window === "undefined" || !context?.battleClockCooldownTimeoutId) {
+    return;
+  }
+  window.clearTimeout(context.battleClockCooldownTimeoutId);
+  context.battleClockCooldownTimeoutId = null;
 }
 
 function showFloatMessage(anchor, text, durationMs) {
