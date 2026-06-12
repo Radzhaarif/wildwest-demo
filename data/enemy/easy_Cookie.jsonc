@@ -14,6 +14,14 @@
       "appearance": "data/Assets/enemy/Cookie.png",
       "health": 100,
       "shield": 0,
+      "itemStatModifiers": [
+        {
+          "itemTypes": ["junk_1", "junk_2", "junk_3"],
+          "multipliers": {
+            "aggression": 1.2
+          }
+        }
+      ],
       "aggression": {
         "threshold": 50,
         "damage": 3,

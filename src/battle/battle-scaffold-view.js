@@ -4,7 +4,9 @@ export function showBattleScaffold(deps, context, root) {
     context.battleRuntimeHandlers = deps.createBattleRuntimeHandlers();
     const lifecycleToken = deps.startBattleLifecycle(context);
     context.battleLog = [];
+    addBattleSeedLog(deps, context);
     deps.prepareBattleAttemptState(context);
+    deps.createBattleTrace(context);
     const attemptToken = deps.startBattleAttemptLifecycle(context);
 
     const overlay = document.createElement("section");
@@ -243,6 +245,26 @@ export function showBattleScaffold(deps, context, root) {
       deps.handleManualBattleShuffle(context, renderTargets);
     });
   });
+}
+
+function addBattleSeedLog(deps, context) {
+  if (!context.request?.seed || !context.request?.seedName) {
+    return;
+  }
+
+  deps.addBattleLog(
+    context,
+    formatText(deps.translate(context.request.locale, "log.battleSeed"), {
+      name: context.request.seedName,
+      seed: context.request.seed,
+    }),
+  );
+}
+
+function formatText(template, values) {
+  return Object.entries(values).reduce((text, [name, value]) => {
+    return text.replaceAll(`{${name}}`, String(value));
+  }, String(template || ""));
 }
 
 export function createBattleTopActionButton(deps, context, actionId, additionalClassName = "") {

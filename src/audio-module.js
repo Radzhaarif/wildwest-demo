@@ -1,3 +1,5 @@
+import { appendVersionParam } from "./app-version.js";
+
 export function createAudioController({ resolveAssetPath }) {
   const audioState = {
     click: null,
@@ -344,8 +346,7 @@ export function createAudioController({ resolveAssetPath }) {
     if (/^(?:blob:|data:)/i.test(trackId)) {
       return trackId;
     }
-    const separator = trackId.includes("?") ? "&" : "?";
-    return `${trackId}${separator}v=${Date.now()}`;
+    return appendVersionParam(trackId);
   }
 
   return {

@@ -40,6 +40,15 @@
           "scope": "all"
         }
       ],
+      "itemStatModifiers": [
+        {
+          "itemTypes": ["granate"],
+          "multipliers": {
+            "damage": 0.8,
+            "aggression": 1.2
+          }
+        }
+      ],
       "aggression": {
         "threshold": 50,
         "damage": 3,
@@ -48,7 +57,7 @@
       "rage": {
         "secondsToUltimate": 45,
         "resetAfterUltimate": true,
-        "targetTypes": ["Knife"]
+        "targetTypes": ["granate"]
       },
       "ultimate": {
         "nameTextKey": "enemy.boom.ultimate.knifeDamage.name",
@@ -58,7 +67,7 @@
             "effectId": "damagePlayerByBoardItems",
             "type": "damagePlayerByBoardItems",
             "count": {
-              "itemTypes": ["Knife"]
+              "itemTypes": ["granate"]
             },
             "modifier": 1
           }

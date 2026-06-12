@@ -1,24 +1,17 @@
 const ENEMY_DATA_ROOT = "./data/enemy";
 const BATTLE_UI_CONFIG_URL = "./data/settings/battle-ui.jsonc";
-const BATTLE_UI_CONFIG_URL_LEGACY = "./data/battle/battle-ui.jsonc";
 
 async function loadBattleUiConfig(loaders) {
   if (!loaders?.loadJsonc) {
     return null;
   }
-  try {
-    return await loaders.loadJsonc(BATTLE_UI_CONFIG_URL);
-  } catch (error) {
-    if (error.message && error.message.includes("Failed to load")) {
-      return loaders.loadJsonc(BATTLE_UI_CONFIG_URL_LEGACY);
-    }
-    throw error;
-  }
+  return loaders.loadJsonc(BATTLE_UI_CONFIG_URL);
 }
 
 export async function loadBattleData(request, loaders = {}) {
+  const enemyConfigUrl = request.enemyConfigUrl || getEnemyConfigUrl(request.enemyId);
   const enemyConfig = loaders.loadJsonc
-    ? await loaders.loadJsonc(getEnemyConfigUrl(request.enemyId))
+    ? await loaders.loadJsonc(enemyConfigUrl)
     : null;
   const uiConfig = loaders.loadJsonc
     ? await loadBattleUiConfig(loaders)
@@ -26,6 +19,7 @@ export async function loadBattleData(request, loaders = {}) {
 
   return {
     enemyConfig,
+    enemyConfigUrl,
     itemCatalog: request.itemCatalog,
     uiConfig,
   };

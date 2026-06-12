@@ -285,12 +285,25 @@ export function createBattleLogOverlay(deps, context) {
 
   const backButton = document.createElement("button");
   backButton.type = "button";
+  backButton.dataset.battleLogAction = "back";
   backButton.textContent = deps.translate(context.request.locale, "ui.back");
   backButton.addEventListener("click", () => {
     overlay.classList.add("hidden");
   });
 
-  modal.append(title, list, backButton);
+  const downloadButton = document.createElement("button");
+  downloadButton.type = "button";
+  downloadButton.dataset.battleLogAction = "download-trace";
+  downloadButton.textContent = deps.translate(context.request.locale, "ui.downloadBattleTrace");
+  downloadButton.addEventListener("click", () => {
+    deps.downloadBattleTrace(context);
+  });
+
+  const actions = document.createElement("div");
+  actions.className = "battle-log-actions";
+  actions.append(downloadButton, backButton);
+
+  modal.append(title, list, actions);
   overlay.append(modal);
   return overlay;
 }
@@ -321,12 +334,16 @@ export function refreshBattleLogOverlayLanguage(deps, logOverlay, context) {
     return;
   }
   const title = logOverlay.querySelector("h2");
-  const backButton = logOverlay.querySelector("button");
+  const backButton = logOverlay.querySelector('[data-battle-log-action="back"]');
+  const downloadButton = logOverlay.querySelector('[data-battle-log-action="download-trace"]');
   if (title) {
     title.textContent = deps.translate(context.request.locale, "ui.eventLog");
   }
   if (backButton) {
     backButton.textContent = deps.translate(context.request.locale, "ui.back");
+  }
+  if (downloadButton) {
+    downloadButton.textContent = deps.translate(context.request.locale, "ui.downloadBattleTrace");
   }
 }
 

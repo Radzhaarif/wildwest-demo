@@ -1,5 +1,7 @@
+import { appendVersionParam } from "./app-version.js";
+
 export async function loadJson(url) {
-  const response = await fetch(withCacheBuster(url), { cache: "no-store" });
+  const response = await fetch(appendVersionParam(url));
   if (!response.ok) {
     throw new Error(`Failed to load ${url} (${response.status})`);
   }
@@ -7,16 +9,11 @@ export async function loadJson(url) {
 }
 
 export async function loadJsonc(url) {
-  const response = await fetch(withCacheBuster(url), { cache: "no-store" });
+  const response = await fetch(appendVersionParam(url));
   if (!response.ok) {
     throw new Error(`Failed to load ${url} (${response.status})`);
   }
   return parseJson(stripJsonComments(await response.text()), url);
-}
-
-function withCacheBuster(url) {
-  const separator = url.includes("?") ? "&" : "?";
-  return `${url}${separator}v=${Date.now()}`;
 }
 
 function stripJsonComments(source) {

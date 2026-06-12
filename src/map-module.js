@@ -1,10 +1,13 @@
 import { BATTLE_CONTRACT_VERSION } from "./battle/battle-contract.js";
+import { appendVersionParam } from "./app-version.js";
 import { createAudioController } from "./audio-module.js";
 import { collectAssetPaths, getCachedAssetUrl, preloadAssets } from "./asset-preloader.js";
 import { loadJson, loadJsonc } from "./data-loader.js";
-import { validateGameData } from "./data-validation.js?v=2026-06-02-boss-event";
+import { exposeWildwestDebug } from "./debug-hooks.js";
+import { validateGameData } from "./data-validation.js";
 import { generateMap, getMapLevelSummary } from "./map/map-generation.js";
 import { renderInlineRichText } from "./rich-text.js";
+import { createDebugSeed, createSeededRandom, deriveDebugSeed, normalizeDebugSeed } from "./seeded-random.js";
 
 const DATA_ROOT = "./data";
 const CAMPAIGN_URL = `${DATA_ROOT}/settings/campaign.jsonc`;
@@ -15,8 +18,7 @@ const DEFAULT_SETTINGS_URL = `${DATA_ROOT}/settings/default-settings.json`;
 const CURRENT_SETTINGS_URL = `${DATA_ROOT}/settings/current-settings.json`;
 const LOAD_UI_CONFIG_URL = `${DATA_ROOT}/settings/load.jsonc`;
 const SETTINGS_STORAGE_KEY = "roguelikeCurrentSettings";
-const ASSET_CACHE_BUSTER = Date.now();
-const MODULE_CACHE_BUSTER = Date.now();
+const RUN_SEED_QUERY_PARAMS = ["seed", "runSeed"];
 const STARTUP_ASSET_PATHS = [
   "data/Assets/backgrounds/main_menu.png",
   "data/Assets/cursor/ready/cursor.png",
@@ -156,6 +158,9 @@ const state = {
   shopSelection: new Map(),
   hasStartedGame: false,
   runNumber: 0,
+  runSeed: "",
+  currentMapSeed: null,
+  battleAttemptCounts: new Map(),
   scrollAnimationFrame: null,
   pendingReward: null,
   pendingLevelUps: [],
@@ -613,7 +618,7 @@ async function preloadBattleCode(status) {
 
 function importBattleModule() {
   if (!battleModulePreloadPromise) {
-    battleModulePreloadPromise = import(`./battle/battle-module.js?v=${MODULE_CACHE_BUSTER}`);
+    battleModulePreloadPromise = import(appendVersionParam("./battle/battle-module.js"));
   }
   return battleModulePreloadPromise;
 }
@@ -884,10 +889,17 @@ async function startGame() {
     await resetPlayerState();
     state.hasStartedGame = true;
     state.runNumber += 1;
+    state.runSeed = getRequestedRunSeed() || createDebugSeed();
     addRunLogHeader(
       formatText("log.runStarted", {
         run: state.runNumber,
         campaign: translate(state.campaign.nameTextKey),
+      }),
+    );
+    addLog(
+      formatText("log.runSeed", {
+        name: "run",
+        seed: state.runSeed,
       }),
     );
     addLog(
@@ -1462,7 +1474,10 @@ async function startCampaignMap(campaignIndex) {
   const campaignEntry = state.campaign.maps[state.campaignIndex];
   const mapUrl = toProjectUrl(campaignEntry.config);
   state.mapConfig = state.mapConfigCache.get(mapUrl) || (await loadJsonc(mapUrl));
-  state.generatedMap = generateMap(state.mapConfig);
+  state.currentMapSeed = createMapSeedInfo(campaignEntry, state.campaignIndex);
+  state.generatedMap = generateMap(state.mapConfig, {
+    random: createSeededRandom(state.currentMapSeed.seed),
+  });
   state.availableNodeIds = new Set(
     state.generatedMap.levels[0].nodes.map((node) => node.id),
   );
@@ -1476,6 +1491,7 @@ async function startCampaignMap(campaignIndex) {
   state.pendingLevelUps = [];
   state.activeLevelUp = null;
   state.pendingMapCompletion = false;
+  state.battleAttemptCounts = new Map();
   closeMapDialogOverlay();
   closeShop({ complete: false });
   hideRewardOverlay();
@@ -1488,12 +1504,38 @@ async function startCampaignMap(campaignIndex) {
       max: levelSummary.maxNodes,
     }),
   );
+  addLog(
+    formatText("log.mapSeed", {
+      name: state.currentMapSeed.name,
+      seed: state.currentMapSeed.seed,
+    }),
+  );
   render();
   playMapIntroScroll();
 }
 
 function toProjectUrl(path) {
   return path.startsWith("data/") ? `./${path}` : path;
+}
+
+function getRequestedRunSeed() {
+  const params = new URLSearchParams(window.location.search);
+  for (const paramName of RUN_SEED_QUERY_PARAMS) {
+    const seed = normalizeDebugSeed(params.get(paramName));
+    if (seed) {
+      return seed;
+    }
+  }
+  return null;
+}
+
+function createMapSeedInfo(campaignEntry, campaignIndex) {
+  const mapId = state.mapConfig?.id || campaignEntry?.mapId || `map-${campaignIndex + 1}`;
+  const name = `map:${mapId}:${campaignIndex + 1}`;
+  return {
+    name,
+    seed: deriveDebugSeed(state.runSeed, name),
+  };
 }
 
 function compareNodeIds(a, b) {
@@ -2287,9 +2329,9 @@ function getNodeClassName(node) {
 
 function getNodeIconPath(node) {
   if (node.eventIcon) {
-    return toProjectUrl(node.eventIcon);
+    return resolveAssetPath(toProjectUrl(node.eventIcon));
   }
-  return `${DATA_ROOT}/Assets/icons/${node.eventType}.png`;
+  return resolveAssetPath(`${DATA_ROOT}/Assets/icons/${node.eventType}.png`);
 }
 
 function getNodeTitle(node) {
@@ -2321,7 +2363,7 @@ function getNodeDescription(node) {
 async function activateNode(node) {
   if (node.eventType === "battle") {
     await openBattleModule(node);
-    elements.selectionStatus.textContent = `${node.id} В· ${node.eventType}`;
+    elements.selectionStatus.textContent = `${node.id} · ${node.eventType}`;
     render();
     return;
   }
@@ -2623,8 +2665,17 @@ function closeMapDialogOverlay() {
 async function openBattleModule(node) {
   stopMapAnimations();
   try {
-    const request = createBattleRequest(node);
-    exposeLegacyContextAlias(request);
+    const battleSeed = createBattleSeedInfo(node);
+    const battleSeedMessage = formatText("log.battleSeed", {
+      name: battleSeed.name,
+      seed: battleSeed.seed,
+    });
+    addLog(battleSeedMessage);
+    const request = createBattleRequest(node, battleSeed);
+    exposeWildwestDebug("map", {
+      state,
+      lastBattleRequest: request,
+    });
     const { startBattle } = await importBattleModule();
     const result = await startBattle(request, {
       root: elements.gameOrientationRoot || document.body,
@@ -2651,6 +2702,9 @@ async function openBattleModule(node) {
       },
     });
     for (const message of result.logMessages) {
+      if (message === battleSeedMessage) {
+        continue;
+      }
       addLog(message);
     }
     addLog(`${node.id}: battle module returned ${result.outcome}`);
@@ -2660,13 +2714,6 @@ async function openBattleModule(node) {
   } catch (error) {
     console.error(error);
     showDialog(error.message);
-  }
-}
-
-function exposeLegacyContextAlias(request) {
-  if (typeof window !== "undefined" && request) {
-    window.context = request;
-    window.contex = request;
   }
 }
 
@@ -2723,19 +2770,40 @@ function completeBattleNodeAfterVictory(node, result, options = {}) {
   }
 }
 
-function createBattleRequest(node) {
+function createBattleRequest(node, battleSeed) {
   return {
     contractVersion: BATTLE_CONTRACT_VERSION,
     nodeId: node.id,
     nodeType: node.eventType,
     enemyId: node.payload.enemyId,
+    enemyConfigUrl: toProjectUrl(battleSeed.enemyConfigPath),
     background: node.payload.background,
     playerState: state.playerState,
     itemCatalog: state.itemCatalog,
     locale: state.locale,
     settings: state.settings,
     language: state.language,
+    seed: battleSeed.seed,
+    seedName: battleSeed.name,
   };
+}
+
+function createBattleSeedInfo(node) {
+  const mapId = state.mapConfig?.id || state.campaign?.maps?.[state.campaignIndex]?.mapId || "map";
+  const enemyConfigPath = getBattleEnemyConfigPath(node.payload.enemyId);
+  const key = `${mapId}:${node.id}:${enemyConfigPath}`;
+  const attempt = (state.battleAttemptCounts.get(key) || 0) + 1;
+  state.battleAttemptCounts.set(key, attempt);
+  const name = `battle:${mapId}:${node.id}:${enemyConfigPath}:${attempt}`;
+  return {
+    name,
+    enemyConfigPath,
+    seed: deriveDebugSeed(state.runSeed, name),
+  };
+}
+
+function getBattleEnemyConfigPath(enemyId) {
+  return `${DATA_ROOT.replace(/^\.\//, "")}/enemy/${enemyId || "unknown"}.jsonc`;
 }
 
 function scrollAvailableNodesIntoActionZone() {
@@ -3859,12 +3927,7 @@ function resolveAssetPath(path) {
 }
 
 function appendAssetCacheBuster(path) {
-  if (path.startsWith("http") || path.startsWith("data:") || path.startsWith("blob:")) {
-    return path;
-  }
-  const [pathWithoutHash, hash = ""] = path.split("#");
-  const separator = pathWithoutHash.includes("?") ? "&" : "?";
-  return `${pathWithoutHash}${separator}v=${ASSET_CACHE_BUSTER}${hash ? `#${hash}` : ""}`;
+  return appendVersionParam(path);
 }
 
 boot().catch((error) => {

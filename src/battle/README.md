@@ -9,9 +9,10 @@ This folder contains the isolated battle module. The map can call `startBattle()
 - `battle-data.js` - battle data loading boundary.
 - `battle-engine.js` - pure battle and match-3 logic without DOM.
 - `battle-config.js` - battle UI config access layer: defaults, board/layout/animation/sound getters, clock-warning parsing, and asset path cache busting.
-- `battle-formatters.js` - battle text helpers: locale lookup, battle text-key lookup, status template formatting, time formatting, and tooltip labels.
+- `battle-formatters.js` - battle text helpers: locale lookup, battle text-key lookup, status template formatting, numeric display formatting, time formatting, and tooltip labels.
 - `battle-player-items.js` - player item/inventory helpers: item labels, item descriptions, configured hand slots, inventory quantity lookup, and quantity mutation.
 - `battle-state.js` - battle state/stage layer: state shape initialization, attempt board setup, reserve board, current stage index, stage convert effects, and walls/boxes/vines sync.
+- `battle-trace.js` - battle attempt trace model: JSON-safe snapshots, player action records, final outcome capture, and trace download payload.
 - `battle-scaffold-view.js` - battle screen scaffold: modal DOM shell, renderTargets, viewport scale, resize handling, and DOM cleanup.
 - `battle-runtime.js` - battle lifecycle, attempt tokens, rage/idle runtime timers, pause/resume helpers.
 - `battle-animations.js` - low-level board DOM animations: swap, shake, blocked click, shuffle, cell lookup, and shared animation state helpers.
@@ -27,7 +28,7 @@ This folder contains the isolated battle module. The map can call `startBattle()
 - `battle-projectiles-view.js` - projectile and rage visual layer: stat-change lights, rage target lights, transform target highlights, and kamikaze burst visuals.
 - `battle-resolution.js` - cascade/death/drop resolution layer: match cascade loop, activated-item death animation, reserve refill movement, and item activation sounds.
 - `battle-view.js` - battle-screen facade: scenario orchestration, engine calls, and thin wrappers for extracted flow/view layers.
-- `data/settings/battle-ui.jsonc` - battle-screen presentation config: UI text keys, icon paths, top-button icon sizes, battle-window background, virtual layout size and scaling, board size, progress bar colors, hint priority, and animation timings.
+- `data/settings/battle-ui.jsonc` - battle-screen presentation config: UI text keys, icon paths, top-button icon sizes, battle-window background, virtual layout size and scaling, board size, progress bar colors, hint priority, and animation timings. This is the only runtime battle UI config path; the battle loader does not fall back to `data/battle/battle-ui.jsonc`.
 - `data/settings/battle-ui.example.jsonc` - commented example that explains each battle UI config field.
 
 ## Current Match-3 Engine
@@ -40,6 +41,7 @@ This folder contains the isolated battle module. The map can call `startBattle()
 - `createBattleBoxes(board, options)` creates boxed cells. Enemy JSON can define `box` on the enemy or current stage; the view stores generated cells in `battleState.boxes`.
 - `createBattleVines(board, options)` creates vined cells. Enemy JSON can define `vines` on the enemy or current stage; the view stores generated cells in `battleState.vines`. Vines avoid boxed cells and do not split gravity columns.
 - Board creation and refill accept `options.playerState`; inventory items with `transform_chance`, `transform_from_itemId`, and `transform_to_itemId` can upgrade newly generated drops before they enter the visible or reserve board. They also accept `options.enemyConvertEffects`; current-stage `convert` entries can give newly generated drops a fractional chance, such as `0.2`, to become one of the configured target `itemId`s. Stage convert has priority: if it transforms a new drop, player inventory transforms are not checked for that drop; if it fails or does not match, player transforms can still apply.
+- Battle gameplay randomness is driven by `request.seed`. The battle module creates a deterministic RNG and `battle-state.js` passes it into board creation, reserve creation, stage obstacles, refill, shuffle, gold loot replacement, and random-target ultimate effects. Visual projectile jitter remains outside this gameplay RNG.
 - `hasBattleMatches(board, itemCatalog)` checks whether matches exist.
 - `findBattleMatches(board, itemCatalog, options)` finds horizontal, vertical, and 2x2 square matches by item `type`; spawned `match-3` items and created `rare_match-3` items can match together when their `type` is the same. `options.boxes` excludes covered cells from match detection; vines do not block active matches.
 - Items with `battleUse: "battery"` are excluded from regular match detection. A battery can be combined with an adjacent item to activate all visible items of that type without aggression, or with another battery to activate the whole visible board without aggression.
@@ -51,7 +53,7 @@ This folder contains the isolated battle module. The map can call `startBattle()
 - `refillBattleBoardFromReserve(board, reserveBoard, itemCatalog, options)` refills the visible board from the invisible reserve board above it and returns `{ board, reserveBoard, movement }` for the view animation. Covered cells stay fixed when `options.boxes` is provided.
 - `getBattleDropPool(itemCatalog)` returns item ids allowed to spawn on the board; bonus-only `rare_match-3` items are intentionally excluded from random drops.
 - `collectBattleMatchCells(matches)` merges match cells without duplicates.
-- `applyBattleMatchEffects(battleState, matches, itemCatalog)` applies item `damage`, `heal`, `aggression`, and `calm`. Before applying the values, it adds inventory-driven `modificate` bonuses from the player's current inventory. Enemy `shield` is resolved per damaging activated item: one damaging item removes one shield point, and only items left after shield absorption contribute their full `damage` to enemy HP.
+- `applyBattleMatchEffects(battleState, matches, itemCatalog)` applies item `damage`, `heal`, `aggression`, and `calm`. Before applying the values, it adds inventory-driven `modificate` bonuses from the player's current inventory, applies current-stage enemy `itemStatModifiers` multipliers, then rounds final item stats down to tenths. Enemy `shield` is resolved per damaging activated item: one damaging item removes one shield point, and only items left after shield absorption contribute their full `damage` to enemy HP.
 - `applyBattleTurnDamage(battleState, itemCatalog, options)` applies passive `dmgperturn` damage from visible board items. The battle view calls it only after an accepted ordinary swap, not during skull/glove/battery actions, manual shuffle, or cascade resolution. `options.boxes` excludes covered cells from this scan, so an item under a box is inactive; vines stay active. Its player HP feedback uses the damaging board item icons as projectile sources and disables the generic enemy-damage fallback for this case.
 - `getBattlePlayerMaxHealth(playerState, itemCatalog)` and `getBattleHealHealth(playerState, itemCatalog)` compute effective battle stats from base player state plus inventory items with `max_hp_modif` and `heal_hp_modif`.
 - `tickBattleRage(enemyState, elapsedSeconds)` decreases the enemy rage countdown and reports when the rage event fires.
@@ -74,7 +76,7 @@ The engine does not update the map, touch DOM, animate anything, run enemy AI, o
 - a 12x9 match-3 board generated from `category: "match-3"` items, while created `rare_match-3` items can still join matches by shared `type`;
 - battle UI icons and labels loaded from `data/settings/battle-ui.jsonc`;
 - battle UI defaults and config getters are delegated to `battle-config.js`; `battle-view.js` keeps only scenario orchestration and passes those getters to extracted layers;
-- battle text formatting is delegated to `battle-formatters.js`; `battle-view.js` keeps thin wrappers because extracted layers still use the old formatter names through deps;
+- battle text formatting is delegated to `battle-formatters.js`; numeric battle values are displayed through `formatBattleNumber()` so floating point tails such as `56.199999999999996` are shown as tenths; `battle-view.js` keeps thin wrappers because extracted layers still use the old formatter names through deps;
 - player item and inventory helpers are delegated to `battle-player-items.js`; `battle-view.js` keeps thin wrappers for the old helper names used by board, popover and inventory layers;
 - battle state/stage helpers are delegated to `battle-state.js`; `battle-view.js` no longer owns attempt board setup, reserve-board refresh, stage convert lookup, or walls/boxes/vines sync;
 - battle-window background loaded from `data/settings/battle-ui.jsonc`;
@@ -82,6 +84,8 @@ The engine does not update the map, touch DOM, animate anything, run enemy AI, o
 - battle menu buttons `ui.surrender`, `menu.settings`, and `ui.eventLog` are opened from the `little_menu` button in the enemy header; their icons and `iconSizePx` are configured in `topButtons`;
 - while the mini menu is open, the battle window is heavily dimmed and the battle runtime is paused; clicking the menu button area again or any empty dimmed area closes the menu and resumes the runtime;
 - the battle log button now lives in the mini menu; short battle messages are no longer shown inside the enemy info panel;
+- the battle log modal has a JSON download button for the current `battleTrace`. The trace records app version, battle seed/name/config URL, initial board/reserve/obstacles, player actions, final outcome and final state. It is debug/replay input data, not a full replay player yet;
+- the enemy ultimate/rage description is localized rich text. It preserves line breaks, supports inline item icons via `{item:itemId}`, and currently uses separate `Rage:` and `Special:` lines. `Special:` should expose non-standard objects that can appear, starting shields/obstacles, and item stat modifiers, but should not spell out exact passive conversion sources or upgrade chains. For this UI text, non-standard means items outside the regular `category: "match-3"` drop pool, such as `rare_match-3` powered items and hazard barrels;
 - settings pause the battle runtime while the settings overlay is open;
 - runtime lifecycle, attempt tokens, pause/resume, rage interval and idle hint timer are delegated to `battle-runtime.js`; `battle-view.js` keeps view-specific callbacks only as thin facade wrappers;
 - click-to-select and adjacent-cell swap;
@@ -125,6 +129,7 @@ The engine does not update the map, touch DOM, animate anything, run enemy AI, o
 - special item creation for 5+ activated cells when `createsOnFive` is configured;
 - battery behavior for `battleUse: "battery"` items created by 5+: adjacent battery + item activates all items of that type, and battery + battery activates the whole visible board, both without aggression;
 - inventory `modificate` bonuses: each owned inventory item can add `damage`, `heal`, `aggression`, or `calm` to configured match-3 item ids;
+- enemy item stat modifiers: current-stage `itemStatModifiers` can multiply activated item `damage`, `heal`, `aggression`, or `calm` by exact `itemId`/`itemIds` or by shared `itemTypes`; this happens after inventory `modificate` bonuses, final item stats are rounded down to tenths, and passive `dmgperturn` or enemy ultimate board counters are not affected;
 - inventory drop transforms: each owned inventory item can add a percent chance to replace a newly generated match-3 item with another configured item;
 - enemy convert transforms: current-stage `convert` can passively replace newly generated items by exact `itemId`/`itemIds` or by `itemTypes` with a fractional chance from 0 to 1;
 - when the enemy changes stage, the invisible reserve board is regenerated for the new stage so hidden future drops do not keep using the previous stage's `convert`;
@@ -137,9 +142,11 @@ This screen intentionally does not run enemy AI or implement every possible ulti
 
 ## Current Map Integration
 
-`src/map-module.js` builds a `BattleRequest` for `battle` nodes and calls `startBattle()`.
+`src/map-module.js` builds a `BattleRequest` for `battle` nodes and calls `startBattle()`. The request includes `seed`, `seedName`, and `enemyConfigUrl`; the map logs the seed as `battle:<mapId>:<nodeId>:data/enemy/<enemyId>.jsonc:<attempt>` before opening the battle, and the battle log records the same seed inside the battle overlay.
 
-During active MVP work, `map-module.js` loads `battle-module.js` dynamically with a stable per-page cache-buster. After START, the map calls `preloadBattleModule()` before showing the run map, so `battle-contract.js`, `battle-data.js`, `battle-engine.js`, `battle-view.js`, and their static dependencies are already fetched and parsed before the first battle click. The cache-buster stays stable for the page lifetime so prewarm and real battle entry reuse the same ES modules while still avoiding stale modules after a page refresh.
+`BattleResult` now also carries `battleTrace`. The map can keep or inspect this machine-readable trace for debugging, but route progress still depends only on `outcome` and reward handling. Human log lines remain in `logMessages`.
+
+During active MVP work, `index.html` reads the root `version.json` and installs a versioned import map before loading `map-module.js`. `map-module.js` then loads `battle-module.js` dynamically with the same `?v=<version>` value. After START, the map calls `preloadBattleModule()` before showing the run map, so `battle-contract.js`, `battle-data.js`, `battle-engine.js`, `battle-view.js`, and their static dependencies are already fetched and parsed before the first battle click. The version stays stable for the build, so prewarm and real battle entry reuse the same ES modules while a changed `version.json` forces the browser to request updated code.
 
 The map marks a battle node completed only after `victory`. If the enemy has a `reward` payload, the map first shows the shared reward overlay and completes the node only after the player clicks `ui.claimReward`.
 

@@ -78,6 +78,7 @@ export async function handleManualBattleShuffle(deps, context, renderTargets) {
   context.battleState.isResolving = true;
   context.battleState.noMovesMessageVisible = false;
   context.battleState.selectedCell = null;
+  context.battleState.lastMoveSummary = null;
   deps.clearBattleBoardMessage(boardElement);
   deps.clearActiveBattleSpecial(context);
   updateBattleShuffleButtonState(deps, context);
@@ -94,6 +95,12 @@ export async function handleManualBattleShuffle(deps, context, renderTargets) {
   deps.setBattleStatus(context, status, deps.translate(context.request.locale, deps.getBattleUiConfig(context).textKeys.noMovesBody));
   if (deps.isBattlePlayerDefeated(context)) {
     context.battleState.isResolving = false;
+    recordBattleAction(deps, context, {
+      type: "manualShuffle",
+      accepted: true,
+      playerDamage: damage,
+      endedByDamage: true,
+    });
     deps.showBattleDefeat(context, renderTargets);
     return;
   }
@@ -107,6 +114,11 @@ export async function handleManualBattleShuffle(deps, context, renderTargets) {
   deps.setBattleStatus(context, status, deps.translateBattleText(context, "shuffleBoardDone"));
   updateBattleShuffleButtonState(deps, context);
   deps.renderBattleBoard(boardElement, context, status, enemyStats, playerMeters, ultimateText);
+  recordBattleAction(deps, context, {
+    type: "manualShuffle",
+    accepted: true,
+    playerDamage: damage,
+  });
   await deps.finishBattleMoveIfNeeded(context, renderTargets);
 }
 
@@ -162,7 +174,7 @@ export function createNoMovesBattleShuffle(deps, context) {
     const shuffleResult = context.engine.shuffleBattleBoardWithMovement(context.battleState.board, {
       boxes: context.battleState.boxes,
       vines: context.battleState.vines,
-      random: Math.random,
+      random: deps.getBattleRandom(context),
     });
     if (!areBattleBoardsEqual(context.battleState.board, shuffleResult.board)) {
       const hasStartingMatches = context.engine.findBattleMatches(
@@ -222,4 +234,10 @@ export function updateBattleShuffleButtonState(deps, context) {
   }
 
   button.disabled = Boolean(context.battleState.isResolving || context.battleState.isComplete);
+}
+
+function recordBattleAction(deps, context, action) {
+  if (typeof deps.recordBattleTraceMove === "function") {
+    deps.recordBattleTraceMove(context, action);
+  }
 }

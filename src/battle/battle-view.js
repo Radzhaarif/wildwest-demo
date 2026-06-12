@@ -1,4 +1,14 @@
 import { BATTLE_OUTCOMES, createBattleResult } from "./battle-contract.js";
+import { exposeWildwestDebug } from "../debug-hooks.js";
+import {
+  createBattleTrace as createBattleTraceModel,
+  createTraceCell,
+  createTraceCells,
+  downloadBattleTrace as downloadBattleTraceModel,
+  recordBattleTraceMove as recordBattleTraceMoveModel,
+  recordBattleTraceOutcome as recordBattleTraceOutcomeModel,
+  summarizeMoveResult,
+} from "./battle-trace.js";
 import {
   animateBattleBoardShuffleMovement,
   animateBattleBoxBlockedClick,
@@ -64,7 +74,7 @@ import {
   startBattleLifecycle,
   startBattleRuntime,
   stopBattleRuntime,
-} from "./battle-runtime.js?v=2026-06-08-clock-pause";
+} from "./battle-runtime.js";
 import {
   applyBattlePopoverScale as applyBattlePopoverScaleView,
   cleanupBattleScaffold as cleanupBattleScaffoldView,
@@ -126,7 +136,7 @@ import {
   renderBattleInventory as renderBattleInventoryView,
   updateBattleClockCooldownDisplay as updateBattleClockCooldownDisplayInventory,
   updateBattleHeaderMenuButton as updateBattleHeaderMenuButtonInventory,
-} from "./battle-inventory-view.js?v=2026-06-08-clock-pause";
+} from "./battle-inventory-view.js";
 import {
   areBattleBoardsEqual as areBattleBoardsEqualShuffle,
   createNoMovesBattleShuffle as createNoMovesBattleShuffleFlow,
@@ -202,6 +212,7 @@ import {
 } from "./battle-config.js";
 import {
   createBattleTooltipLabel as createBattleTooltipLabelFormatter,
+  formatBattleNumber as formatBattleNumberFormatter,
   formatBattleSeconds as formatBattleSecondsFormatter,
   formatMoveStatus as formatMoveStatusFormatter,
   translate as translateFormatter,
@@ -212,6 +223,7 @@ import {
   ensureBattleReserveBoardForCurrentStage,
   ensureBattleStateShape,
   getBattleGenerationConfig,
+  getBattleRandom,
   getCurrentBattleStageIndex,
   prepareBattleAttemptState,
   syncBattleBoxesWithStage,
@@ -235,19 +247,12 @@ export function createBattleView(options = {}) {
     root: options.root || null,
     start(context) {
       ensureBattleContext(context);
-      exposeLegacyBattleContext(context);
+      exposeWildwestDebug("battle", { context });
       context.engine = engine;
       context.callbacks = options.callbacks || {};
       return showBattleScaffold(context, options.root || document.body);
     },
   };
-}
-
-function exposeLegacyBattleContext(context) {
-  if (typeof window !== "undefined" && context) {
-    window.context = context;
-    window.contex = context;
-  }
 }
 
 function ensureBattleContext(context) {
@@ -313,6 +318,7 @@ function createBattleScaffoldViewDeps() {
     shouldContinueBattle,
     ensureBattleStateShape,
     prepareBattleAttemptState,
+    createBattleTrace,
     createBattleRuntimeHandlers,
     renderBattleBoard,
     renderBattleStats,
@@ -329,6 +335,7 @@ function createBattleScaffoldViewDeps() {
     attachBattlePointerTracker,
     attachBattleLanguageChangeListener,
     closeBattleMiniMenu,
+    addBattleLog,
     renderBattleLog,
     openBattleSettings,
     openBattleSurrender,
@@ -385,6 +392,7 @@ function createBattlePopoverDeps() {
     resumeBattleRuntime,
     shouldContinueBattle,
     translate,
+    downloadBattleTrace,
   };
 }
 
@@ -392,6 +400,7 @@ function createBattleFeedbackDeps() {
   return {
     getBattleHealthChangeAnimation,
     triggerBattleLightDamageProjectiles,
+    formatBattleNumber,
   };
 }
 
@@ -453,6 +462,7 @@ function createBattleRageFlowDeps() {
     getBoardElementsForSourceCells,
     getBattleEnemyShieldMax,
     getBattleEnemyHealthSourceElements,
+    getBattleRandom,
     wait,
     isBattlePlayerDefeated,
     showBattleDefeat,
@@ -475,6 +485,7 @@ function createBattleStatsViewDeps() {
     resolveAssetPath,
     translate,
     formatBattleSeconds,
+    formatBattleNumber,
     getClockWarningSeconds,
     getClockWarningChangeMs,
     getClockWarningChangeScale,
@@ -516,7 +527,9 @@ function createBattleShuffleFlowDeps() {
     clearBattleBoardMessage,
     createBattleReserveBoardForCurrentStage,
     finishBattleMoveIfNeeded,
+    recordBattleTraceMove,
     getBattleAnimationConfig,
+    getBattleRandom,
     getBattlePlayerHealthSourceElements,
     getBattleUiConfig,
     isBattlePlayerDefeated,
@@ -547,6 +560,7 @@ function createBattleOutcomeFlowDeps() {
     clearActiveBattleSpecial,
     clearBattleBoardMessage,
     createBattleResult,
+    createBattleTrace,
     getBattleAnimationConfig,
     getBattleUiConfig,
     normalizeBattleRenderTargets,
@@ -563,6 +577,7 @@ function createBattleOutcomeFlowDeps() {
     stopBattleRuntime,
     translate,
     translateBattleText,
+    recordBattleTraceOutcome,
     wait,
   };
 }
@@ -606,6 +621,7 @@ function createBattleBoardActionsDeps() {
     getBattleAnimationConfig,
     getBattleSwapDurationMs,
     getBattleUiConfig,
+    getBattleRandom,
     clearBattleGoldTargetPreview,
     getBattleGoldPrice,
     getInventoryQuantity,
@@ -639,6 +655,10 @@ function createBattleBoardActionsDeps() {
     syncBattleVinesWithStage,
     isBattlePlayerDefeated,
     showBattleDefeat,
+    recordBattleTraceMove,
+    createTraceCell,
+    createTraceCells,
+    summarizeMoveResult,
   };
 }
 
@@ -696,6 +716,22 @@ function renderBattleLog(logOverlay, context) {
 
 function addBattleLog(context, message) {
   addBattleLogView(context, message);
+}
+
+function createBattleTrace(context) {
+  return createBattleTraceModel(context);
+}
+
+function recordBattleTraceMove(context, action) {
+  return recordBattleTraceMoveModel(context, action);
+}
+
+function recordBattleTraceOutcome(context, outcome) {
+  return recordBattleTraceOutcomeModel(context, outcome);
+}
+
+function downloadBattleTrace(context) {
+  return downloadBattleTraceModel(context);
 }
 
 function attachBattleLanguageChangeListener(context, renderTargets) {
@@ -1546,6 +1582,10 @@ function getBattleSwapDurationMs(context) {
 
 function formatBattleSeconds(value) {
   return formatBattleSecondsFormatter(value);
+}
+
+function formatBattleNumber(value) {
+  return formatBattleNumberFormatter(value);
 }
 
 function isBattlePlayerDefeated(context) {

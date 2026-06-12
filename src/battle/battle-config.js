@@ -1,3 +1,4 @@
+import { appendVersionParam } from "../app-version.js";
 import { getCachedAssetUrl } from "../asset-preloader.js";
 
 export const CLOCK_ITEM_ID = "item_time";
@@ -83,8 +84,6 @@ export const BATTLE_POPUP_INVENTORY_QUANTITY_OFFSET_Y_PX = 3;
 export const BATTLE_POPUP_INVENTORY_QUANTITY_MIN_WIDTH_PX = 20;
 export const BATTLE_POPUP_INVENTORY_COLUMNS = 6;
 export const BATTLE_POPUP_INVENTORY_VERTICAL_OFFSET_RATIO = 0.5;
-
-const ASSET_CACHE_BUSTER = Date.now();
 
 export function getBattleTopButtonConfig(context, actionId) {
   const topButtons = getBattleUiConfig(context).topButtons || {};
@@ -494,7 +493,5 @@ export function resolveAssetPath(assetPath) {
 }
 
 export function appendAssetCacheBuster(assetPath) {
-  const [pathWithoutHash, hash = ""] = assetPath.split("#");
-  const separator = pathWithoutHash.includes("?") ? "&" : "?";
-  return `${pathWithoutHash}${separator}v=${ASSET_CACHE_BUSTER}${hash ? `#${hash}` : ""}`;
+  return appendVersionParam(assetPath);
 }

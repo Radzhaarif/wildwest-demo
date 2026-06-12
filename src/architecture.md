@@ -8,16 +8,18 @@
 - `src/asset-preloader.js` - общий предзагрузчик и RAM-кэш локальных ассетов из `data/Assets`; скачивает ассеты в blob/object URL, держит декодированные изображения в памяти и используется стартовым экраном загрузки и прогревом ассетов кампании перед START.
 - `data/settings/load.jsonc` - настройки первого loading-screen: логотип, белый фон, волна по логотипу, нижний progress bar, подпись и минимальное время показа.
 - `src/map/map-generation.js` - чистая генерация графа карты: уровни, выбор событий, payload-варианты, связи между точками и защита от лишних пересечений дорог.
+- `src/seeded-random.js` - общий deterministic RNG для debug-воспроизводимости. Карта получает производный `map:<mapId>:<campaignIndex>` seed, а бой - `battle:<mapId>:<nodeId>:data/enemy/<enemyId>.jsonc:<attempt>`; оба значения идут в лог и передаются в gameplay RNG.
+- `src/debug-hooks.js` - явный dev/debug-хук `window.__wildwestDebug`, включаемый через debug-флаг. Runtime state не должен утекать в старые `window.context` / `window.contex`.
 - `src/data-validation.js` - фасад проверки данных перед стартом. Его можно дробить дальше на доменные валидаторы, но формат ошибок должен остаться прежним.
 
 ## Бой
 
-- `src/battle/battle-module.js` - публичный вход `startBattle(request, options)`.
+- `src/battle/battle-module.js` - публичный вход `startBattle(request, options)`; создает deterministic battle RNG из `request.seed`.
 - `src/battle/battle-engine.js` - чистая match-3 логика без DOM.
 - `src/battle/battle-config.js` - слой доступа к battle UI config: fallback-значения, board/layout/animation/sound getters, clock-warning parsing и asset path resolution через общий RAM-кэш ассетов.
 - `src/battle/battle-formatters.js` - текстовый слой боя: lookup локалей, battle text keys, форматирование статусных шаблонов, времени и tooltip labels.
 - `src/battle/battle-player-items.js` - слой предметов игрока в бою: подписи/описания предметов, боевые hand slots, чтение и изменение количества в инвентаре.
-- `src/battle/battle-state.js` - слой состояния и стадии боя: форма `battleState`, подготовка попытки, reserve board, текущая стадия, stage convert effects и sync стен/коробок/лоз.
+- `src/battle/battle-state.js` - слой состояния и стадии боя: форма `battleState`, подготовка попытки, reserve board, текущая стадия, stage convert effects, доступ к battle RNG и sync стен/коробок/лоз.
 - `src/battle/battle-scaffold-view.js` - DOM-каркас боевого окна: сборка scaffold, renderTargets, viewport-scale, resize и cleanup DOM-ресурсов.
 - `src/battle/battle-runtime.js` - lifecycle боя, attempt-token, runtime-таймер ярости, idle hint timer и pause/resume.
 - `src/battle/battle-animations.js` - низкоуровневые DOM-анимации поля: swap, shake, blocked click, shuffle и общие cell-animation helpers.

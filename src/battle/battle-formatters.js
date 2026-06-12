@@ -10,7 +10,29 @@ export function translateBattleText(deps, context, textKeyName) {
 }
 
 export function formatText(template, values) {
-  return String(template).replace(/\{(\w+)\}/g, (_, key) => values[key] ?? "");
+  return String(template).replace(/\{(\w+)\}/g, (_, key) => formatBattleTemplateValue(values[key]));
+}
+
+export function formatBattleNumber(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) {
+    return "0";
+  }
+
+  const sign = number < 0 ? "-" : "";
+  const rounded = Math.floor((Math.abs(number) + 1e-9) * 10) / 10;
+  const text = Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
+  return `${sign}${text}`;
+}
+
+function formatBattleTemplateValue(value) {
+  if (value === undefined || value === null) {
+    return "";
+  }
+  if (typeof value === "number") {
+    return formatBattleNumber(value);
+  }
+  return value;
 }
 
 export function formatMoveStatus(deps, context, result, enemyState) {

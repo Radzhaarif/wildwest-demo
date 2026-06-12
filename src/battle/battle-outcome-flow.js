@@ -129,6 +129,7 @@ export function restartCurrentBattle(deps, context, renderTargets, banner) {
   context.battleState.isComplete = false;
   context.battleState.lastMoveSummary = null;
   deps.prepareBattleAttemptState(context);
+  deps.createBattleTrace(context);
   deps.setBattleStatus(context, activeRenderTargets.status, deps.translateBattleText(context, "selectFirstCell"));
   deps.renderBattleStats(
     activeRenderTargets.enemyStats,
@@ -183,6 +184,12 @@ export function finishBattle(deps, context, renderTargets, outcome) {
 }
 
 export function createScaffoldResult(deps, context, outcome) {
+  deps.recordBattleTraceOutcome(context, {
+    outcome,
+    nodeId: context.request.nodeId,
+    nodeType: context.request.nodeType,
+    reward: outcome === deps.BATTLE_OUTCOMES.victory ? context.battleData.enemyConfig?.reward : null,
+  });
   return deps.createBattleResult({
     outcome,
     nodeId: context.request.nodeId,
@@ -192,6 +199,7 @@ export function createScaffoldResult(deps, context, outcome) {
     rewards: [],
     reward: outcome === deps.BATTLE_OUTCOMES.victory ? context.battleData.enemyConfig?.reward : null,
     logMessages: [...(context.battleLog || [])].reverse(),
+    battleTrace: context.battleTrace || null,
   });
 }
 

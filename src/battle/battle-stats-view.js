@@ -289,7 +289,7 @@ function createLabeledIconProgressRow(deps, context, {
   }
 
   const currentElement = document.createElement("strong");
-  currentElement.textContent = String(current);
+  currentElement.textContent = formatBattleStatValue(deps, current);
   currentElement.className = "battle-scaffold-meter-current";
 
   const track = document.createElement("span");
@@ -302,7 +302,7 @@ function createLabeledIconProgressRow(deps, context, {
   track.append(fill);
 
   const maxElement = document.createElement("strong");
-  maxElement.textContent = String(max);
+  maxElement.textContent = formatBattleStatValue(deps, max);
   maxElement.className = "battle-scaffold-meter-max";
 
   deps.attachBattleTooltip(context, meter, {
@@ -358,12 +358,12 @@ function updateBattleLabeledIconProgressRow(deps, context, meter, {
 
   const currentElement = meter.querySelector(".battle-scaffold-meter-current");
   if (currentElement) {
-    currentElement.textContent = String(current);
+    currentElement.textContent = formatBattleStatValue(deps, current);
   }
 
   const maxElement = meter.querySelector(".battle-scaffold-meter-max");
   if (maxElement) {
-    maxElement.textContent = String(max);
+    maxElement.textContent = formatBattleStatValue(deps, max);
   }
 
   const trackFill = meter.querySelector(".battle-scaffold-meter-track-fill");
@@ -430,7 +430,7 @@ function syncBattleShieldOverlay(deps, iconWrapper, shieldOverlay) {
 
   const shieldCount = shieldElement.querySelector(".battle-scaffold-meter-shield-count");
   if (shieldCount) {
-    shieldCount.textContent = String(shieldValue);
+    shieldCount.textContent = formatBattleStatValue(deps, shieldValue);
   }
 }
 
@@ -454,7 +454,7 @@ function createEnemyValue(deps, context, { label, icon, value, stat }) {
   iconElement.alt = "";
 
   const currentElement = document.createElement("strong");
-  currentElement.textContent = String(value);
+  currentElement.textContent = formatBattleStatValue(deps, value);
 
   deps.attachBattleTooltip(context, item, {
     name: label,
@@ -488,7 +488,7 @@ function upsertEnemyDamageBadge(deps, context, container, { label, description, 
   }
   const valueElement = existingBadge.querySelector("strong");
   if (valueElement) {
-    valueElement.textContent = String(value);
+    valueElement.textContent = formatBattleStatValue(deps, value);
   }
 }
 
@@ -506,7 +506,7 @@ function createEnemyDamageBadge(deps, context, { label, description, icon, value
   iconElement.alt = "";
 
   const valueElement = document.createElement("strong");
-  valueElement.textContent = String(value);
+  valueElement.textContent = formatBattleStatValue(deps, value);
 
   deps.attachBattleTooltip(context, badge, {
     name: () => badge.dataset.battleTooltipName || "",
@@ -516,4 +516,8 @@ function createEnemyDamageBadge(deps, context, { label, description, icon, value
 
   badge.append(iconElement, valueElement);
   return badge;
+}
+
+function formatBattleStatValue(deps, value) {
+  return typeof value === "number" ? deps.formatBattleNumber(value) : String(value ?? "");
 }

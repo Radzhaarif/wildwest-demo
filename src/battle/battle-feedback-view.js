@@ -162,7 +162,10 @@ export function triggerBattleHealthChangeFeedback(deps, context, iconWrapper, de
     if (resolvedOptions.forceShieldProjectiles) {
       deltaElement.classList.add("is-shield");
     }
-    deltaElement.textContent = `${currentDelta > 0 ? "+" : ""}${currentDelta}`;
+    const formattedDelta = typeof deps.formatBattleNumber === "function"
+      ? deps.formatBattleNumber(currentDelta)
+      : String(currentDelta);
+    deltaElement.textContent = `${currentDelta > 0 ? "+" : ""}${formattedDelta}`;
     iconWrapper.append(deltaElement);
 
     const animationClass = resolvedOptions.forceShieldProjectiles ? "is-shield-changing" : "is-health-changing";

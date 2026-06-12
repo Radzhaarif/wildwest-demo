@@ -1,14 +1,15 @@
-export function generateMap(config) {
+export function generateMap(config, options = {}) {
+  const random = typeof options.random === "function" ? options.random : Math.random;
   const eventCatalog = getMapEventCatalog(config);
   const levelConfigs = getMapLevelConfigs(config);
   const levels = [];
 
   for (const levelConfig of levelConfigs) {
     const levelNumber = levelConfig.level;
-    const nodeCount = getLevelNodeCount(levelConfig);
-    const eventConfigs = pickLevelEvents(levelConfig, nodeCount, eventCatalog);
+    const nodeCount = getLevelNodeCount(levelConfig, random);
+    const eventConfigs = pickLevelEvents(levelConfig, nodeCount, eventCatalog, random);
     const nodes = eventConfigs.map((eventConfig, index) =>
-      createNode(config, levelNumber, index + 1, eventConfig),
+      createNode(config, levelNumber, index + 1, eventConfig, random),
     );
     levels.push({ level: levelNumber, nodes });
   }
@@ -19,6 +20,7 @@ export function generateMap(config) {
       levels[index].nodes,
       levels[index + 1].nodes,
       getLevelPathConfig(config, levelConfigs[index], singlePathDepths),
+      random,
     );
   }
 
@@ -75,12 +77,12 @@ function getLevelNodeRange(levelConfig) {
   };
 }
 
-function getLevelNodeCount(levelConfig) {
+function getLevelNodeCount(levelConfig, random) {
   const range = getLevelNodeRange(levelConfig);
-  return randomInt(range.min, range.max);
+  return randomInt(range.min, range.max, random);
 }
 
-function pickLevelEvents(levelConfig, nodeCount, eventCatalog) {
+function pickLevelEvents(levelConfig, nodeCount, eventCatalog, random) {
   const resolveEvent = (levelEvent) => {
     const eventConfig = eventCatalog.get(levelEvent.name);
     if (!eventConfig) {
@@ -106,13 +108,13 @@ function pickLevelEvents(levelConfig, nodeCount, eventCatalog) {
   );
   const pickedEvents = [...guaranteedEvents];
   while (pickedEvents.length < nodeCount) {
-    pickedEvents.push(resolveEvent(pickMapEvent(randomEvents)));
+    pickedEvents.push(resolveEvent(pickMapEvent(randomEvents, random)));
   }
 
-  return shuffleArray(pickedEvents);
+  return shuffleArray(pickedEvents, random);
 }
 
-function createNode(config, levelNumber, index, eventConfig) {
+function createNode(config, levelNumber, index, eventConfig, random) {
   const eventType = eventConfig.type;
   return {
     id: `L${levelNumber}_N${index}`,
@@ -120,12 +122,12 @@ function createNode(config, levelNumber, index, eventConfig) {
     eventName: eventConfig.name,
     eventType,
     eventIcon: eventConfig.icon,
-    payload: pickEventPayload(config, eventConfig.name, eventType, levelNumber),
+    payload: pickEventPayload(config, eventConfig.name, eventType, levelNumber, random),
     connectedTo: [],
   };
 }
 
-function pickEventPayload(config, eventName, eventType, levelNumber) {
+function pickEventPayload(config, eventName, eventType, levelNumber, random) {
   const variants = Array.isArray(config[eventType]) ? config[eventType] : [];
   const available = variants.filter(
     (variant) =>
@@ -136,10 +138,10 @@ function pickEventPayload(config, eventName, eventType, levelNumber) {
   if (available.length === 0) {
     return {};
   }
-  return pickWeightedArray(available);
+  return pickWeightedArray(available, random);
 }
 
-function connectLevels(currentNodes, nextNodes, pathConfig) {
+function connectLevels(currentNodes, nextNodes, pathConfig, random) {
   const connectionSets = new Map(currentNodes.map((node) => [node.id, new Set()]));
   const sourceIndexById = new Map(currentNodes.map((node, index) => [node.id, index]));
   const targetIndexById = new Map(nextNodes.map((node, index) => [node.id, index]));
@@ -148,7 +150,7 @@ function connectLevels(currentNodes, nextNodes, pathConfig) {
   const desiredConnectionCounts = new Map(
     currentNodes.map((node) => [
       node.id,
-      pickDesiredConnectionCount(pathConfig, minConnections, maxConnections, node.id),
+      pickDesiredConnectionCount(pathConfig, minConnections, maxConnections, node.id, random),
     ]),
   );
 
@@ -209,7 +211,7 @@ function connectLevels(currentNodes, nextNodes, pathConfig) {
       if (
         targets.size < maxConnections &&
         !targets.has(target.id) &&
-        Math.random() * 100 < pathConfig.extraConnectionChance &&
+        random() * 100 < pathConfig.extraConnectionChance &&
         !wouldConnectionCross(
           connectionSets,
           node.id,
@@ -246,7 +248,7 @@ function getConnectionGrowthOrder(nodes, desiredConnectionCounts, singlePathDept
   });
 }
 
-function pickDesiredConnectionCount(pathConfig, minConnections, maxConnections, nodeId = null) {
+function pickDesiredConnectionCount(pathConfig, minConnections, maxConnections, nodeId = null, random = Math.random) {
   const weights = Array.isArray(pathConfig.connectionCountWeights)
     ? pathConfig.connectionCountWeights.filter((entry) =>
         Number.isInteger(entry?.count) && entry.count > 0 && entry.weight > 0
@@ -256,7 +258,7 @@ function pickDesiredConnectionCount(pathConfig, minConnections, maxConnections, 
 
   if (weights.length > 0) {
     const total = weights.reduce((sum, entry) => sum + entry.weight, 0);
-    let roll = Math.random() * total;
+    let roll = random() * total;
     for (const entry of weights) {
       roll -= entry.weight;
       if (roll <= 0) {
@@ -346,13 +348,13 @@ function wouldConnectionCross(connectionSets, sourceId, targetId, sourceIndexByI
   return false;
 }
 
-function pickMapEvent(events) {
+function pickMapEvent(events, random) {
   const entries = events.filter((event) => event.weight > 0);
   if (entries.length === 0) {
     throw new Error("event must contain at least one positive weight");
   }
   const total = entries.reduce((sum, event) => sum + event.weight, 0);
-  let roll = Math.random() * total;
+  let roll = random() * total;
   for (const event of entries) {
     roll -= event.weight;
     if (roll <= 0) {
@@ -362,22 +364,22 @@ function pickMapEvent(events) {
   return entries.at(-1);
 }
 
-function shuffleArray(items) {
+function shuffleArray(items, random) {
   const shuffled = [...items];
   for (let index = shuffled.length - 1; index > 0; index -= 1) {
-    const swapIndex = randomInt(0, index);
+    const swapIndex = randomInt(0, index, random);
     [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
   }
   return shuffled;
 }
 
-function pickWeightedArray(items) {
+function pickWeightedArray(items, random) {
   const weightedItems = items.filter((item) => item.weight > 0);
   if (weightedItems.length === 0) {
     throw new Error("weighted array must contain at least one positive weight");
   }
   const total = weightedItems.reduce((sum, item) => sum + item.weight, 0);
-  let roll = Math.random() * total;
+  let roll = random() * total;
   for (const item of weightedItems) {
     roll -= item.weight;
     if (roll <= 0) {
@@ -414,8 +416,8 @@ function compareNodeIds(a, b) {
   return a.localeCompare(b, undefined, { numeric: true });
 }
 
-function randomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+function randomInt(min, max, random) {
+  return Math.floor(random() * (max - min + 1)) + min;
 }
 
 function clamp(value, min, max) {

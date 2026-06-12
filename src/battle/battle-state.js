@@ -47,9 +47,16 @@ export function ensureBattleStateShape(context) {
 }
 
 export function getBattleGenerationConfig(context) {
-  return getBattleGenerationConfigFromConfig(context, {
-    getEnemyConvertEffects: getCurrentBattleConvertEffects,
-  });
+  return {
+    ...getBattleGenerationConfigFromConfig(context, {
+      getEnemyConvertEffects: getCurrentBattleConvertEffects,
+    }),
+    random: getBattleRandom(context),
+  };
+}
+
+export function getBattleRandom(context) {
+  return typeof context?.battleRandom === "function" ? context.battleRandom : Math.random;
 }
 
 export function getCurrentBattleStageIndex(context) {
@@ -122,6 +129,7 @@ export function syncBattleWallsWithStage(context, options = {}) {
   context.battleState.walls = context.engine.createBattleWalls(context.battleState.board, {
     count: wallCount,
     boxes: context.battleState.boxes,
+    random: getBattleRandom(context),
   });
   context.battleState.wallCount = wallCount;
   context.battleState.wallsInitialized = true;
@@ -141,6 +149,7 @@ export function syncBattleBoxesWithStage(context, options = {}) {
 
   context.battleState.boxes = context.engine.createBattleBoxes(context.battleState.board, {
     count: boxCount,
+    random: getBattleRandom(context),
   });
   context.battleState.boxCount = boxCount;
   context.battleState.boxesInitialized = true;
@@ -161,6 +170,7 @@ export function syncBattleVinesWithStage(context, options = {}) {
   context.battleState.vines = context.engine.createBattleVines(context.battleState.board, {
     count: vineCount,
     boxes: context.battleState.boxes,
+    random: getBattleRandom(context),
   });
   context.battleState.vineCount = vineCount;
   context.battleState.vinesInitialized = true;

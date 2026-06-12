@@ -13,7 +13,10 @@ export const BATTLE_OUTCOMES = Object.freeze({
  * @property {string} nodeId
  * @property {"battle" | "boss"} nodeType
  * @property {string} enemyId
+ * @property {string=} enemyConfigUrl
  * @property {string} background
+ * @property {string=} seed
+ * @property {string=} seedName
  * @property {object} playerState
  * @property {object} itemCatalog
  * @property {object} locale
@@ -38,6 +41,7 @@ export const BATTLE_OUTCOMES = Object.freeze({
  * @property {BattleReward[]} rewards
  * @property {object|null=} reward
  * @property {string[]} logMessages
+ * @property {object|null=} battleTrace
  */
 
 /**
@@ -57,5 +61,6 @@ export function createBattleResult(result) {
     rewards: Array.isArray(result.rewards) ? result.rewards : [],
     reward: result.reward || null,
     logMessages: Array.isArray(result.logMessages) ? result.logMessages : [],
+    battleTrace: result.battleTrace || null,
   };
 }

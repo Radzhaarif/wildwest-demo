@@ -40,6 +40,15 @@
           "scope": "all"
         }
       ],
+      "itemStatModifiers": [
+        {
+          "itemTypes": ["Shield"],
+          "multipliers": {
+            "calm": 0.8,
+            "aggression": 1.2
+          }
+        }
+      ],
       "aggression": {
         "threshold": 50,
         "damage": 3,

@@ -11,6 +11,7 @@ export async function handleGoldBoardClick(deps, context, cell, renderTargets) {
   const item = context.engine.getBattleItemDefinition(context.request.itemCatalog, itemId);
   const price = deps.getBattleGoldPrice(item);
   const currentGold = deps.getInventoryQuantity(context.battleState.playerState, deps.GOLD_ITEM_ID);
+  context.battleState.lastMoveSummary = null;
 
   if (price === null) {
     await deps.animateBattleShakeCells(boardElement, [cell], deps.getBattleAnimationConfig(context).invalidShakeMs);
@@ -21,6 +22,13 @@ export async function handleGoldBoardClick(deps, context, cell, renderTargets) {
         deps.translate(context.request.locale, deps.getBattleUiConfig(context).textKeys.clockUnavailable),
       );
     }
+    recordBattleAction(deps, context, {
+      type: "gold",
+      accepted: false,
+      reason: "priceUnavailable",
+      cell: traceCell(deps, cell),
+      itemId,
+    });
     return;
   }
 
@@ -29,13 +37,22 @@ export async function handleGoldBoardClick(deps, context, cell, renderTargets) {
     if (deps.shouldContinueBattle(context, renderTargets)) {
       deps.setBattleStatus(context, statusElement, deps.translate(context.request.locale, "ui.notEnoughGold"));
     }
+    recordBattleAction(deps, context, {
+      type: "gold",
+      accepted: false,
+      reason: "notEnoughGold",
+      cell: traceCell(deps, cell),
+      itemId,
+      price,
+      currentGold,
+    });
     return;
   }
 
   const nextItemId = context.engine.pickBattleGoldLootItem(context.request.itemCatalog, {
     sourceItemId: itemId,
     playerState: context.battleState.playerState,
-    random: Math.random,
+    random: deps.getBattleRandom(context),
   });
   if (!nextItemId) {
     await deps.animateBattleShakeCells(boardElement, [cell], deps.getBattleAnimationConfig(context).invalidShakeMs);
@@ -46,6 +63,15 @@ export async function handleGoldBoardClick(deps, context, cell, renderTargets) {
         deps.translate(context.request.locale, deps.getBattleUiConfig(context).textKeys.clockUnavailable),
       );
     }
+    recordBattleAction(deps, context, {
+      type: "gold",
+      accepted: false,
+      reason: "lootUnavailable",
+      cell: traceCell(deps, cell),
+      itemId,
+      price,
+      currentGold,
+    });
     return;
   }
 
@@ -63,6 +89,7 @@ export async function handleGoldBoardClick(deps, context, cell, renderTargets) {
     vines: context.battleState.vines,
   });
 
+  let moveResult = null;
   if (firstMatches.length > 0) {
     const result = await deps.resolveBattleCascades(context.battleState.board, context, {
       boardElement,
@@ -79,6 +106,7 @@ export async function handleGoldBoardClick(deps, context, cell, renderTargets) {
     }
     context.battleState.board = result.board;
     context.battleState.lastMoveSummary = result;
+    moveResult = result;
     deps.setBattleStatus(context, statusElement, deps.formatMoveStatus(context, result, context.battleState.enemyState));
   } else {
     deps.setBattleStatus(context, statusElement, deps.translateBattleText(context, "freeSwapDone"));
@@ -87,6 +115,16 @@ export async function handleGoldBoardClick(deps, context, cell, renderTargets) {
   context.battleState.isResolving = false;
   deps.renderBattleStats(enemyStatsElement, playerMetersElement, ultimateTextElement, context);
   renderCurrentInventory(deps, context, renderTargets);
+  recordBattleAction(deps, context, {
+    type: "gold",
+    accepted: true,
+    cell: traceCell(deps, cell),
+    itemId,
+    nextItemId,
+    price,
+    matched: firstMatches.length > 0,
+    result: traceMoveResult(deps, moveResult),
+  });
   await deps.finishBattleMoveIfNeeded(context, renderTargets);
 }
 
@@ -98,6 +136,7 @@ export async function handleSkullBoardClick(deps, context, cell, renderTargets) 
   deps.resetBattleIdleTimer(context, renderTargets);
   context.battleState.isResolving = true;
   context.battleState.selectedCell = null;
+  context.battleState.lastMoveSummary = null;
   deps.clearActiveBattleSpecial(context);
   renderCurrentInventory(deps, context, renderTargets);
 
@@ -175,6 +214,13 @@ export async function handleSkullBoardClick(deps, context, cell, renderTargets) 
   context.battleState.lastMoveSummary = cascadeResult;
   context.battleState.isResolving = false;
   deps.setBattleStatus(context, statusElement, deps.formatMoveStatus(context, cascadeResult, context.battleState.enemyState));
+  recordBattleAction(deps, context, {
+    type: "skull",
+    accepted: true,
+    cell: traceCell(deps, cell),
+    cells: traceCells(deps, activatedCells),
+    result: traceMoveResult(deps, cascadeResult),
+  });
   await deps.finishBattleMoveIfNeeded(context, renderTargets);
 }
 
@@ -203,6 +249,7 @@ export async function handleFreeSwapBoardClick(deps, context, cell, renderTarget
   context.battleState.isResolving = true;
   context.battleState.selectedCell = null;
   context.battleState.specialSwapCell = null;
+  context.battleState.lastMoveSummary = null;
   deps.clearActiveBattleSpecial(context);
   renderCurrentInventory(deps, context, renderTargets);
 
@@ -218,6 +265,7 @@ export async function handleFreeSwapBoardClick(deps, context, cell, renderTarget
     boxes: context.battleState.boxes,
     vines: context.battleState.vines,
   });
+  let moveResult = null;
   if (firstMatches.length > 0) {
     const result = await deps.resolveBattleCascades(swappedBoard, context, {
       boardElement,
@@ -234,12 +282,21 @@ export async function handleFreeSwapBoardClick(deps, context, cell, renderTarget
     }
     context.battleState.board = result.board;
     context.battleState.lastMoveSummary = result;
+    moveResult = result;
     deps.setBattleStatus(context, statusElement, deps.formatMoveStatus(context, result, context.battleState.enemyState));
   } else {
     deps.setBattleStatus(context, statusElement, deps.translateBattleText(context, "freeSwapDone"));
   }
 
   context.battleState.isResolving = false;
+  recordBattleAction(deps, context, {
+    type: "freeSwap",
+    accepted: true,
+    from: traceCell(deps, selectedCell),
+    to: traceCell(deps, cell),
+    matched: firstMatches.length > 0,
+    result: traceMoveResult(deps, moveResult),
+  });
   await deps.finishBattleMoveIfNeeded(context, renderTargets);
 }
 
@@ -251,6 +308,7 @@ export async function handleBatteryBoardClick(deps, context, activation, renderT
   deps.resetBattleIdleTimer(context, renderTargets);
   context.battleState.isResolving = true;
   context.battleState.selectedCell = null;
+  context.battleState.lastMoveSummary = null;
 
   const activatedCells = activation.cells.filter((targetCell) => (
     !deps.isBattleCellBoxed(context, targetCell) && !deps.isBattleCellVined(context, targetCell)
@@ -332,6 +390,16 @@ export async function handleBatteryBoardClick(deps, context, activation, renderT
   context.battleState.lastMoveSummary = cascadeResult;
   context.battleState.isResolving = false;
   deps.setBattleStatus(context, statusElement, deps.formatMoveStatus(context, cascadeResult, context.battleState.enemyState));
+  recordBattleAction(deps, context, {
+    type: "battery",
+    accepted: true,
+    kind: activation.kind || "",
+    batteryCell: traceCell(deps, activation.batteryCell),
+    targetCell: traceCell(deps, activation.targetCell),
+    targetType: activation.targetType || "",
+    cells: traceCells(deps, activatedCells),
+    result: traceMoveResult(deps, cascadeResult),
+  });
   await deps.finishBattleMoveIfNeeded(context, renderTargets);
 }
 
@@ -339,6 +407,7 @@ export async function handleBattleBoxedCellClick(deps, context, cell, renderTarg
   const { boardElement, statusElement } = renderTargets;
   deps.resetBattleIdleTimer(context, renderTargets);
   context.battleState.isResolving = true;
+  context.battleState.lastMoveSummary = null;
   const selectedCell = context.battleState.specialSwapCell || context.battleState.selectedCell;
   await deps.animateBattleBoxBlockedClick(
     boardElement,
@@ -354,6 +423,13 @@ export async function handleBattleBoxedCellClick(deps, context, cell, renderTarg
   }
   context.battleState.isResolving = false;
   deps.setBattleStatus(context, statusElement, deps.translateBattleText(context, "boxBlocked"));
+  recordBattleAction(deps, context, {
+    type: "blockedCell",
+    accepted: false,
+    reason: "box",
+    cell: traceCell(deps, cell),
+    selectedCell: traceCell(deps, selectedCell),
+  });
   await deps.finishBattleMoveIfNeeded(context, renderTargets);
 }
 
@@ -361,6 +437,7 @@ export async function handleBattleVinedCellClick(deps, context, cell, renderTarg
   const { boardElement, statusElement } = renderTargets;
   deps.resetBattleIdleTimer(context, renderTargets);
   context.battleState.isResolving = true;
+  context.battleState.lastMoveSummary = null;
   const selectedCell = context.battleState.selectedCell;
   await deps.animateBattleVineBlockedClick(
     boardElement,
@@ -374,6 +451,13 @@ export async function handleBattleVinedCellClick(deps, context, cell, renderTarg
   context.battleState.selectedCell = null;
   context.battleState.isResolving = false;
   deps.setBattleStatus(context, statusElement, deps.translateBattleText(context, "vinesBlocked"));
+  recordBattleAction(deps, context, {
+    type: "blockedCell",
+    accepted: false,
+    reason: "vines",
+    cell: traceCell(deps, cell),
+    selectedCell: traceCell(deps, selectedCell),
+  });
   await deps.finishBattleMoveIfNeeded(context, renderTargets);
 }
 
@@ -434,6 +518,7 @@ export async function handleBattleCellClick(deps, context, cell, renderTargets) 
   if (context.engine.hasBattleWallBetween(context.battleState.walls, selectedCell, cell)) {
     context.battleState.selectedCell = null;
     context.battleState.isResolving = true;
+    context.battleState.lastMoveSummary = null;
     await deps.animateBattleWallBlockedSwap(
       boardElement,
       selectedCell,
@@ -445,6 +530,13 @@ export async function handleBattleCellClick(deps, context, cell, renderTargets) 
     }
     context.battleState.isResolving = false;
     deps.setBattleStatus(context, statusElement, deps.translateBattleText(context, "wallBlocked"));
+    recordBattleAction(deps, context, {
+      type: "swap",
+      accepted: false,
+      reason: "wall",
+      from: traceCell(deps, selectedCell),
+      to: traceCell(deps, cell),
+    });
     await deps.finishBattleMoveIfNeeded(context, renderTargets);
     return;
   }
@@ -469,6 +561,7 @@ export async function handleBattleCellClick(deps, context, cell, renderTargets) 
 
   context.battleState.selectedCell = null;
   context.battleState.isResolving = true;
+  context.battleState.lastMoveSummary = null;
   await deps.animateBattleSwap(boardElement, selectedCell, cell, deps.getBattleSwapDurationMs(context));
   if (!deps.shouldContinueBattle(context, renderTargets)) {
     return;
@@ -480,6 +573,14 @@ export async function handleBattleCellClick(deps, context, cell, renderTargets) 
     }
     context.battleState.isResolving = false;
     deps.setBattleStatus(context, statusElement, deps.translateBattleText(context, "noMatchSwapCancelled"));
+    recordBattleAction(deps, context, {
+      type: "swap",
+      accepted: false,
+      reason: "noMatch",
+      from: traceCell(deps, selectedCell),
+      to: traceCell(deps, cell),
+      matched: false,
+    });
     await deps.finishBattleMoveIfNeeded(context, renderTargets);
     return;
   }
@@ -491,6 +592,16 @@ export async function handleBattleCellClick(deps, context, cell, renderTargets) 
     deps.renderBattleStats(enemyStatsElement, playerMetersElement, ultimateTextElement, context);
     if (deps.isBattlePlayerDefeated(context)) {
       context.battleState.isResolving = false;
+      recordBattleAction(deps, context, {
+        type: "swap",
+        accepted: true,
+        from: traceCell(deps, selectedCell),
+        to: traceCell(deps, cell),
+        matched: true,
+        firstMatchCount: firstMatches.length,
+        turnDamage: traceEffectSummary(turnDamageSummary),
+        endedByTurnDamage: true,
+      });
       deps.showBattleDefeat(context, renderTargets);
       return;
     }
@@ -507,6 +618,16 @@ export async function handleBattleCellClick(deps, context, cell, renderTargets) 
   context.battleState.lastMoveSummary = result;
   context.battleState.isResolving = false;
   deps.setBattleStatus(context, statusElement, deps.formatMoveStatus(context, result, context.battleState.enemyState));
+  recordBattleAction(deps, context, {
+    type: "swap",
+    accepted: true,
+    from: traceCell(deps, selectedCell),
+    to: traceCell(deps, cell),
+    matched: true,
+    firstMatchCount: firstMatches.length,
+    turnDamage: traceEffectSummary(turnDamageSummary),
+    result: traceMoveResult(deps, result),
+  });
   await deps.finishBattleMoveIfNeeded(context, renderTargets);
 }
 
@@ -536,4 +657,48 @@ function renderCurrentInventory(deps, context, renderTargets) {
     return;
   }
   deps.renderBattleInventory(targets.specialItems, targets.handItems, context, targets);
+}
+
+function recordBattleAction(deps, context, action) {
+  if (typeof deps.recordBattleTraceMove === "function") {
+    deps.recordBattleTraceMove(context, action);
+  }
+}
+
+function traceCell(deps, cell) {
+  if (typeof deps.createTraceCell === "function") {
+    return deps.createTraceCell(cell);
+  }
+  return cell ? { row: Number(cell.row), col: Number(cell.col) } : null;
+}
+
+function traceCells(deps, cells) {
+  if (typeof deps.createTraceCells === "function") {
+    return deps.createTraceCells(cells);
+  }
+  return Array.isArray(cells) ? cells.map((cell) => traceCell(deps, cell)).filter(Boolean) : [];
+}
+
+function traceMoveResult(deps, result) {
+  if (typeof deps.summarizeMoveResult === "function") {
+    return deps.summarizeMoveResult(result);
+  }
+  if (!result) {
+    return null;
+  }
+  return {
+    cascades: Number(result.cascades || 0),
+    removedCells: Number(result.removedCells || 0),
+    createdBonuses: Number(result.createdBonuses || 0),
+    cascadeLimitReached: Boolean(result.cascadeLimitReached),
+    cancelled: Boolean(result.cancelled),
+    effects: traceEffectSummary(result.effects),
+  };
+}
+
+function traceEffectSummary(summary) {
+  if (!summary || typeof summary !== "object") {
+    return {};
+  }
+  return JSON.parse(JSON.stringify(summary));
 }

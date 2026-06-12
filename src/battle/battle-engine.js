@@ -5,6 +5,9 @@ const MIN_BATTLE_BOARD_DROP_TYPES = 3;
 const BATTLE_DROP_CATEGORY = "match-3";
 const BATTLE_MATCH_CATEGORIES = new Set([BATTLE_DROP_CATEGORY, "rare_match-3"]);
 const BATTLE_BATTERY_USE = "battery";
+const BATTLE_ITEM_STAT_KEYS = ["damage", "heal", "aggression", "calm"];
+const BATTLE_ITEM_STAT_ROUNDING_FACTOR = 10;
+const BATTLE_ITEM_STAT_ROUNDING_EPSILON = 1e-9;
 const DEFAULT_ENEMY_SHIELD_CAP = 99;
 
 export function createInitialBattleState(request, battleData) {
@@ -574,6 +577,7 @@ export function applyBattleMatchEffects(battleState, matches, itemCatalog, optio
       itemCatalog,
       battleState.board[cell.row]?.[cell.col],
       battleState.playerState,
+      battleState,
     );
     const itemDamage = Math.max(0, itemStats.damage);
     if (itemDamage > 0) {
@@ -1665,7 +1669,7 @@ function getBattleInventoryStatModifier(itemCatalog, playerState, statKey) {
   }, 0);
 }
 
-function getBattleEffectiveItemStats(itemCatalog, itemId, playerState) {
+function getBattleEffectiveItemStats(itemCatalog, itemId, playerState, battleState = null) {
   const item = getBattleItemDefinition(itemCatalog, itemId);
   const stats = {
     damage: getNumber(item?.damage),
@@ -1682,7 +1686,69 @@ function getBattleEffectiveItemStats(itemCatalog, itemId, playerState) {
     stats.calm += getNumber(modifier.calm) * quantity;
   }
 
+  applyBattleEnemyItemStatModifiers(stats, itemCatalog, itemId, battleState);
+  roundBattleItemStatsDown(stats);
   return stats;
+}
+
+function applyBattleEnemyItemStatModifiers(stats, itemCatalog, itemId, battleState) {
+  const stage = getCurrentBattleStage(battleState?.enemyConfig, battleState?.enemyState);
+  if (!Array.isArray(stage?.itemStatModifiers)) {
+    return;
+  }
+
+  const item = getBattleItemDefinition(itemCatalog, itemId);
+  for (const modifier of stage.itemStatModifiers) {
+    if (!matchesBattleEnemyItemStatModifier(modifier, item, itemId)) {
+      continue;
+    }
+    const multipliers = modifier?.multipliers;
+    if (!multipliers || typeof multipliers !== "object") {
+      continue;
+    }
+    for (const statKey of BATTLE_ITEM_STAT_KEYS) {
+      if (!Object.prototype.hasOwnProperty.call(multipliers, statKey)) {
+        continue;
+      }
+      stats[statKey] = Math.max(0, getNumber(stats[statKey]) * getNumber(multipliers[statKey]));
+    }
+  }
+}
+
+function matchesBattleEnemyItemStatModifier(modifier, item, itemId) {
+  if (!modifier || typeof modifier !== "object") {
+    return false;
+  }
+
+  const itemIds = getBattleStringList(modifier.itemIds ?? modifier.itemId);
+  if (itemIds.includes(itemId)) {
+    return true;
+  }
+
+  const itemTypes = getBattleStringList(modifier.itemTypes);
+  return itemTypes.includes(item?.type);
+}
+
+function getBattleStringList(value) {
+  if (value === undefined || value === null) {
+    return [];
+  }
+  return (Array.isArray(value) ? value : [value])
+    .filter((entry) => typeof entry === "string" && entry.trim() !== "")
+    .map((entry) => entry.trim());
+}
+
+function roundBattleItemStatsDown(stats) {
+  for (const statKey of BATTLE_ITEM_STAT_KEYS) {
+    stats[statKey] = roundBattleItemStatDown(stats[statKey]);
+  }
+}
+
+function roundBattleItemStatDown(value) {
+  const safeValue = Math.max(0, getNumber(value));
+  return Math.floor(
+    (safeValue + BATTLE_ITEM_STAT_ROUNDING_EPSILON) * BATTLE_ITEM_STAT_ROUNDING_FACTOR,
+  ) / BATTLE_ITEM_STAT_ROUNDING_FACTOR;
 }
 
 function getBattleInventoryModifiers(itemCatalog, targetItemId, playerState) {

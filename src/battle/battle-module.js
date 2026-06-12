@@ -1,4 +1,6 @@
-const BATTLE_MODULE_CACHE_BUSTER = Date.now();
+import { appendVersionParam } from "../app-version.js";
+import { exposeWildwestDebug } from "../debug-hooks.js";
+
 let battleModulePreloadPromise = null;
 
 export function preloadBattleModule() {
@@ -15,9 +17,10 @@ export function preloadBattleModule() {
 
 export async function startBattle(request, options = {}) {
   const callbacks = options.callbacks || {};
-  const [{ BATTLE_CONTRACT_VERSION }, { loadBattleData }] = await Promise.all([
+  const [{ BATTLE_CONTRACT_VERSION }, { loadBattleData }, { createSeededRandom }] = await Promise.all([
     importBattleContract(),
     importBattleData(),
+    importSeededRandom(),
   ]);
 
   assertBattleRequest(request, BATTLE_CONTRACT_VERSION);
@@ -28,8 +31,14 @@ export async function startBattle(request, options = {}) {
     request,
     battleData,
     battleState: battleEngine.createInitialBattleState(request, battleData),
+    battleRandom: createSeededRandom(request.seed || request.nodeId),
   };
-  exposeLegacyBattleContext(context);
+  exposeWildwestDebug("battle", {
+    context,
+    request,
+    battleData,
+    battleState: context.battleState,
+  });
   const { createBattleView } = await importBattleView();
   const battleView = createBattleView({
     root: options.root,
@@ -62,26 +71,23 @@ export async function startBattle(request, options = {}) {
 }
 
 function importBattleContract() {
-  return import(`./battle-contract.js?v=${BATTLE_MODULE_CACHE_BUSTER}`);
+  return import(appendVersionParam("./battle-contract.js"));
 }
 
 function importBattleData() {
-  return import(`./battle-data.js?v=${BATTLE_MODULE_CACHE_BUSTER}`);
+  return import(appendVersionParam("./battle-data.js"));
 }
 
 function importBattleEngine() {
-  return import(`./battle-engine.js?v=${BATTLE_MODULE_CACHE_BUSTER}`);
+  return import(appendVersionParam("./battle-engine.js"));
 }
 
 function importBattleView() {
-  return import(`./battle-view.js?v=${BATTLE_MODULE_CACHE_BUSTER}`);
+  return import(appendVersionParam("./battle-view.js"));
 }
 
-function exposeLegacyBattleContext(context) {
-  if (typeof window !== "undefined" && context) {
-    window.context = context;
-    window.contex = context;
-  }
+function importSeededRandom() {
+  return import(appendVersionParam("../seeded-random.js"));
 }
 
 function assertBattleRequest(request, contractVersion) {

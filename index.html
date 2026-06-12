@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Map Module Prototype</title>
-    <link rel="stylesheet" href="./src/styles.css?v=2026-06-08-unified-modal-blur" />
+    <link rel="icon" href="data:," />
+    <link id="mainStylesheet" rel="stylesheet" data-versioned-href="./src/styles.css" />
   </head>
   <body>
     <div id="gameOrientationRoot" class="game-orientation-root">
@@ -125,7 +126,7 @@
               <div class="heal-info">
                 <h2 id="healTitle">Healing</h2>
                 <div class="heal-card">
-                  <img src="./data/Assets/icons/hearts.png" alt="" />
+                  <img data-versioned-src="./data/Assets/icons/hearts.png" alt="" />
                   <strong id="healAmountText"></strong>
                   <span id="healCurrentHpText"></span>
                 </div>
@@ -233,9 +234,143 @@
     </dialog>
     </div>
 
-    <script type="module">
-      // Cache-buster нужен, чтобы после правок src/map-module.js браузер не держал старый ES-модуль.
-      import(`./src/map-module.js?v=${Date.now()}`);
+    <script>
+      const APP_VERSION_GLOBAL_KEY = "__ROGUELITE_MATCH3_VERSION__";
+      const DEFAULT_APP_VERSION = "dev";
+      const VERSION_MANIFEST_URL = "./version.json";
+      const VERSIONED_CURSOR_URLS = [
+        ["--cursor-default", "../data/Assets/cursor/ready/cursor.png", "4 2"],
+        ["--cursor-active", "../data/Assets/cursor/ready/cursor_activ.png", "4 2"],
+        ["--cursor-help", "../data/Assets/cursor/ready/cursor_q.png", "7 2"],
+        ["--cursor-hand-finger", "../data/Assets/cursor/ready/hand-finger.png", "14 5"],
+        ["--cursor-hand", "../data/Assets/cursor/ready/hand.png", "14 14"],
+        ["--cursor-hand-take", "../data/Assets/cursor/ready/hand_take.png", "14 14"],
+        ["--cursor-up-down", "../data/Assets/cursor/ready/up_down.png", "16 16"],
+      ];
+      const VERSIONED_MODULE_PATHS = [
+        "./src/app-version.js",
+        "./src/asset-preloader.js",
+        "./src/audio-module.js",
+        "./src/data-loader.js",
+        "./src/data-validation.js",
+        "./src/debug-hooks.js",
+        "./src/map-module.js",
+        "./src/rich-text.js",
+        "./src/seeded-random.js",
+        "./src/map/map-generation.js",
+        "./src/battle/battle-animations.js",
+        "./src/battle/battle-board-actions.js",
+        "./src/battle/battle-board-view.js",
+        "./src/battle/battle-config.js",
+        "./src/battle/battle-contract.js",
+        "./src/battle/battle-data.js",
+        "./src/battle/battle-engine.js",
+        "./src/battle/battle-feedback-view.js",
+        "./src/battle/battle-formatters.js",
+        "./src/battle/battle-inventory-view.js",
+        "./src/battle/battle-module.js",
+        "./src/battle/battle-outcome-flow.js",
+        "./src/battle/battle-player-items.js",
+        "./src/battle/battle-popovers.js",
+        "./src/battle/battle-projectiles-view.js",
+        "./src/battle/battle-rage-flow.js",
+        "./src/battle/battle-resolution.js",
+        "./src/battle/battle-runtime.js",
+        "./src/battle/battle-scaffold-view.js",
+        "./src/battle/battle-shuffle-flow.js",
+        "./src/battle/battle-state.js",
+        "./src/battle/battle-stats-view.js",
+        "./src/battle/battle-trace.js",
+        "./src/battle/battle-view.js",
+      ];
+      const bootstrapScript = document.currentScript;
+
+      bootstrap().catch((error) => {
+        console.error(error);
+        const loadingTitle = document.getElementById("loadingTitle");
+        const loadingStatus = document.getElementById("loadingStatus");
+        if (loadingTitle) {
+          loadingTitle.textContent = "Ошибка загрузки";
+        }
+        if (loadingStatus) {
+          loadingStatus.textContent = error.message;
+        }
+      });
+
+      async function bootstrap() {
+        const version = await loadAppVersion();
+        globalThis[APP_VERSION_GLOBAL_KEY] = version;
+        applyCursorVersion(version);
+        applyStaticAssetVersion(version);
+        applyStylesheetVersion(version);
+        installVersionedImportMap(version);
+        await import(appendVersionParam("./src/map-module.js", version));
+      }
+
+      async function loadAppVersion() {
+        try {
+          const response = await fetch(VERSION_MANIFEST_URL, { cache: "no-store" });
+          if (!response.ok) {
+            throw new Error(`Failed to load ${VERSION_MANIFEST_URL} (${response.status})`);
+          }
+          const manifest = await response.json();
+          return normalizeAppVersion(manifest?.version) || DEFAULT_APP_VERSION;
+        } catch (error) {
+          console.warn("Failed to load version manifest; using dev cache version.", error);
+          return DEFAULT_APP_VERSION;
+        }
+      }
+
+      function applyStylesheetVersion(version) {
+        const stylesheet = document.getElementById("mainStylesheet");
+        const href = stylesheet?.dataset?.versionedHref;
+        if (stylesheet && href) {
+          stylesheet.href = appendVersionParam(href, version);
+        }
+      }
+
+      function applyCursorVersion(version) {
+        for (const [property, url, hotspot] of VERSIONED_CURSOR_URLS) {
+          document.documentElement.style.setProperty(property, `url("${appendVersionParam(url, version)}") ${hotspot}`);
+        }
+      }
+
+      function applyStaticAssetVersion(version) {
+        for (const element of document.querySelectorAll("[data-versioned-src]")) {
+          element.src = appendVersionParam(element.dataset.versionedSrc, version);
+        }
+      }
+
+      function installVersionedImportMap(version) {
+        if (!HTMLScriptElement.supports || !HTMLScriptElement.supports("importmap")) {
+          return;
+        }
+
+        const imports = {};
+        for (const modulePath of VERSIONED_MODULE_PATHS) {
+          imports[modulePath] = appendVersionParam(modulePath, version);
+        }
+
+        const importMap = document.createElement("script");
+        importMap.type = "importmap";
+        importMap.textContent = JSON.stringify({ imports });
+        (bootstrapScript || document.head.lastElementChild).after(importMap);
+      }
+
+      function appendVersionParam(url, version) {
+        const rawUrl = String(url || "");
+        if (!rawUrl || /^(?:blob:|data:|https?:)/i.test(rawUrl)) {
+          return rawUrl;
+        }
+        const normalizedVersion = normalizeAppVersion(version) || DEFAULT_APP_VERSION;
+        const [pathWithoutHash, hash = ""] = rawUrl.split("#");
+        const separator = pathWithoutHash.includes("?") ? "&" : "?";
+        return `${pathWithoutHash}${separator}v=${encodeURIComponent(normalizedVersion)}${hash ? `#${hash}` : ""}`;
+      }
+
+      function normalizeAppVersion(value) {
+        return typeof value === "string" ? value.trim() : "";
+      }
     </script>
   </body>
 </html>

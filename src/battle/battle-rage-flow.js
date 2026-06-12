@@ -152,6 +152,7 @@ export async function runBattleRageAction(deps, context, renderTargets) {
         {
           boxes: context.battleState.boxes,
           enemyShieldMax: deps.getBattleEnemyShieldMax(context),
+          random: deps.getBattleRandom(context),
         },
       );
       deps.stopBattleRageTransformTargetLights(transformLights);

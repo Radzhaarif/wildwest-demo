@@ -7,6 +7,7 @@ const MAP_UI_CONFIG_URL = `${DATA_ROOT}/settings/map-ui.jsonc`;
 const ENEMY_CONFIG_ROOT = `${DATA_ROOT}/enemy`;
 const MIN_BATTLE_BOARD_DROP_TYPES = 3;
 const MAP_EVENT_TYPES = ["battle", "reward", "heal", "shop", "skip", "dialog"];
+const BATTLE_ITEM_STAT_KEYS = ["damage", "heal", "aggression", "calm"];
 const REQUIRED_LOCALE_KEYS = [
   "campaign.main.name",
   "menu.title",
@@ -29,6 +30,7 @@ const REQUIRED_LOCALE_KEYS = [
   "ui.back",
   "ui.surrender",
   "ui.eventLog",
+  "ui.downloadBattleTrace",
   "ui.yes",
   "ui.no",
   "ui.leave",
@@ -53,8 +55,11 @@ const REQUIRED_LOCALE_KEYS = [
   "hud.health",
   "validation.failed",
   "log.runStarted",
+  "log.runSeed",
   "log.validationPassed",
   "log.mapGenerated",
+  "log.mapSeed",
+  "log.battleSeed",
   "log.nodeSelected",
   "log.skipResolved",
   "log.rewardResolved",
@@ -1001,6 +1006,7 @@ function validateEnemyStage(stage, path, issues, requiredTextKeys, requiredItemI
     requireIntegerInRange(stage.shield, `${path}.shield`, 0, Infinity, issues);
   }
   validateEnemyConvertEffects(stage.convert, `${path}.convert`, issues, requiredItemIds);
+  validateEnemyItemStatModifiers(stage.itemStatModifiers, `${path}.itemStatModifiers`, issues, requiredItemIds);
   requirePositiveNumber(stage.health, `${path}.health`, issues);
   requirePositiveNumber(stage.aggression?.threshold, `${path}.aggression.threshold`, issues);
   requireNumberInRange(stage.aggression?.damage, `${path}.aggression.damage`, 0, Infinity, issues);
@@ -1023,6 +1029,49 @@ function validateEnemyStage(stage, path, issues, requiredTextKeys, requiredItemI
   } else {
     validateEnemyUltimateEffects(stage.ultimate.effects, `${path}.ultimate.effects`, issues, requiredItemIds);
   }
+}
+
+function validateEnemyItemStatModifiers(modifiers, path, issues, requiredItemIds) {
+  if (modifiers === undefined) {
+    return;
+  }
+  if (!Array.isArray(modifiers)) {
+    issues.push(`${path}: must be an array when present`);
+    return;
+  }
+
+  modifiers.forEach((modifier, index) => {
+    const prefix = `${path}[${index}]`;
+    if (!modifier || typeof modifier !== "object" || Array.isArray(modifier)) {
+      issues.push(`${prefix}: must be an object`);
+      return;
+    }
+
+    const itemIds = modifier.itemIds ?? modifier.itemId;
+    validateOptionalStringList(itemIds, `${prefix}.itemIds`, issues, requiredItemIds);
+    validateOptionalStringList(modifier.itemTypes, `${prefix}.itemTypes`, issues);
+    if (!hasOptionalStringList(itemIds) && !hasOptionalStringList(modifier.itemTypes)) {
+      issues.push(`${prefix}: expected itemTypes, itemIds or itemId selector`);
+    }
+
+    if (!modifier.multipliers || typeof modifier.multipliers !== "object" || Array.isArray(modifier.multipliers)) {
+      issues.push(`${prefix}.multipliers: must be an object`);
+      return;
+    }
+
+    let hasStatMultiplier = false;
+    for (const [statKey, multiplier] of Object.entries(modifier.multipliers)) {
+      if (!BATTLE_ITEM_STAT_KEYS.includes(statKey)) {
+        issues.push(`${prefix}.multipliers.${statKey}: expected one of ${BATTLE_ITEM_STAT_KEYS.join(", ")}`);
+        continue;
+      }
+      hasStatMultiplier = true;
+      requireNumberInRange(multiplier, `${prefix}.multipliers.${statKey}`, 0, Infinity, issues);
+    }
+    if (!hasStatMultiplier) {
+      issues.push(`${prefix}.multipliers: expected at least one of ${BATTLE_ITEM_STAT_KEYS.join(", ")}`);
+    }
+  });
 }
 
 function validateEnemyUltimateEffects(effects, path, issues, requiredItemIds) {

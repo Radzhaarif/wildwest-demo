@@ -2079,6 +2079,13 @@ button.reward-item {
   color: #fff7e7;
 }
 
+.battle-log-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 .battle-outcome-banner {
   position: fixed;
   left: 0;
@@ -2502,9 +2509,10 @@ button.reward-item {
   background: rgba(255, 220, 165, 0.16);
   color: #fff7e7;
   backdrop-filter: blur(2px);
-  display: flex;
-  align-items: center;
-  overflow: hidden;
+  display: block;
+  line-height: 1.28;
+  white-space: pre-line;
+  overflow: auto;
 }
 
 .battle-scaffold-shuffle-button {
