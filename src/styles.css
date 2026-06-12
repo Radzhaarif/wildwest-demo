@@ -2497,6 +2497,7 @@ button.reward-item {
 }
 
 .battle-scaffold-ultimate {
+  --inline-item-icon-size: var(--battle-ultimate-inline-item-icon-size, 2.1em);
   min-height: 100%;
   height: auto;
   align-self: stretch;
@@ -2513,6 +2514,11 @@ button.reward-item {
   line-height: 1.28;
   white-space: pre-line;
   overflow: auto;
+}
+
+.battle-scaffold-ultimate .inline-item-icon {
+  max-width: 2.2em;
+  max-height: 2.2em;
 }
 
 .battle-scaffold-shuffle-button {
