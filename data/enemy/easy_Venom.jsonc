@@ -1,5 +1,6 @@
 {
-  "enemyId": "Venom",
+  "enemyId": "easy_Venom",
+  "baseEnemyId": "Venom",
   "nameTextKey": "enemy.Venom.name",
   "descriptionTextKey": "enemy.Venom.description",
   "stageCount": 1,
@@ -29,7 +30,7 @@
         }
       ],
       "aggression": {
-        "threshold": 50,
+        "threshold": 100,
         "damage": 3,
         "resetOnTrigger": true
       },

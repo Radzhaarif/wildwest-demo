@@ -1,4 +1,5 @@
 import { appendVersionParam } from "./app-version.js";
+import { stripJsonLineComments } from "./jsonc-utils.js";
 
 export async function loadJson(url) {
   const response = await fetch(appendVersionParam(url));
@@ -13,14 +14,7 @@ export async function loadJsonc(url) {
   if (!response.ok) {
     throw new Error(`Failed to load ${url} (${response.status})`);
   }
-  return parseJson(stripJsonComments(await response.text()), url);
-}
-
-function stripJsonComments(source) {
-  return source
-    .split("\n")
-    .map((line) => (line.trimStart().startsWith("//") ? "" : line))
-    .join("\n");
+  return parseJson(stripJsonLineComments(await response.text()), url);
 }
 
 function parseJson(source, url) {

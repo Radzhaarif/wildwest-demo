@@ -18,6 +18,8 @@ export function normalizeDebugSeed(value) {
 }
 
 export function deriveDebugSeed(seed, ...parts) {
+  // deriveDebugSeed дает независимые deterministic streams от одного run seed:
+  // map, battle, rewards и dialog payloads не должны расходовать общий счетчик.
   return createDebugSeed(createSeededRandom([seed, ...parts].join(":")));
 }
 

@@ -1,0 +1,32 @@
+{
+  "enabled": true,
+  "inputMode": "typedSequence",
+  "bufferMaxLength": 12,
+  "activation": {
+    "scope": "mainMenu",
+    "command": "iddqd",
+    "sound": "data/Assets/sound/item_bullet.mp3"
+  },
+  "testRun": {
+    "enabled": true,
+    "buttonTextKey": "menu.smokeTest",
+    "mapId": "SmokeTest",
+    "config": "data/maps/SmokeTest.jsonc",
+    "playerState": "data/player/smoke-test-player-state.json",
+    "mapNameTextKey": "SmokeTest.name",
+    "victoryTitleTextKey": "campaign.main.victory.title",
+    "victoryMessageTextKey": "campaign.main.victory.message"
+  },
+  "commands": [
+    {
+      "id": "autoWin",
+      "scope": "battle",
+      "command": "win"
+    },
+    {
+      "id": "levelUp",
+      "scope": "map",
+      "command": "lvl"
+    }
+  ]
+}

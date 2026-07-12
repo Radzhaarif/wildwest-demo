@@ -1,5 +1,6 @@
 {
-  "enemyId": "Toxxy",
+  "enemyId": "easy_Toxxy",
+  "baseEnemyId": "Toxxy",
   "nameTextKey": "enemy.Toxxy.name",
   "descriptionTextKey": "enemy.Toxxy.description",
   "stageCount": 1,
@@ -29,7 +30,7 @@
         }
       ],
       "aggression": {
-        "threshold": 50,
+        "threshold": 100,
         "damage": 3,
         "resetOnTrigger": true
       },

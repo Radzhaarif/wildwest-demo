@@ -3,6 +3,8 @@ import { renderInlineRichText } from "../rich-text.js";
 let battleTooltipHideTimeoutId = null;
 let battleTooltipShowTimeoutId = null;
 
+// Mini-menu/inventory оверлеи ставят runtime на паузу. При закрытии важно
+// возобновлять бой только если второй overlay не открыт и lifecycle еще жив.
 export function createBattleMiniMenuOverlay(deps, panel, context) {
   const overlay = document.createElement("div");
   overlay.className = "battle-mini-menu-overlay";

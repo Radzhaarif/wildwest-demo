@@ -1,6 +1,8 @@
 export const BATTLE_TRACE_VERSION = 1;
 
 export function createBattleTrace(context) {
+  // Trace хранит JSON-safe снимки вместо ссылок на живой context. Его можно
+  // скачать после боя и воспроизвести ход рассуждений без DOM.
   const trace = {
     traceVersion: BATTLE_TRACE_VERSION,
     createdAt: new Date().toISOString(),
@@ -144,6 +146,7 @@ function createEnemySnapshot(context) {
   const enemyConfig = context?.battleData?.enemyConfig || {};
   return {
     enemyId: enemyConfig.enemyId || context?.request?.enemyId || "",
+    baseEnemyId: enemyConfig.baseEnemyId || "",
     nameTextKey: enemyConfig.nameTextKey || "",
     configUrl: context?.request?.enemyConfigUrl || "",
   };

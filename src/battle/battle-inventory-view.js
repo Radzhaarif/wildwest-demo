@@ -227,16 +227,20 @@ function createInventorySlot(deps, context, itemId, options = {}) {
     slot.dataset.itemIcon = deps.resolveAssetPath(itemIcon);
   }
   const isClock = itemId === deps.CLOCK_ITEM_ID;
+  const shouldShowQuantity = options.showQuantity !== false;
+  const itemQuantity = deps.getInventoryQuantity(context.battleState.playerState, itemId);
   const activeSpecialItemId = context.battleState.activeSpecialItemId;
   const clockCooldownSeconds = isClock ? getClockCooldownState(context).seconds : 0;
   const isActiveSpecial = activeSpecialItemId === itemId;
   const isBattleActiveItem = deps.ACTIVE_BATTLE_ITEM_IDS.includes(itemId);
   const isBlockedByOtherSpecial = Boolean(activeSpecialItemId && activeSpecialItemId !== itemId && isBattleActiveItem);
   const isClockUnavailable = isClock
-    && (clockCooldownSeconds > 0 || deps.getInventoryQuantity(context.battleState.playerState, itemId) <= 0);
+    && (clockCooldownSeconds > 0 || itemQuantity <= 0);
   const isSpecialUnavailable = isBattleActiveItem
     && !isActiveSpecial
-    && (isBlockedByOtherSpecial || deps.getInventoryQuantity(context.battleState.playerState, itemId) <= 0);
+    && (isBlockedByOtherSpecial || itemQuantity <= 0);
+  const isMissingInventoryItem = shouldShowQuantity && itemQuantity <= 0;
+  slot.dataset.itemQuantity = String(itemQuantity);
 
   if (isActiveSpecial) {
     slot.classList.add("is-active");
@@ -246,6 +250,10 @@ function createInventorySlot(deps, context, itemId, options = {}) {
     slot.classList.add("is-disabled");
   }
 
+  if (isMissingInventoryItem) {
+    slot.classList.add("is-missing");
+  }
+
   if (itemIcon) {
     const image = document.createElement("img");
     image.src = deps.resolveAssetPath(itemIcon);
@@ -253,11 +261,10 @@ function createInventorySlot(deps, context, itemId, options = {}) {
     slot.append(image);
   }
 
-  const shouldShowQuantity = options.showQuantity !== false;
   if (shouldShowQuantity) {
     const quantity = document.createElement("span");
     quantity.className = "battle-scaffold-inventory-quantity";
-    quantity.textContent = String(deps.getInventoryQuantity(context.battleState.playerState, itemId));
+    quantity.textContent = String(itemQuantity);
     slot.append(quantity);
   }
 

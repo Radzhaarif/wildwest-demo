@@ -1,0 +1,363 @@
+{
+  "id": "SmokeTest",
+  "nameTextKey": "SmokeTest.name",
+  "mapImage": "data/Assets/map/WildWest_map.png",
+  "pathRules": {
+    "connectionCountWeights": [
+      {
+        "count": 1,
+        "weight": 100
+      }
+    ],
+    "maxSinglePathChain": 7
+  },
+  "events": [
+    {
+      "name": "dialog_smoke",
+      "type": "dialog",
+      "icon": "data/Assets/icons/dialog.png"
+    },
+    {
+      "name": "skip_smoke",
+      "type": "skip",
+      "icon": "data/Assets/icons/skip.png"
+    },
+    {
+      "name": "shop_all",
+      "type": "shop",
+      "icon": "data/Assets/icons/shop.png"
+    },
+    {
+      "name": "heal_paid",
+      "type": "heal",
+      "icon": "data/Assets/icons/heal.png"
+    },
+    {
+      "name": "reward_all",
+      "type": "reward",
+      "icon": "data/Assets/icons/reward.png"
+    },
+    {
+      "name": "battle_test",
+      "type": "battle",
+      "icon": "data/Assets/icons/black_skull.png"
+    },
+    {
+      "name": "boss",
+      "type": "battle",
+      "icon": "data/Assets/icons/boss.png"
+    }
+  ],
+  "levels": [
+    {
+      "level": 1,
+      "nodes": {
+        "count": 1
+      },
+      "paths": {
+        "minConnectionsFromNode": 1,
+        "maxConnectionsFromNode": 1,
+        "extraConnectionChance": 0
+      },
+      "events": [
+        {
+          "name": "dialog_smoke",
+          "weight": 100,
+          "guaranteed": true
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "nodes": {
+        "count": 1
+      },
+      "paths": {
+        "minConnectionsFromNode": 1,
+        "maxConnectionsFromNode": 1,
+        "extraConnectionChance": 0
+      },
+      "events": [
+        {
+          "name": "skip_smoke",
+          "weight": 100,
+          "guaranteed": true
+        }
+      ]
+    },
+    {
+      "level": 3,
+      "nodes": {
+        "count": 1
+      },
+      "paths": {
+        "minConnectionsFromNode": 1,
+        "maxConnectionsFromNode": 1,
+        "extraConnectionChance": 0
+      },
+      "events": [
+        {
+          "name": "shop_all",
+          "weight": 100,
+          "guaranteed": true
+        }
+      ]
+    },
+    {
+      "level": 4,
+      "nodes": {
+        "count": 1
+      },
+      "paths": {
+        "minConnectionsFromNode": 1,
+        "maxConnectionsFromNode": 1,
+        "extraConnectionChance": 0
+      },
+      "events": [
+        {
+          "name": "heal_paid",
+          "weight": 100,
+          "guaranteed": true
+        }
+      ]
+    },
+    {
+      "level": 5,
+      "nodes": {
+        "count": 1
+      },
+      "paths": {
+        "minConnectionsFromNode": 1,
+        "maxConnectionsFromNode": 1,
+        "extraConnectionChance": 0
+      },
+      "events": [
+        {
+          "name": "reward_all",
+          "weight": 100,
+          "guaranteed": true
+        }
+      ]
+    },
+    {
+      "level": 6,
+      "nodes": {
+        "count": 1
+      },
+      "paths": {
+        "minConnectionsFromNode": 1,
+        "maxConnectionsFromNode": 1,
+        "extraConnectionChance": 0
+      },
+      "events": [
+        {
+          "name": "battle_test",
+          "weight": 100,
+          "guaranteed": true
+        }
+      ]
+    },
+    {
+      "level": 7,
+      "nodes": {
+        "count": 1
+      },
+      "paths": {
+        "minConnectionsFromNode": 1,
+        "maxConnectionsFromNode": 1,
+        "extraConnectionChance": 0
+      },
+      "events": [
+        {
+          "name": "boss",
+          "weight": 100,
+          "guaranteed": true
+        }
+      ]
+    }
+  ],
+  "battle": [
+    {
+      "eventName": "battle_test",
+      "enemyId": "test",
+      "background": "data/Assets/backgrounds/WildWest_1.png",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 100,
+      "nodeTitleTextKey": "enemy.test.name"
+    },
+    {
+      "eventName": "boss",
+      "enemyId": "boss_Fireman",
+      "background": "data/Assets/backgrounds/WildWest_3.png",
+      "minLevel": 7,
+      "maxLevel": 7,
+      "weight": 100,
+      "nodeTitleTextKey": "enemy.Fireman.name"
+    }
+  ],
+  "reward": [
+    {
+      "eventName": "reward_all",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 100,
+      "dialogTextKey": "reward.item.text_01",
+      "eventImage": "data/Assets/events/reward_gold.png",
+      "itemCount": 4,
+      "rewards": [
+        {
+          "type": "gold",
+          "amount": 10
+        },
+        {
+          "type": "experience",
+          "amount": 50
+        },
+        {
+          "type": "health",
+          "amount": 10
+        },
+        {
+          "type": "item",
+          "itemId": "item_swap",
+          "amount": 1
+        }
+      ]
+    }
+  ],
+  "heal": [
+    {
+      "eventName": "heal_paid",
+      "minLevel": 4,
+      "maxLevel": 4,
+      "healPercent": 100,
+      "dialogTextKey": "healer.text_02",
+      "eventImage": "data/Assets/events/doctor.png",
+      "goldPrice": 40,
+      "weight": 100
+    }
+  ],
+  "shop": [
+    {
+      "eventName": "shop_all",
+      "minLevel": 3,
+      "maxLevel": 3,
+      "weight": 100,
+      "dialogTextKey": "trader.text_01",
+      "eventImage": "data/Assets/events/trader.png",
+      "items": [
+        {
+          "itemId": "item_skull",
+          "amount": 10,
+          "goldPrice": 5
+        },
+        {
+          "itemId": "item_time",
+          "amount": 10,
+          "goldPrice": 5
+        },
+        {
+          "itemId": "item_swap",
+          "amount": 10,
+          "goldPrice": 5
+        },
+        {
+          "itemId": "red",
+          "amount": 10,
+          "goldPrice": 5
+        },
+        {
+          "itemId": "green",
+          "amount": 10,
+          "goldPrice": 5
+        },
+        {
+          "itemId": "item_granate",
+          "amount": 10,
+          "goldPrice": 5
+        },
+        {
+          "itemId": "item_granate_power",
+          "amount": 10,
+          "goldPrice": 5
+        },
+        {
+          "itemId": "item_bullet",
+          "amount": 10,
+          "goldPrice": 5
+        },
+        {
+          "itemId": "item_bullet_power",
+          "amount": 10,
+          "goldPrice": 5
+        },
+        {
+          "itemId": "item_Knife",
+          "amount": 10,
+          "goldPrice": 5
+        },
+        {
+          "itemId": "item_Knife_power",
+          "amount": 10,
+          "goldPrice": 5
+        },
+        {
+          "itemId": "item_Bandage",
+          "amount": 10,
+          "goldPrice": 5
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "amount": 10,
+          "goldPrice": 5
+        },
+        {
+          "itemId": "item_Shield",
+          "amount": 10,
+          "goldPrice": 5
+        },
+        {
+          "itemId": "item_Shield_power",
+          "amount": 10,
+          "goldPrice": 5
+        }
+      ]
+    }
+  ],
+  "skip": [
+    {
+      "eventName": "skip_smoke",
+      "minLevel": 2,
+      "maxLevel": 2,
+      "weight": 100,
+      "textKey": "WildWest_skip"
+    }
+  ],
+  "dialog": [
+    {
+      "eventName": "dialog_smoke",
+      "minLevel": 1,
+      "maxLevel": 1,
+      "weight": 100,
+      "characterImage": "data/Assets/enemy/Sweety.png",
+      "characterNameTextKey": "sweety.name",
+      "characterWidthPct": 58,
+      "characterCenterXPct": 50,
+      "characterCenterYPct": 48,
+      "initialStepId": "intro",
+      "steps": [
+        {
+          "stepId": "intro",
+          "textKey": "dialog.sweety.hello",
+          "answers": [
+            {
+              "textKey": "dialog.sweety.answer.end",
+              "end": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

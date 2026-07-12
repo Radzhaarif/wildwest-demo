@@ -1,5 +1,6 @@
 {
-  "enemyId": "Bully",
+  "enemyId": "easy_Bully",
+  "baseEnemyId": "Bully",
   "nameTextKey": "enemy.Bully.name",
   "descriptionTextKey": "enemy.Bully.description",
   "stageCount": 1,
@@ -50,7 +51,7 @@
         }
       ],
       "aggression": {
-        "threshold": 50,
+        "threshold": 100,
         "damage": 3,
         "resetOnTrigger": true
       },

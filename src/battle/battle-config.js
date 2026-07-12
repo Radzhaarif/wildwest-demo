@@ -63,9 +63,9 @@ export const DEFAULT_CLOCK_WARNING_CHANGE_SCALE = 1.5;
 export const DEFAULT_BATTLE_LAYOUT = {
   designWidthPx: 1500,
   designHeightPx: 860,
-  viewportPaddingPx: 8,
+  viewportPaddingPx: 0,
   allowUpscale: true,
-  upscaleFactor: 0.5,
+  upscaleFactor: 1,
   minScale: 0.1,
 };
 
@@ -152,6 +152,8 @@ export function getBattleEnemyShieldMax(context) {
 }
 
 export function getBattleUiConfig(context) {
+  // UI config всегда читается через этот accessor: data/settings/battle-ui.jsonc
+  // может перекрыть часть полей, а остальное добирается безопасными default'ами.
   const config = context?.battleData?.uiConfig || {};
   return {
     textKeys: {

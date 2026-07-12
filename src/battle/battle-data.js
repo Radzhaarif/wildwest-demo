@@ -9,6 +9,8 @@ async function loadBattleUiConfig(loaders) {
 }
 
 export async function loadBattleData(request, loaders = {}) {
+  // Map may pass an explicit enemyConfigUrl for seeded/debug runs. Fallback by
+  // enemyId keeps battle-module usable for direct smoke/manual starts.
   const enemyConfigUrl = request.enemyConfigUrl || getEnemyConfigUrl(request.enemyId);
   const enemyConfig = loaders.loadJsonc
     ? await loaders.loadJsonc(enemyConfigUrl)

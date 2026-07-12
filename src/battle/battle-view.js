@@ -10,13 +10,16 @@ import {
   summarizeMoveResult,
 } from "./battle-trace.js";
 import {
+  createEmptyEffectSummary,
+  mergeEffectSummary,
+} from "./battle-effect-summary.js";
+import {
   animateBattleBoardShuffleMovement,
   animateBattleBoxBlockedClick,
   animateBattleShakeCells,
   animateBattleSwap,
   animateBattleVineBlockedClick,
   animateBattleWallBlockedSwap,
-  getBattleCellIconElement,
   wait,
 } from "./battle-animations.js";
 import {
@@ -52,6 +55,10 @@ import {
   setBattleHealthFeedbackSuppression as setBattleHealthFeedbackSuppressionView,
   triggerBattleHealthChangeFeedback as triggerBattleHealthChangeFeedbackView,
 } from "./battle-feedback-view.js";
+import {
+  getBoardElementsForSourceCells as getBoardElementsForSourceCellsFeedback,
+  setMatchFeedbackForBattleChange as setMatchFeedbackForBattleChangeFeedback,
+} from "./battle-match-feedback.js";
 import {
   animateBattleKamikazeSelfDamageBurst as animateBattleKamikazeSelfDamageBurstView,
   animateBattleRageProjectiles as animateBattleRageProjectilesView,
@@ -137,6 +144,10 @@ import {
   updateBattleClockCooldownDisplay as updateBattleClockCooldownDisplayInventory,
   updateBattleHeaderMenuButton as updateBattleHeaderMenuButtonInventory,
 } from "./battle-inventory-view.js";
+import {
+  attachBattleLanguageChangeListener as attachBattleLanguageChangeListenerFlow,
+  updateBattleTopActionButtonLabel as updateBattleTopActionButtonLabelFlow,
+} from "./battle-language-flow.js";
 import {
   areBattleBoardsEqual as areBattleBoardsEqualShuffle,
   createNoMovesBattleShuffle as createNoMovesBattleShuffleFlow,
@@ -239,8 +250,18 @@ import {
 } from "./battle-player-items.js";
 
 const MAX_CASCADE_STEPS = 30;
+const battleDepsCache = new Map();
+
+function getCachedBattleDeps(key, createDeps) {
+  if (!battleDepsCache.has(key)) {
+    battleDepsCache.set(key, createDeps());
+  }
+  return battleDepsCache.get(key);
+}
 
 export function createBattleView(options = {}) {
+  // battle-view остается фасадом: он собирает view/flow модули и сохраняет
+  // старые имена функций для callsites, пока боевой слой режется на части.
   const engine = assertBattleEngine(options.engine);
 
   return {
@@ -283,21 +304,23 @@ function createBattleRuntimeHandlers() {
 }
 
 function createBattleFormatterDeps() {
-  return {
+  // Все deps factory ниже намеренно явные. Извлеченные battle-модули не тянут
+  // общий context импортом, а получают только нужные helper'ы.
+  return getCachedBattleDeps("formatter", () => ({
     getBattleUiConfig,
-  };
+  }));
 }
 
 function createBattlePlayerItemsDeps() {
-  return {
+  return getCachedBattleDeps("playerItems", () => ({
     DEFAULT_HAND_ITEM_IDS,
     getBattleUiConfig,
     translate,
-  };
+  }));
 }
 
 function createBattleScaffoldViewDeps() {
-  return {
+  return getCachedBattleDeps("scaffoldView", () => ({
     DEFAULT_BATTLE_LAYOUT,
     BATTLE_POPUP_MENU_GAP_PX,
     BATTLE_POPUP_INVENTORY_GAP_PX,
@@ -334,6 +357,7 @@ function createBattleScaffoldViewDeps() {
     attachBattleTooltip,
     attachBattlePointerTracker,
     attachBattleLanguageChangeListener,
+    attachBattleCheatCommands,
     closeBattleMiniMenu,
     addBattleLog,
     renderBattleLog,
@@ -349,11 +373,11 @@ function createBattleScaffoldViewDeps() {
     translate,
     translateBattleText,
     resolveAssetPath,
-  };
+  }));
 }
 
 function createBattleBoardViewDeps() {
-  return {
+  return getCachedBattleDeps("boardView", () => ({
     GOLD_ITEM_ID,
     updateBattleShuffleButtonState,
     getBattleBoardConfig,
@@ -367,11 +391,11 @@ function createBattleBoardViewDeps() {
     isBattleLifecycleActive,
     isBattleAttemptActive,
     renderBattleStats,
-  };
+  }));
 }
 
 function createBattlePopoverDeps() {
-  return {
+  return getCachedBattleDeps("popover", () => ({
     BAG_ITEM_ID,
     BATTLE_POPUP_EDGE_GAP_PX,
     BATTLE_POPUP_INVENTORY_COLUMNS,
@@ -393,19 +417,28 @@ function createBattlePopoverDeps() {
     shouldContinueBattle,
     translate,
     downloadBattleTrace,
-  };
+  }));
 }
 
 function createBattleFeedbackDeps() {
-  return {
+  return getCachedBattleDeps("feedback", () => ({
     getBattleHealthChangeAnimation,
     triggerBattleLightDamageProjectiles,
     formatBattleNumber,
-  };
+  }));
+}
+
+function createBattleMatchFeedbackDeps() {
+  return getCachedBattleDeps("matchFeedback", () => ({
+    getBattlePlayerHealthSourceElements,
+    getBattlePlayerHealSourceElements,
+    setBattleHealthFeedbackDelta,
+    setBattleHealthFeedbackSuppression,
+  }));
 }
 
 function createBattleProjectilesDeps() {
-  return {
+  return getCachedBattleDeps("projectiles", () => ({
     DEFAULT_LIGHT_PROJECTILE_ICON,
     DEFAULT_LIGHT_BLUE_PROJECTILE_ICON,
     DEFAULT_LIGHT_GREEN_PROJECTILE_ICON,
@@ -431,11 +464,11 @@ function createBattleProjectilesDeps() {
     isBattleUltimateKamikazeEffect,
     normalizeStringList,
     isBattleCellBoxed,
-  };
+  }));
 }
 
 function createBattleRageFlowDeps() {
-  return {
+  return getCachedBattleDeps("rageFlow", () => ({
     DEFAULT_LIGHT_PROJECTILE_MS,
     shouldContinueBattle,
     hasActiveBattleResolutionAnimation,
@@ -469,11 +502,11 @@ function createBattleRageFlowDeps() {
     resolveBattleCascades,
     formatMoveStatus,
     finishBattleMoveIfNeeded,
-  };
+  }));
 }
 
 function createBattleStatsViewDeps() {
-  return {
+  return getCachedBattleDeps("statsView", () => ({
     DEFAULT_CLOCK_WARNING_CHANGE_SCALE,
     getBattleUiConfig,
     getCurrentBattleStageIndex,
@@ -489,11 +522,11 @@ function createBattleStatsViewDeps() {
     getClockWarningSeconds,
     getClockWarningChangeMs,
     getClockWarningChangeScale,
-  };
+  }));
 }
 
 function createBattleInventoryViewDeps() {
-  return {
+  return getCachedBattleDeps("inventoryView", () => ({
     ACTIVE_BATTLE_ITEM_IDS,
     BAG_ITEM_ID,
     CLOCK_ITEM_ID,
@@ -516,11 +549,25 @@ function createBattleInventoryViewDeps() {
     toggleBattleInventory,
     toggleBattleMiniMenu,
     translate,
-  };
+  }));
+}
+
+function createBattleLanguageFlowDeps() {
+  return getCachedBattleDeps("languageFlow", () => ({
+    getBattleTopButtonConfig,
+    refreshBattleLogOverlayLanguage,
+    renderBattleInventory,
+    renderBattleStats,
+    shouldContinueBattle,
+    translate,
+    translateBattleText,
+    updateBattleHeaderMenuButton,
+    updateBattleShuffleButtonLanguage,
+  }));
 }
 
 function createBattleShuffleFlowDeps() {
-  return {
+  return getCachedBattleDeps("shuffleFlow", () => ({
     animateBattleBoardShuffleMovement,
     animateBattleShakeCells,
     clearActiveBattleSpecial,
@@ -548,11 +595,11 @@ function createBattleShuffleFlowDeps() {
     translate,
     translateBattleText,
     wait,
-  };
+  }));
 }
 
 function createBattleOutcomeFlowDeps() {
-  return {
+  return getCachedBattleDeps("outcomeFlow", () => ({
     BATTLE_OUTCOMES,
     cancelBattleAttempt,
     cancelBattleLifecycle,
@@ -579,11 +626,11 @@ function createBattleOutcomeFlowDeps() {
     translateBattleText,
     recordBattleTraceOutcome,
     wait,
-  };
+  }));
 }
 
 function createBattleResolutionDeps() {
-  return {
+  return getCachedBattleDeps("resolution", () => ({
     MAX_CASCADE_STEPS,
     shouldContinueBattle,
     wait,
@@ -603,11 +650,11 @@ function createBattleResolutionDeps() {
     translateBattleText,
     resolveAssetPath,
     getBattleSoundVolume,
-  };
+  }));
 }
 
 function createBattleBoardActionsDeps() {
-  return {
+  return getCachedBattleDeps("boardActions", () => ({
     GOLD_ITEM_ID,
     SKULL_ITEM_ID,
     SWAP_ITEM_ID,
@@ -659,7 +706,7 @@ function createBattleBoardActionsDeps() {
     createTraceCell,
     createTraceCells,
     summarizeMoveResult,
-  };
+  }));
 }
 
 function showBattleScaffold(context, root) {
@@ -735,48 +782,72 @@ function downloadBattleTrace(context) {
 }
 
 function attachBattleLanguageChangeListener(context, renderTargets) {
-  if (typeof context.callbacks?.onLanguageChange !== "function") {
-    return;
-  }
-
-  context.unsubscribeLanguageChange = context.callbacks.onLanguageChange(({ language, locale }) => {
-    if (!shouldContinueBattle(context, renderTargets)) {
-      return;
-    }
-    context.request.language = language;
-    context.request.locale = locale;
-    refreshBattleLanguage(context, renderTargets);
-  });
+  attachBattleLanguageChangeListenerFlow(createBattleLanguageFlowDeps(), context, renderTargets);
 }
 
-function refreshBattleLanguage(context, renderTargets) {
-  const {
-    title,
-    surrenderButton,
-    settingsButton,
-    logButton,
-    menuButton,
-    shuffleButton,
-    status,
-    enemyStats,
-    playerMeters,
-    ultimateText,
-    specialItems,
-    handItems,
-    logOverlay,
-  } = renderTargets;
+function attachBattleCheatCommands(context, renderTargets) {
+  if (!isBattleCheatInputEnabled(context)) {
+    return;
+  }
+  const autoWinCommand = findBattleCheatCommand(context, "autoWin");
+  if (!autoWinCommand) {
+    return;
+  }
+  let inputBuffer = "";
+  const maxLength = getBattleCheatInputBufferMaxLength(context);
 
-  title.textContent = translate(context.request.locale, context.battleData.enemyConfig?.nameTextKey)
-    || context.request.enemyId;
-  updateBattleTopActionButtonLabel(context, surrenderButton, "surrender");
-  updateBattleTopActionButtonLabel(context, settingsButton, "settings");
-  updateBattleTopActionButtonLabel(context, logButton, "log");
-  updateBattleHeaderMenuButton(context, renderTargets);
-  updateBattleShuffleButtonLanguage(context, shuffleButton);
-  status.textContent = translateBattleText(context, "selectFirstCell");
-  renderBattleStats(enemyStats, playerMeters, ultimateText, context);
-  renderBattleInventory(specialItems, handItems, context, renderTargets);
-  refreshBattleLogOverlayLanguage(logOverlay, context);
+  const onKeyDown = (event) => {
+    const input = getBattleCheatInputCharacter(event);
+    if (!input || shouldIgnoreBattleCheatInputTarget(event.target)) {
+      return;
+    }
+    inputBuffer = `${inputBuffer}${input}`.slice(-maxLength);
+    if (!inputBuffer.endsWith(autoWinCommand.command)) {
+      return;
+    }
+    event.preventDefault();
+    inputBuffer = "";
+    completeBattleVictory(context, renderTargets);
+  };
+
+  window.addEventListener("keydown", onKeyDown);
+  context.cleanupBattleCheatCommands = () => {
+    window.removeEventListener("keydown", onKeyDown);
+  };
+}
+
+function isBattleCheatInputEnabled(context) {
+  const cheats = context.request?.cheats;
+  return cheats?.active === true && cheats.inputMode === "typedSequence";
+}
+
+function findBattleCheatCommand(context, id) {
+  return (context.request?.cheats?.commands || []).find((command) => {
+    return command?.scope === "battle" && command?.id === id && command.command;
+  }) || null;
+}
+
+function getBattleCheatInputBufferMaxLength(context) {
+  const configured = Number(context.request?.cheats?.bufferMaxLength);
+  const longestCommand = (context.request?.cheats?.commands || []).reduce((max, command) => {
+    return Math.max(max, String(command?.command || "").length);
+  }, 0);
+  return Math.max(longestCommand, Number.isFinite(configured) ? Math.floor(configured) : 0, 1);
+}
+
+function getBattleCheatInputCharacter(event) {
+  if (event.ctrlKey || event.altKey || event.metaKey || event.key?.length !== 1) {
+    return "";
+  }
+  return event.key.toLowerCase();
+}
+
+function shouldIgnoreBattleCheatInputTarget(target) {
+  const element = target instanceof Element ? target : null;
+  if (!element) {
+    return false;
+  }
+  return Boolean(element.closest("input, select, textarea, [contenteditable='true']"));
 }
 
 function updateBattleShuffleButtonLanguage(context, button) {
@@ -792,17 +863,7 @@ function createBattleTopActionButton(context, actionId, additionalClassName = ""
 }
 
 function updateBattleTopActionButtonLabel(context, button, actionId) {
-  if (!button) {
-    return;
-  }
-
-  const config = getBattleTopButtonConfig(context, actionId);
-  const label = translate(context.request.locale, config.textKey);
-  const labelElement = button.querySelector(".battle-top-button-label");
-  if (labelElement) {
-    labelElement.textContent = label;
-  }
-  button.setAttribute("aria-label", label);
+  updateBattleTopActionButtonLabelFlow(createBattleLanguageFlowDeps(), context, button, actionId);
 }
 
 function refreshBattleLogOverlayLanguage(logOverlay, context) {
@@ -867,125 +928,8 @@ function setBattleHealthFeedbackDelta(context, statId, delta, options = {}) {
   setBattleHealthFeedbackDeltaView(context, statId, delta, options);
 }
 
-function getBattlePotentialPlayerHealthRecovery(context, beforePlayerState, healAmount) {
-  const healthPerTrigger = Number(
-    context?.engine?.getBattleHealHealth(context?.battleState?.playerState, context?.request?.itemCatalog),
-  );
-  const rawHealAmount = Number(healAmount);
-  const healState = beforePlayerState?.heal || {};
-  const maxHeal = Number(healState.max);
-  const beforeHeal = Number(healState.current) || 0;
-
-  if (
-    !Number.isFinite(healthPerTrigger)
-    || healthPerTrigger <= 0
-    || !Number.isFinite(rawHealAmount)
-    || rawHealAmount <= 0
-    || !Number.isFinite(maxHeal)
-    || maxHeal <= 0
-  ) {
-    return 0;
-  }
-
-  const triggerCount = Math.floor((beforeHeal + rawHealAmount) / maxHeal);
-  return triggerCount * healthPerTrigger;
-}
-
-function getBattleNumericValue(value) {
-  const numericValue = Number(value);
-  return Number.isFinite(numericValue) ? numericValue : 0;
-}
-
-function collectBattleCellSourceStats(context, board, playerState, matches) {
-  const matchCells = context.engine?.collectBattleMatchCells(Array.isArray(matches) ? matches : []);
-  const sourceCellsByModifier = {
-    "enemy-health": [],
-    "player-heal": [],
-    "enemy-aggression": [],
-  };
-  const modifiersByItemId = new Map();
-
-  const inventory = Array.isArray(playerState?.inventory) ? playerState.inventory : [];
-  for (const inventoryEntry of inventory) {
-    const entryQuantity = Math.max(0, getBattleNumericValue(inventoryEntry?.quantity));
-    if (entryQuantity <= 0) {
-      continue;
-    }
-
-    const modifierSourceItem = context.engine.getBattleItemDefinition(
-      context.request.itemCatalog,
-      inventoryEntry?.itemId,
-    );
-    if (!Array.isArray(modifierSourceItem?.modificate)) {
-      continue;
-    }
-
-    for (const modifier of modifierSourceItem.modificate) {
-      const targetItemId = modifier?.itemId;
-      if (!targetItemId) {
-        continue;
-      }
-
-      const existing = modifiersByItemId.get(targetItemId) || {
-        damage: 0,
-        heal: 0,
-        aggression: 0,
-        calm: 0,
-      };
-      existing.damage += getBattleNumericValue(modifier?.damage) * entryQuantity;
-      existing.heal += getBattleNumericValue(modifier?.heal) * entryQuantity;
-      existing.aggression += getBattleNumericValue(modifier?.aggression) * entryQuantity;
-      existing.calm += getBattleNumericValue(modifier?.calm) * entryQuantity;
-      modifiersByItemId.set(targetItemId, existing);
-    }
-  }
-
-  const resolveItemStats = (itemId) => {
-    const item = context.engine.getBattleItemDefinition(context.request.itemCatalog, itemId);
-    const baseStats = {
-      damage: getBattleNumericValue(item?.damage),
-      heal: getBattleNumericValue(item?.heal),
-      aggression: getBattleNumericValue(item?.aggression),
-      calm: getBattleNumericValue(item?.calm),
-    };
-    const itemModifiers = modifiersByItemId.get(itemId) || {};
-    return {
-      damage: baseStats.damage + getBattleNumericValue(itemModifiers.damage),
-      heal: baseStats.heal + getBattleNumericValue(itemModifiers.heal),
-      aggression: baseStats.aggression + getBattleNumericValue(itemModifiers.aggression),
-      calm: baseStats.calm + getBattleNumericValue(itemModifiers.calm),
-    };
-  };
-
-  for (const cell of matchCells) {
-    const itemId = board?.[cell.row]?.[cell.col];
-    const itemStats = resolveItemStats(itemId);
-
-    if (itemStats.damage > 0) {
-      sourceCellsByModifier["enemy-health"].push(cell);
-    }
-    if (itemStats.heal > 0) {
-      sourceCellsByModifier["player-heal"].push(cell);
-    }
-    if (itemStats.aggression !== 0 || itemStats.calm !== 0) {
-      sourceCellsByModifier["enemy-aggression"].push(cell);
-    }
-  }
-
-  return sourceCellsByModifier;
-}
-
 function getBoardElementsForSourceCells(context, sourceCells) {
-  if (!Array.isArray(sourceCells) || sourceCells.length === 0) {
-    return [];
-  }
-  const boardElement = context?.battleRenderTargets?.boardElement;
-  if (!boardElement) {
-    return [];
-  }
-  return sourceCells
-    .map((cell) => getBattleCellIconElement(boardElement, cell))
-    .filter((element) => Boolean(element));
+  return getBoardElementsForSourceCellsFeedback(context, sourceCells);
 }
 
 function setBattleHealthFeedbackSuppression(context, statId, options = {}) {
@@ -993,70 +937,17 @@ function setBattleHealthFeedbackSuppression(context, statId, options = {}) {
 }
 
 function setMatchFeedbackForBattleChange(context, beforeEnemyState, afterEnemyState, beforePlayerState, afterPlayerState, effectSummary, board, matches) {
-  const enemyDamage = Number(effectSummary?.damage || 0);
-  const playerDamage = Number(effectSummary?.playerDamage || 0);
-  const healAdded = Number(effectSummary?.heal || 0);
-  const aggressionDelta = Number(effectSummary?.aggression || 0) - Number(effectSummary?.calm || 0);
-  const playerHealthRecovery = getBattlePotentialPlayerHealthRecovery(context, beforePlayerState, healAdded);
-  const playerHealthSourceElements = getBattlePlayerHealthSourceElements(context);
-  const sourceCellsByModifier = collectBattleCellSourceStats(context, board, context?.battleState?.playerState, matches);
-  const sourceElementsByModifier = {
-    "enemy-health": getBoardElementsForSourceCells(
-      context,
-      Array.isArray(effectSummary?.damageSourceCells) && effectSummary.damageSourceCells.length > 0
-        ? effectSummary.damageSourceCells
-        : sourceCellsByModifier["enemy-health"],
-    ),
-    "player-heal": getBoardElementsForSourceCells(context, sourceCellsByModifier["player-heal"]),
-    "enemy-aggression": getBoardElementsForSourceCells(context, sourceCellsByModifier["enemy-aggression"]),
-  };
-
-  if (enemyDamage !== 0) {
-    setBattleHealthFeedbackDelta(context, "enemy-health", -enemyDamage, {
-      sourceElements: sourceElementsByModifier["enemy-health"],
-    });
-  }
-
-  if (playerDamage > 0) {
-    setBattleHealthFeedbackDelta(context, "player-health", -playerDamage, {
-      sourceElements: playerHealthSourceElements,
-    });
-  } else if (playerHealthRecovery > 0) {
-    setBattleHealthFeedbackDelta(context, "player-health", playerHealthRecovery, {
-      sourceElements: getBattlePlayerHealSourceElements(context),
-      forceDamageProjectiles: true,
-    });
-  }
-
-  if (healAdded !== 0) {
-    setBattleHealthFeedbackDelta(context, "player-heal", healAdded, {
-      sourceElements: sourceElementsByModifier["player-heal"],
-    });
-  }
-
-  if (aggressionDelta !== 0) {
-    setBattleHealthFeedbackDelta(context, "enemy-aggression", aggressionDelta, {
-      sourceElements: sourceElementsByModifier["enemy-aggression"],
-    });
-  }
-
-  const beforeHeal = Number(beforePlayerState?.heal?.current || 0);
-  const afterHeal = Number(afterPlayerState?.heal?.current || 0);
-  if (Number.isFinite(beforeHeal) && Number.isFinite(afterHeal) && afterHeal < beforeHeal) {
-    setBattleHealthFeedbackSuppression(context, "player-heal", { suppressNegativeDelta: true });
-  }
-
-  const beforeAggression = Number(beforeEnemyState?.aggression?.current || 0);
-  const afterAggression = Number(afterEnemyState?.aggression?.current || 0);
-  if (
-    Number.isFinite(beforeAggression)
-    && beforeAggression > 0
-    && Number.isFinite(afterAggression)
-    && afterAggression === 0
-    && Number(effectSummary?.aggressionTriggers || 0) > 0
-  ) {
-    setBattleHealthFeedbackSuppression(context, "enemy-aggression", { suppressNegativeDelta: true });
-  }
+  setMatchFeedbackForBattleChangeFeedback(
+    createBattleMatchFeedbackDeps(),
+    context,
+    beforeEnemyState,
+    afterEnemyState,
+    beforePlayerState,
+    afterPlayerState,
+    effectSummary,
+    board,
+    matches,
+  );
 }
 
 function triggerBattleHealthChangeFeedback(context, iconWrapper, delta, modifier, sourceElements = [], options = {}) {
@@ -1418,44 +1309,6 @@ async function animateBattleBoardMove(boardElement, movement, context) {
 
 function refillBattleBoardFromReserve(context, beforeGravityBoard) {
   return refillBattleBoardFromReserveResolution(createBattleResolutionDeps(), context, beforeGravityBoard);
-}
-
-function createEmptyEffectSummary() {
-  return {
-    activatedCells: 0,
-    damage: 0,
-    heal: 0,
-    aggression: 0,
-    calm: 0,
-    shieldDamage: 0,
-    healthRecovered: 0,
-    playerDamage: 0,
-    aggressionTriggers: 0,
-    stageChanged: false,
-    enemyDefeated: false,
-    damageSourceCells: [],
-    shieldSourceCells: [],
-  };
-}
-
-function mergeEffectSummary(target, source) {
-  target.activatedCells += source.activatedCells;
-  target.damage += source.damage;
-  target.heal += source.heal;
-  target.aggression += source.aggression;
-  target.calm += source.calm;
-  target.shieldDamage += source.shieldDamage || 0;
-  target.healthRecovered += source.healthRecovered;
-  target.playerDamage += source.playerDamage || 0;
-  target.aggressionTriggers += source.aggressionTriggers || 0;
-  target.stageChanged = target.stageChanged || source.stageChanged;
-  target.enemyDefeated = target.enemyDefeated || source.enemyDefeated;
-  if (Array.isArray(source.damageSourceCells)) {
-    target.damageSourceCells.push(...source.damageSourceCells);
-  }
-  if (Array.isArray(source.shieldSourceCells)) {
-    target.shieldSourceCells.push(...source.shieldSourceCells);
-  }
 }
 
 function formatMoveStatus(context, result, enemyState) {

@@ -1,4 +1,6 @@
 export function startBattleLifecycle(context) {
+  // Lifecycle token защищает от старых async/timer callbacks после закрытия
+  // overlay. Любой долгий flow должен сверяться через shouldContinueBattle().
   cancelBattleLifecycle(context);
   const token = { cancelled: false };
   context.battleLifecycle = {
@@ -24,6 +26,8 @@ export function isBattleLifecycleActive(context, token = context.battleLifecycle
 }
 
 export function startBattleAttemptLifecycle(context) {
+  // Attempt token короче общего lifecycle: restart боя отменяет старую попытку,
+  // но оставляет тот же overlay и общий battle context.
   cancelBattleAttempt(context);
   const token = { cancelled: false };
   context.battleAttempt = { token };

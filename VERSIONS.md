@@ -1,0 +1,2773 @@
+# Журнал версий
+
+Этот файл фиксирует изменения проекта: новые функции, правки кода, изменения данных, ассетов, интерфейса, документации и правил работы.
+
+## Правило
+
+Каждое значимое изменение проекта должно получать запись в этом файле. Если изменение влияет на устройство проекта, запуск, данные, правила игры или пользовательские сценарии, нужно также обновить `data/README.md`.
+
+У каждой записи должен быть контекст версии: зачем изменение сделано, какую проблему решает и почему его не стоит менять без отдельной причины.
+
+## Формат записи
+
+Для каждой записи указывать:
+
+- дату изменения;
+- краткое описание;
+- контекст версии: зачем добавлено и почему не стоит менять без причины;
+- затронутые файлы;
+- что проверено после изменения.
+
+## Изменения
+
+### 2026-07-01 - Battle HUD синхронизирован по вертикали
+
+- `src/styles.css` поднимает match-3 поле, вертикальные player heal/HP bars, enemy HP/aggression bars, damage badge и rage timer на тот же шаг, на который раньше был поднят нижний ряд активных предметов.
+- Ряд активных предметов компенсирован внутри поднятой левой колонки, поэтому skull/glove/clock/gold, сумка и shuffle остаются на уже выбранной нижней линии.
+- Enemy HP icon сдвинута вправо на размер иконки, а enemy art сдвинут вправо примерно на 10%, чтобы исправить прошлое неверное направление сдвига.
+- Контекст версии: это визуальная синхронизация после ручной доводки fullscreen battle layout. Не стоит менять эти offsets по одному без нового скрина, потому что поле, bars, rage timer и нижний HUD теперь выровнены как единая композиция.
+- Затронутые файлы: `src/styles.css`, `version.json`, `VERSIONS.md`.
+- Проверка: `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=battle --screenshot=artifacts/battle-layout-scene-raise.png`; `node scripts/browser-smoke.mjs --start=smoke-test`.
+
+### 2026-07-01 - Fullscreen battle HUD подправлен
+
+- `src/styles.css` поднимает нижний боевой HUD в fullscreen/cover-режиме, чтобы активные предметы, сумка и кнопка shuffle не выглядели слишком низко при покрытии viewport.
+- Enemy art сдвинут немного левее. Текущее значение агрессии получило такой же правый якорь и запас ширины, как HP, чтобы дробные и многозначные значения не залезали под bar. Иконка HP врага сдвинута левее примерно на половину размера иконки.
+- `src/battle/README.md` обновляет описание выравнивания enemy HP/aggression values, `version.json` поднят до `2026.07.01.2`.
+- Контекст версии: это визуальная доводка предыдущего fullscreen layout. Не стоит снова опускать нижний HUD без нового скрина, потому что cover-масштаб усиливает любые нижние отступы.
+- Затронутые файлы: `src/styles.css`, `src/battle/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=battle --screenshot=artifacts/battle-layout-fullscreen-hud-tune.png`; `node scripts/browser-smoke.mjs --start=smoke-test`.
+
+### 2026-07-01 - Battle fullscreen и лимиты 100
+
+- Лимит накопительного лечения игрока повышен с `50` до `100` в активных player-state файлах и примере player-state. Enemy aggression threshold `50` повышен до `100` во всех enemy JSONC, где этот лимит был явно задан как `50`; кастомные короткие threshold у `Boss_1` оставлены без изменений.
+- `src/styles.css` резервирует больше места под дробные текущие значения HP врага и выравнивает их вправо перед полосой здоровья, чтобы значения вроде `44.4` не залезали под бар.
+- `src/battle/battle-scaffold-view.js`, `src/battle/battle-config.js` и `data/settings/battle-ui*.jsonc` переводят battle scaling в полноэкранный cover-режим: viewport padding `0`, upscale factor `1`, масштаб выбирается по покрытию экрана.
+- `data/README.md` и `src/battle/README.md` обновляют контракт лечения и battle layout, `version.json` поднят до `2026.07.01.1`.
+- Контекст версии: это финальная доводка текущего боевого UI и темпа шкал по запросу пользователя. Не стоит возвращать fit-масштаб или пороги `50` без отдельного балансового решения, потому что smoke и визуальная раскладка теперь ожидают полноэкранный бой и шкалы `100`.
+- Затронутые файлы: `data/player/*.json`, `data/player/player-state.example.jsonc`, `data/enemy/*.jsonc`, `data/settings/battle-ui.jsonc`, `data/settings/battle-ui.example.jsonc`, `src/battle/battle-config.js`, `src/battle/battle-scaffold-view.js`, `src/styles.css`, `src/battle/README.md`, `data/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-config.js`; `node --check src/battle/battle-scaffold-view.js`; `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=battle --screenshot=artifacts/battle-layout-fullscreen-limits-100.png`; `node scripts/browser-smoke.mjs --start=smoke-test`.
+
+### 2026-06-30 - Foxy крупнее и длиннее aggression bar
+
+- `src/styles.css` увеличивает direct enemy art примерно на 20% и чуть возвращает его левее, не расширяя селектор на вложенные HUD-иконки.
+- Enemy aggression bar удлинен примерно на две трети. Текущее значение агрессии сдвинуто ближе к линии и закреплено по правому краю, чтобы двух- и трехзначные числа росли влево и не толкали бар.
+- `src/battle/README.md` обновляет описание текущей раскладки, `version.json` поднят до `2026.06.30.15`.
+- Контекст версии: правка продолжает визуальную доводку battle HUD по макету пользователя. Не стоит снова делать текущее значение агрессии левым якорем, иначе длинные числа будут визуально дергать начало бара.
+- Затронутые файлы: `src/styles.css`, `src/battle/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=battle --screenshot=artifacts/battle-layout-foxy-aggression-pass.png`; `node scripts/browser-smoke.mjs --start=smoke-test`.
+
+### 2026-06-30 - Enemy HUD icons возвращены в старую группу
+
+- `src/styles.css` сдвигает enemy art примерно на 10% правее текущего варианта, но оставляет его размер без дополнительного увеличения.
+- Селектор арта врага сужен с `.battle-scaffold-enemy-visual img` до `.battle-scaffold-enemy-visual > img`, чтобы сдвиг персонажа больше не применялся к иконкам HP/aggression/damage внутри enemy HUD. Верхние enemy HP/aggression иконки закреплены в своих позициях и больше не получают scale/translate feedback-анимацию, из-за которой они визуально уезжали при изменении статов. Damage badge возвращен к старой группе `value-left/icon-right`, где число урона стоит слева от капли.
+- `src/battle/README.md` обновляет описание текущей раскладки, `version.json` поднят до `2026.06.30.14`.
+- Контекст версии: пользователь показал фрагмент старой удачной позиции enemy stat icons и попросил вернуть иконки туда же. Не стоит снова расширять селектор арта врага на все вложенные `img`, менять порядок damage badge или добавлять сдвигающую feedback-анимацию верхним enemy icons без нового макета, потому что это визуально читается как поломка layout.
+- Затронутые файлы: `src/styles.css`, `src/battle/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=battle --screenshot=artifacts/battle-layout-enemy-icons-selector-fixed.png`; `node scripts/browser-smoke.mjs --start=smoke-test`.
+
+### 2026-06-30 - Enemy art сдвинут обратно левее
+
+- `src/styles.css` корректирует последнюю итерацию battle layout: enemy art сдвинут левее относительно слишком правого варианта и дополнительно уменьшен примерно на 10%.
+- Damage badge возвращен в спокойный порядок `icon-left/value-right` с компактным зазором, чтобы иконка урона не воспринималась уехавшей из enemy HUD. Для верхних enemy HP/aggression иконок добавлена мягкая feedback-анимация без сильного масштабирования, чтобы во время удара они не казались сдвинутыми.
+- `src/battle/README.md` обновляет описание текущей раскладки, `version.json` поднят до `2026.06.30.11`.
+- Контекст версии: предыдущий сдвиг врага вправо оказался чрезмерным, а сильное масштабирование enemy stat icons во время feedback визуально сбивало верхний enemy HUD. Не стоит снова уводить enemy art настолько далеко вправо или возвращать крупный scale верхним stat icons без нового скрина-макета.
+- Затронутые файлы: `src/styles.css`, `src/battle/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=battle --screenshot=artifacts/battle-layout-enemy-adjust-pass.png`; `node scripts/browser-smoke.mjs --start=smoke-test`.
+
+### 2026-06-30 - Battle HUD: равные player bars и крупнее enemy art
+
+- `src/styles.css` делает player heal/HP бары одинаковой длины, меняет их местами и поднимает так, чтобы нижний край иконок совпадал с нижним краем match-3 поля. Сумка остается под этим левым блоком.
+- Damage badge разнесен шире: значение урона выравнивается вправо и растет влево, иконка урона сдвинута правее. Rage timer чуть сдвинут влево, чтобы визуально не торчать за правый край поля.
+- Enemy art увеличен примерно на 30% и сдвинут левее за поле, чтобы персонаж занимал больше сцены. `src/battle/README.md` обновляет описание layout, `version.json` поднят до `2026.06.30.9`.
+- Контекст версии: эта итерация выравнивает левый HUD игрока по нижней границе поля и делает enemy art выразительнее. Не стоит снова делать heal короче HP или уменьшать enemy art без нового визуального решения.
+- Затронутые файлы: `src/styles.css`, `src/battle/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=battle --screenshot=artifacts/battle-layout-candy-pass-2.png`; `node scripts/browser-smoke.mjs --start=smoke-test`.
+
+### 2026-06-30 - Battle HUD привязан к краям поля
+
+- `src/styles.css` уточняет раскладку по новому paint-макету: HP/heal шкалы игрока сдвинуты левее, HP-шкала вытянута вверх, а сумка вынесена под эти шкалы отдельной кнопкой.
+- Кнопка shuffle теперь стоит так, чтобы ее правый край совпадал с правым краем match-3 поля. Rage timer с иконкой часов сдвинут левее и ниже, а правая грань подложки значения таймера выровнена по правому краю поля.
+- Damage badge получил фиксированную правую привязку числа: значение урона выравнивается вправо и растет влево, а иконка урона сдвинута правее, чтобы не залезать под цифру. `src/battle/README.md` обновляет описание layout, `version.json` поднят до `2026.06.30.8`.
+- Контекст версии: правый край поля теперь служит общей осью для timer и shuffle, а левый HUD игрока стал отдельным блоком с сумкой под шкалами. Не стоит возвращать сумку в ряд активных предметов или уводить shuffle от края поля без нового макета.
+- Затронутые файлы: `src/styles.css`, `src/battle/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=battle --screenshot=artifacts/battle-layout-candy-pass.png`; `node scripts/browser-smoke.mjs --start=smoke-test`.
+
+### 2026-06-30 - Heal-шкала боя смещена по paint-макету
+
+- `src/styles.css` уточняет вертикальный HUD игрока: heal-шкала остается короче HP, но теперь сидит ниже внутри своей колонки, начинается ниже HP-бара и заканчивается раньше, как в paint-наброске.
+- Верхний HP-ряд врага и позиция поля оставлены на текущей привязке к доске, чтобы не ухудшить видимость персонажа справа. `src/battle/README.md` обновляет описание текущей раскладки, `version.json` поднят до `2026.06.30.7`.
+- Контекст версии: новый paint показал, что heal должен быть отдельной короткой колонкой рядом с HP, а не уменьшенной шкалой, прижатой к верхней подписи. Не стоит возвращать heal к верхнему краю без нового макета.
+- Затронутые файлы: `src/styles.css`, `src/battle/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=battle --screenshot=artifacts/battle-layout-paint-bars-pass.png`; `node scripts/browser-smoke.mjs --start=smoke-test`.
+
+### 2026-06-30 - Уточнены вертикальные шкалы игрока и enemy row
+
+- `src/styles.css` меняет вертикальные HP/heal шкалы игрока: max-значение теперь сверху, текущее значение снизу, иконки здоровья и лечения стоят под шкалами и увеличены. Heal-шкала стала короче и чуть выше HP-шкалы.
+- Enemy HP оставлен на прежнем месте, aggression row опущен ниже, damage badge поменял порядок на число-слева/иконка-справа, а timer получил отдельную полупрозрачную подложку только под значением.
+- `src/battle/README.md` обновляет описание текущей раскладки, `version.json` поднят до `2026.06.30.6`.
+- Контекст версии: пользовательская читабельность верхней строки боя зависит от ровной линии чисел, а вертикальные шкалы игрока должны восприниматься как шкалы с максимумом сверху. Не стоит возвращать current над bar без нового UI-решения.
+- Затронутые файлы: `src/styles.css`, `src/battle/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=battle --screenshot=artifacts/battle-layout-bars-pass-4.png`; `node scripts/browser-smoke.mjs --start=smoke-test`.
+
+### 2026-06-30 - Battle HUD привязан к полю
+
+- `src/styles.css` привязывает enemy HP/aggression/timer к координатам match-3 поля, а не к центру всего окна боя: полосы стоят прямо над доской, damage badge остается слева от них, а rage timer получает прозрачную зону без общей подложки.
+- У вертикальных HP/heal шкал игрока убрана панельная подложка, активные предметы начинаются ровно от левого края поля, а сумка опущена в общий нижний ряд рядом с активными предметами и shuffle.
+- `src/battle/README.md` обновляет описание текущей раскладки, `version.json` поднят до `2026.06.30.5`.
+- Контекст версии: layout боя теперь держится от поля как главного интерактивного центра. Не стоит снова центрировать enemy HUD по всему экрану или возвращать отдельную верхнюю сумку без нового макета.
+- Затронутые файлы: `src/styles.css`, `src/battle/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=battle --screenshot=artifacts/battle-layout-field-anchored.png`; `node scripts/browser-smoke.mjs --start=smoke-test`.
+
+### 2026-06-30 - Battle HUD выровнен по paint-макету
+
+- `battle-scaffold-view.js` выносит контейнер rage timer из карточки имени врага в общий battle layer, чтобы таймер можно было поставить рядом с aggression row, а не держать внутри правого header.
+- `src/styles.css` подвигает верхний enemy HUD: HP/aggression бары стоят над полем, damage badge находится слева от них, rage timer стоит справа от aggression row. Активные battle tools стали крупнее, сдвинуты левее и выровнены в одну строку с shuffle button.
+- `src/battle/README.md` обновляет описание текущей раскладки, `version.json` поднят до `2026.06.30.4`.
+- Контекст версии: paint-макет уточнил, что timer должен быть частью верхнего HUD, а активные кнопки и shuffle должны восприниматься как одна нижняя строка. Не стоит возвращать timer в enemy title card без нового layout-решения.
+- Затронутые файлы: `src/battle/battle-scaffold-view.js`, `src/styles.css`, `src/battle/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-scaffold-view.js`; `node --check src/battle/battle-stats-view.js`; `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=battle --screenshot=artifacts/battle-layout-paint-pass.png`; `node scripts/browser-smoke.mjs --start=smoke-test`.
+
+### 2026-06-30 - Доведены размеры и высоты battle HUD
+
+- `battle-stats-view.js` теперь кладет рассчитанный процент meter'а в CSS-переменную `--battle-meter-ratio`, чтобы вертикальные HP/heal шкалы игрока рисовались настоящим вертикальным заполнением, а не повернутым горизонтальным треком.
+- `src/styles.css` поднимает HP/aggression врага выше над полем, делает HP шире aggression примерно в полтора раза, центрирует aggression под HP, уменьшает и поднимает badge урона, удлиняет вертикальные HP/heal шкалы игрока и убирает их с края поля.
+- Активные предметы сдвинуты левее и увеличены, а кнопка перемешивания опущена в один ряд с ними. `src/battle/README.md` обновляет описание текущей раскладки, `version.json` поднят до `2026.06.30.3`.
+- Контекст версии: предыдущая итерация задала правильные зоны, но вертикальные шкалы игрока выглядели сломанно из-за повернутого трека, а shuffle еще не стоял в одном ряду с предметами. Не стоит возвращать повернутые vertical meters без отдельной причины.
+- Затронутые файлы: `src/battle/battle-stats-view.js`, `src/styles.css`, `src/battle/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-stats-view.js`; `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=battle --screenshot=artifacts/battle-layout-hud-pass-2.png`; `node scripts/browser-smoke.mjs --start=smoke-test`.
+
+### 2026-06-30 - Уточнена расстановка HUD боя вокруг поля
+
+- `src/styles.css` переставляет уже существующие battle HUD-элементы: здоровье и агрессия врага теперь стоят прямо над match-3 полем, badge урона врага находится слева от этих полос, здоровье и лечение игрока стали вертикальной группой слева от поля, сумка вынесена под них, а активные боевые предметы расположены одной строкой под полем.
+- Кнопка перемешивания перенесена правее активных предметов с отдельным зазором, чтобы ее сложнее было нажать случайно во время работы с предметами. `src/battle/README.md` обновляет описание текущего layout, `version.json` поднят до `2026.06.30.2`.
+- Контекст версии: это уточнение делает экран ближе к целевому референсу и задает понятные зоны ответственности для HUD боя. Не стоит возвращать сумку в строку активных предметов или уводить вражеские полосы обратно вправо без нового визуального решения.
+- Затронутые файлы: `src/styles.css`, `src/battle/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=battle --screenshot=artifacts/battle-layout-hud-pass.png`; `node scripts/browser-smoke.mjs --start=smoke-test`.
+
+### 2026-06-30 - Боевой экран переведен в cinematic layout
+
+- `src/styles.css` перестраивает scaffold боя без изменения боевой логики: match-3 доска закреплена слева, enemy visual/background растянут как сцена на весь боевой panel, статы врага стали оверлеями, а HP/лечение игрока и активные боевые предметы собраны вдоль нижнего края.
+- `src/battle/README.md` обновляет описание текущего battle layout, compact top-right menu и расположения shuffle/ultimate UI. `version.json` поднят до `2026.06.30.1`.
+- Контекст версии: правый персонаж должен быть заметной частью боевой сцены, а не маленькой картинкой внутри служебной карточки. Не стоит возвращать прежнюю тяжелую правую колонку без отдельной причины и визуальной проверки, потому что она снова закрывает персонажа и усложняет дальнейшую работу над battle UI.
+- Затронутые файлы: `src/styles.css`, `src/battle/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node --check scripts/browser-smoke.mjs`; `node scripts/browser-smoke.mjs --start=battle --screenshot=artifacts/battle-layout-cinematic.png`; `node scripts/browser-smoke.mjs --start=smoke-test`.
+
+### 2026-06-27 - Browser smoke запускается с тихим звуком
+
+- `scripts/browser-smoke/core.mjs` перед загрузкой игры выставляет в smoke-профиле `musicVolume` и `soundVolume` равными `0.1`, чтобы автоматические проверки не запускали музыку и эффекты на полной громкости.
+- Smoke дополнительно проверяет через debug state, что runtime действительно прочитал оба значения как 10% от максимума. Обычная игра, данные, баланс, локали и UX не менялись.
+- `version.json` поднят до `2026.06.27.4`.
+- Контекст версии: браузерные smoke-прогоны часто запускаются рядом с пользователем и не должны пугать громкими звуками. Не стоит возвращать full-volume smoke без отдельной причины.
+- Затронутые файлы: `scripts/browser-smoke/core.mjs`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check scripts/browser-smoke/core.mjs`; `node scripts/check-project.mjs`; `node scripts/browser-smoke.mjs --start=smoke-test`; `node scripts/browser-smoke.mjs --start=battle`.
+
+### 2026-06-27 - `data-validation` разбит на доменные валидаторы
+
+- `src/data-validation/core.js` уменьшен до orchestration-слоя: он создает `issues`, `requiredTextKeys`, `requiredItemIds`, грузит карты/UI/enemy/player/locales и вызывает доменные валидаторы в прежнем порядке.
+- Добавлены внутренние модули `src/data-validation/common.js`, `items.js`, `cheats.js`, `campaign.js`, `map-config.js`, `enemy.js`, `ui-map.js`, `ui-battle.js`, `player-locales.js`; публичный импорт `validateGameData(...)` через `src/data-validation.js` сохранен.
+- `index.html` добавляет новые validator-модули в versioned import map, чтобы браузерный smoke не получал незаверсионированные JS-ресурсы. `version.json` поднят до `2026.06.27.3`.
+- Контекст версии: после первого фасадного разреза `data-validation/core.js` оставался большим и мешал безопасно менять отдельные домены данных. Этот шаг делает проверки предметов, карты, UI, врагов, кампании и player/locales независимыми файлами без изменения JSON/JSONC-форматов, текстов ошибок, UX, баланса, локалей или ассетов.
+- Затронутые файлы: `index.html`, `src/data-validation.js`, `src/data-validation/core.js`, новые `src/data-validation/*.js`, `src/architecture.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check` для `src/data-validation.js` и всех `src/data-validation/*.js`; `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=smoke-test`; `node scripts/browser-smoke.mjs --start=battle`; `node scripts/check-project.mjs --with-smoke`.
+
+### 2026-06-27 - Первый оптимизационный разрез кода без изменения игры
+
+- `scripts/browser-smoke.mjs` стал тонким CLI-entrypoint, а прежняя реализация перенесена во внутренний `scripts/browser-smoke/core.mjs`; публичные флаги и сценарии запуска сохранены.
+- `battle-view.js` уменьшен: effect summary, match feedback source collection и language refresh вынесены в отдельные battle-модули, а deps-объекты extracted layers теперь кэшируются вместо пересоздания в каждом thin-wrapper вызове.
+- `src/data-validation.js` стал публичным фасадом `validateGameData(...)`, текущая реализация перенесена в `src/data-validation/core.js`; внешний API и shape результата не менялись.
+- Общая логика JSONC line-comments вынесена в `src/jsonc-utils.js` и используется runtime loader и project checks. `index.html` добавляет новые browser-loaded модули в versioned import map. `version.json` поднят до `2026.06.27.2`.
+- Контекст версии: после комментарного прохода стало видно несколько мест с фасадным шумом и точным дублированием. Этот шаг уменьшает entrypoint/facade-файлы и повторные helper-объекты без изменения UX, DOM, данных, баланса, локалей или ассетов; не стоит откатывать его ради возврата к крупным файлам.
+- Затронутые файлы: `index.html`, `scripts/browser-smoke.mjs`, `scripts/browser-smoke/core.mjs`, `scripts/check-project.mjs`, `src/data-loader.js`, `src/data-validation.js`, `src/data-validation/core.js`, `src/jsonc-utils.js`, `src/battle/battle-view.js`, `src/battle/battle-effect-summary.js`, `src/battle/battle-match-feedback.js`, `src/battle/battle-language-flow.js`, `src/architecture.md`, `src/battle/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS/MJS; `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=smoke-test`; `node scripts/browser-smoke.mjs --start=battle`; `node scripts/check-project.mjs --with-smoke`.
+
+### 2026-06-27 - Добавлены комментарии-инварианты к рискованным слоям кода
+
+- После полного прохода по entrypoint, карте, активностям, бою, валидации и smoke-проверкам добавлены короткие комментарии к неочевидным контрактам кода.
+- Зафиксированы ключевые инварианты: `map-module.js` остается composition root, `map-dom.js` единственный DOM lookup слой в `src/map/*`, gameplay RNG отделен от декоративного random, reward/level-up применяются в контролируемом порядке, linked dialog event завершает исходный node, бой общается с картой через `BattleRequest`/`BattleResult`, battle runtime защищен lifecycle/attempt token'ами, SmokeTest является full e2e контрактом.
+- Поведение, DOM-id, JSON/JSONC-форматы, баланс, локали и ассеты не менялись. `version.json` поднят до `2026.06.27.1`.
+- Контекст версии: проект после архитектурного разреза стал модульнее, но важные правила теперь распределены по нескольким файлам. Эти комментарии нужны как локальные ориентиры перед следующими изменениями; не стоит удалять их как "шум", пока инварианты остаются актуальными.
+- Затронутые файлы: `index.html`, `src/map-module.js`, `src/asset-preloader.js`, `src/data-loader.js`, `src/data-validation.js`, `src/debug-hooks.js`, `src/rich-text.js`, `src/seeded-random.js`, несколько `src/map/*.js` и `src/battle/*.js`, `scripts/browser-smoke.mjs`, `scripts/check-project.mjs`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check` для 38 измененных JS/MJS файлов; `rg -n "querySelector" src/map`; `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=smoke-test`; `node scripts/check-project.mjs --with-smoke`.
+
+### 2026-06-26 - SmokeTest стал щедрее для прохождения боев
+
+- В `data/maps/SmokeTest.jsonc` тестовый магазин теперь продает каждый безопасный item-предмет пачкой по 10 штук, сохраняя прежнюю цену позиции.
+- Тестовый лекарь на SmokeTest-карте теперь использует `healPercent: 100`, то есть полностью восстанавливает HP в текущем контракте heal-события.
+- `scripts/browser-smoke.mjs --start=smoke-test` обновлен под новые QA-ожидания: smoke явно проверяет пачки по 10 и полный heal.
+- `version.json` поднят до `2026.06.26.10`, `data/README.md` фиксирует, что это намеренная щедрость служебной QA-карты.
+- Контекст версии: SmokeTest должен помогать быстро проверять весь маршрут, включая бои, без ручного фарма ресурсов. Не стоит переносить эти значения в обычные карты или считать их балансным ориентиром для кампании.
+- Затронутые файлы: `data/maps/SmokeTest.jsonc`, `scripts/browser-smoke.mjs`, `data/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: после изменения нужно прогнать структурные проверки, encoding-check и полный `scripts/browser-smoke.mjs --start=smoke-test`.
+
+### 2026-06-26 - Остаточные обязанности карты вынесены из `map-module.js`
+
+- `src/map-module.js` больше не хранит boot/reload, data preload, battle import, settings/audio helpers, item tooltip, event image и completion flow; файл остался composition root’ом для `state`, `elements`, создания контроллеров, wiring обработчиков и `boot().catch(...)`.
+- Добавлены `map-dom`, `map-media`, `map-tooltips`, `map-audio`, `map-settings`, `map-data-preload`, `map-boot-controller` и `map-completion`. Внутри `src/map/*` только `map-dom.js` использует `querySelector`.
+- `index.html` добавляет новые модули в versioned import map. `src/architecture.md`, `data/README.md` и `DECISIONS.md` обновляют границу composition root. `version.json` поднят до `2026.06.26.9`.
+- Контекст версии: после полного SmokeTest можно было убрать последние крупные сценарные блоки из фасада карты без изменения поведения. Не стоит возвращать эти слои в `map-module.js`, иначе он снова станет местом скрытой связанности.
+- Затронутые файлы: `index.html`, `src/map-module.js`, `src/map/map-dom.js`, `src/map/map-media.js`, `src/map/map-tooltips.js`, `src/map/map-audio.js`, `src/map/map-settings.js`, `src/map/map-data-preload.js`, `src/map/map-boot-controller.js`, `src/map/map-completion.js`, `src/architecture.md`, `data/README.md`, `DECISIONS.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check src/map-module.js`; `node --check` для новых/измененных `src/map/*.js`; `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=smoke-test`; `node scripts/browser-smoke.mjs --start=battle`; `node scripts/check-project.mjs --with-smoke`; `rg -n "querySelector" src/map`.
+
+### 2026-06-26 - `map-module.js` стал composition root карты
+
+- `src/map-module.js` больше не держит item/inventory helpers, loading/ui-scale, cheats, shell UI, layout/render/scroll/animation, battle entry, node-flow и run lifecycle. Эти слои вынесены во внутренние `src/map/*` controller/helper-модули с явными зависимостями.
+- Добавлены модули `map-items`, `map-ui-scale`, `map-loading-ui`, `map-shell-ui`, `map-cheats`, `map-layout`, `map-renderer`, `map-scroll`, `map-animations`, `map-battle-controller`, `map-node-flow` и `map-run-controller`.
+- `index.html` добавляет новые map-модули в versioned import map, чтобы `version.json` инвалидировал их кэш вместе с остальным runtime-кодом.
+- Поведение, DOM-id, JSON/JSONC-форматы, баланс и UX не менялись; `map-module.js` остается владельцем единого `state`, DOM `elements`, boot/wiring и загрузки данных.
+- `src/architecture.md`, `data/README.md` и `DECISIONS.md` фиксируют новую границу: map-модули создаются через factory/deps, не импортируют общий runtime state скрыто и не ищут DOM через `querySelector` без отдельного DOM-адаптера. `version.json` поднят до `2026.06.26.8`.
+- Контекст версии: после SmokeTest можно безопаснее продолжать распил главного риска сопровождения. Не стоит возвращать orchestration и activity-логику обратно в `map-module.js`, иначе следующий рефакторинг снова потеряет видимость зависимостей.
+- Затронутые файлы: `index.html`, `src/map-module.js`, `src/map/map-items.js`, `src/map/map-ui-scale.js`, `src/map/map-loading-ui.js`, `src/map/map-shell-ui.js`, `src/map/map-cheats.js`, `src/map/map-layout.js`, `src/map/map-renderer.js`, `src/map/map-scroll.js`, `src/map/map-animations.js`, `src/map/map-battle-controller.js`, `src/map/map-node-flow.js`, `src/map/map-run-controller.js`, `src/architecture.md`, `data/README.md`, `DECISIONS.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check` для `src/map-module.js` и новых `src/map/*.js`; `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=smoke-test`; `node scripts/browser-smoke.mjs --start=battle`; `node scripts/check-project.mjs --with-smoke`.
+
+### 2026-06-26 - SmokeTest-карта запускает полный QA-run за паролем
+
+- Добавлена служебная карта `data/maps/SmokeTest.jsonc`: линейный маршрут покрывает `dialog`, `skip`, магазин со всеми безопасными item-предметами, платное лечение, смешанную reward-награду, бой с `test` и финальный boss-бой с `boss_Fireman`.
+- В `data/player/cheats.json` добавлен блок `testRun`; после ввода `iddqd` в главном меню появляется скрытая кнопка `Start Smoke Test`, которая запускает отдельный test-run с `data/player/smoke-test-player-state.json`. Обычный `START` и `campaign.maps` не менялись.
+- Валидатор данных теперь загружает и проверяет включенную test-run карту, ее врагов и test-run player-state; ассеты test-run попадают в общий preload/cache.
+- `scripts/browser-smoke.mjs --start=smoke-test` проходит SmokeTest целиком: покупает все товары, лечится, забирает reward, выбирает level-up награды, завершает оба боя через `win`, проверяет HUD/инвентарь/золото/HP/опыт/завершение узлов и отсутствие runtime/resource ошибок.
+- `scripts/check-project.mjs --with-smoke` теперь запускает полный `--start=smoke-test`, а быстрые старые режимы `battle/dialog/shop/heal/reward/level-up` остаются доступными вручную.
+- `README.md`, `data/README.md` и `DECISIONS.md` фиксируют новый QA-run контракт. `version.json` поднят до `2026.06.26.7`.
+- Контекст версии: полный smoke должен проверять все map activities на стабильной служебной карте, а не зависеть от стартового сценария WildWest. Не стоит переносить SmokeTest в обычную кампанию или делать кнопку видимой без пароля, иначе QA-инструмент начнет влиять на пользовательский маршрут.
+- Затронутые файлы: `index.html`, `src/map-module.js`, `src/data-validation.js`, `data/player/cheats.json`, `data/player/smoke-test-player-state.json`, `data/maps/SmokeTest.jsonc`, `data/locales/en.json`, `data/locales/ru.json`, `data/locales/new_ru.json`, `scripts/browser-smoke.mjs`, `scripts/check-project.mjs`, `README.md`, `data/README.md`, `DECISIONS.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS/MJS; `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=smoke-test`; `node scripts/browser-smoke.mjs --start=battle`; `node scripts/check-project.mjs --with-smoke`.
+
+### 2026-06-26 - Browser smoke проверяет полные циклы map activity
+
+- `scripts/browser-smoke.mjs` теперь не останавливается на открытии `shop`, `heal` и `reward`: сценарии выбирают товар, подтверждают покупку, применяют лечение, забирают награду и сверяют итоговое состояние игрока, HUD, закрытие overlay и завершение узла карты.
+- Добавлен режим `--start=level-up`, который активирует тестовые читы, вызывает `lvl`, выбирает первую доступную level-up награду и проверяет ее начисление.
+- HUD и reward items получили additive `data-*` маркеры для тестируемости: `data-item-id`, `data-hud-value`, `data-item-amount`. UX, DOM-id и форматы данных не менялись.
+- Debug hook карты теперь публикует `window.__wildwestDebug.map.state` уже после старта карты при `?debug=1`, чтобы smoke мог подготавливать проверочные состояния вроде сниженного HP для лечения.
+- `README.md` и `data/README.md` обновляют описание browser-smoke. `version.json` поднят до `2026.06.26.6`.
+- Контекст версии: после разреза map activity на controller-модули нужна более сильная браузерная страховка перед дальнейшим распилом `map-module.js`. Не стоит откатывать smoke обратно к проверке “оверлей открылся”, иначе регрессии начисления наград, покупки, лечения и level-up снова будут проходить незамеченными.
+- Затронутые файлы: `src/map-module.js`, `src/map/map-hud.js`, `src/map/map-rewards.js`, `scripts/browser-smoke.mjs`, `README.md`, `data/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS/MJS; `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=battle`; `node scripts/browser-smoke.mjs --start=shop`; `node scripts/browser-smoke.mjs --start=heal`; `node scripts/browser-smoke.mjs --start=reward`; `node scripts/browser-smoke.mjs --start=level-up`.
+
+### 2026-06-26 - Имя врага подбирает размер шрифта под плашку
+
+- Окно имени врага больше не обрезает текст многоточием: `battle-scaffold-view` измеряет фактическую ширину строки и уменьшает `h2` до полного попадания в доступную ширину плашки.
+- Пересчет запускается при первом показе боя, при изменении размера окна и после смены языка, чтобы локализованные имена не ломали шапку.
+- Высота шапки остается фиксированной, поэтому окно врага не съезжает вниз из-за длинного имени. `version.json` поднят до `2026.06.26.5`.
+- Контекст версии: имя врага должно читаться полностью, но не должно раздувать боевую шапку. Не стоит возвращать `text-overflow: ellipsis` как основной сценарий для имени или делать размер имени зависящим от `vh`, потому что это снова свяжет текст с внешним viewport вместо собственной плашки.
+- Затронутые файлы: `src/battle/battle-scaffold-view.js`, `src/battle/battle-view.js`, `src/styles.css`, `data/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check src\battle\battle-scaffold-view.js`; `node --check src\battle\battle-view.js`; `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=dialog --screenshot=artifacts\battle-title-fit-dialog.png`; browser-проверка русской локали на узком viewport `540x790`: `Тестовый юнит` показан полностью, `title.scrollWidth <= title.clientWidth + 1`, шапка остается `84px`.
+
+### 2026-06-26 - Боевая шапка врага больше не раздувается на больших окнах
+
+- Заголовок врага в боевом окне получил фиксированную высоту строки шапки, а имя врага больше не переносится на вторую строку.
+- Размеры текста имени и стадии больше не зависят от `vh`: боевое окно уже масштабируется целиком через `battle-ui.layout`, поэтому внутренний текст должен оставаться в виртуальных координатах панели.
+- `version.json` поднят до `2026.06.26.4`, чтобы браузер забрал обновленный CSS.
+- Контекст версии: при сильном увеличении окна имя вроде `Тестовый юнит` могло стать слишком крупным, перенестись и растянуть верхнюю плашку, из-за чего окно врага съезжало вниз. Не стоит возвращать viewport-зависимый размер шрифта в элементы внутри `.battle-scaffold-panel` без отдельной проверки всех размеров окна.
+- Затронутые файлы: `src/styles.css`, `version.json`, `VERSIONS.md`.
+- Проверка: `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=dialog --screenshot=artifacts\battle-header-fix-dialog.png`; browser-проверка большого viewport `2200x1400` с DOM-метриками шапки: `rowCssHeight: 84px`, `white-space: nowrap`, стабильный зазор до окна врага.
+
+### 2026-06-26 - Map activities вынесены из фасада карты
+
+- `src/map-module.js` больше не держит тела сценариев reward/level-up, shop/heal, dialog и HUD: они вынесены во внутренние controller-модули `src/map/map-rewards.js`, `src/map/map-shop-heal.js`, `src/map/map-dialog.js` и `src/map/map-hud.js`.
+- Новые модули получают `state`, DOM-ссылки и helper-функции через явные зависимости при создании контроллера; они не читают runtime state скрытым импортом и не ищут DOM через `querySelector`.
+- `index.html` добавляет новые `src/map/map-*.js` в versioned import map, чтобы браузер получал их с тем же `?v=<version>`, что и остальные runtime-модули.
+- Фасад карты остается владельцем boot/start, загрузки данных, генерации карты, входа в бой, верхних кнопок, surrender/settings/log/music и wiring обработчиков.
+- `scripts/browser-smoke.mjs` получил режимы `--start=heal` и `--start=reward`, чтобы покрывать dialog-linked события первого уровня вместе с уже существующими `battle/dialog/shop`.
+- `src/architecture.md`, `data/README.md` и `DECISIONS.md` фиксируют новую границу. `version.json` поднят до `2026.06.26.3`.
+- Контекст версии: `map-module.js` оставался главным риском сопровождения, потому что смешивал слишком много пользовательских сценариев. Не стоит возвращать activity-код обратно в фасад или прятать зависимости в глобальных импортах: тогда следующий перенос снова станет угадайкой по связанности.
+- Затронутые файлы: `index.html`, `src/map-module.js`, `src/map/map-rewards.js`, `src/map/map-shop-heal.js`, `src/map/map-dialog.js`, `src/map/map-hud.js`, `scripts/browser-smoke.mjs`, `src/architecture.md`, `data/README.md`, `DECISIONS.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS/MJS; `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=battle`; `node scripts/browser-smoke.mjs --start=shop`; `node scripts/browser-smoke.mjs --start=heal`; `node scripts/browser-smoke.mjs --start=reward`; машинная проверка стабильности reward/level-up выбора для одинакового seed.
+
+### 2026-06-26 - Enemy id теперь совпадает с file id активного врага
+
+- Enemy JSONC с вариантами сложности и boss-вариантами теперь используют технический `enemyId`, совпадающий с именем файла: например `easy_Foxy` в `data/enemy/easy_Foxy.jsonc` и `boss_Fireman` в `data/enemy/boss_Fireman.jsonc`.
+- Для связи с базовым персонажем добавлено необязательное поле `baseEnemyId`; прежние внутренние id вроде `Foxy` и `Fireman` сохранены там.
+- `src/data-validation.js` проверяет активные enemy config на совпадение `enemyId` с именем файла без `.jsonc` и валидирует `baseEnemyId`, если поле указано.
+- `battleTrace` теперь сохраняет `baseEnemyId`, чтобы логи и будущие debug/editor-инструменты могли различать конкретный конфиг и базового персонажа.
+- `data/enemy/enemy.example.jsonc`, `data/README.md`, `src/battle/README.md` и `DECISIONS.md` фиксируют новый контракт. `version.json` поднят до `2026.06.26.2`.
+- Контекст версии: file id должен быть надежной технической идентичностью конфига, иначе карта, trace, статистика и редактор будут путать `easy_Foxy` как файл с `Foxy` как персонажем. Не стоит возвращать базовый id в `enemyId` у variant-файлов без отдельного решения о всей модели врагов.
+- Затронутые файлы: `data/enemy/easy_*.jsonc`, `data/enemy/boss_Fireman.jsonc`, `src/data-validation.js`, `src/battle/battle-trace.js`, `data/enemy/enemy.example.jsonc`, `data/README.md`, `src/battle/README.md`, `DECISIONS.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check src/data-validation.js`; `node --check src/battle/battle-trace.js`; машинная проверка активных enemy id; `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`.
+
+### 2026-06-26 - Reward и level-up выборы стали воспроизводимыми от run seed
+
+- `src/map-module.js` добавляет отдельные domain RNG для игровых выборов карты после генерации графа.
+- Reward-пулы карты и награды за победу в бою теперь выбираются через seed домена `reward:<source>:<campaignIndex>:<nodeId>:<eventName>`, а не через общий `Math.random()`.
+- Варианты level-up теперь выбираются через seed домена `level-up:<campaignIndex>:<level>:<requiredExperience>`; сглаживание весов по текущему инвентарю осталось прежним.
+- Декоративная случайность карты, включая ambient-анимации, по-прежнему может использовать несидированный `Math.random()`, но больше не сдвигает игровые награды при том же `?seed=...`.
+- `README.md` и `data/README.md` уточняют контракт воспроизводимого забега. `version.json` поднят до `2026.06.26.1`.
+- Контекст версии: run seed должен быть пригоден для bug report и балансной проверки всего забега, а не только карты и боя. Не стоит возвращать reward/level-up на `Math.random()`, иначе один и тот же seed снова сможет давать разные игровые награды.
+- Затронутые файлы: `src/map-module.js`, `README.md`, `data/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check src/map-module.js`; машинная проверка отсутствия `Math.random()` в `pickRewardEntries()` и `pickLevelRewardOptions()`; машинная проверка стабильности reward/level-up выбора для одинакового seed и различия для другого seed; `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`.
+
+### 2026-06-15 - Level-up веса и количество предметов обновлены по новой таблице
+
+- `data/player/experience-table.jsonc` обновляет `rewards[].weight` для уровней 1-50 по новой трехтабличной схеме.
+- Фазы 1-2 цикла используют первый набор весов с суммой `16410`: обычные атакующие предметы по `2125`, усиленные атакующие по `1025`, обычные защитные по `1600`, усиленные защитные по `700`, `red/green` по `1180`.
+- Фазы 3-4 используют второй набор с суммой `15460`: обычные атакующие по `1600`, усиленные атакующие по `700`, обычные защитные по `2095`, усиленные защитные по `1005`, `red/green` по `1180`.
+- Фаза 5 использует третий набор с суммой `11800`: обычные предметы по `400`, усиленные предметы по `1000`, `red/green` по `2400`.
+- `rewards[].amount` теперь растет блоками по 10 уровней: 1-10 дают 1 предмет, 11-20 - 2, 21-30 - 3, 31-40 - 4, 41-50 - 5. Уровень 10 оставлен в первом блоке, потому что следующий блок начинается с 11.
+- Пороги опыта, `rewardCount`, картинки и тексты level-up не менялись.
+- `data/README.md` фиксирует новый цикл весов и количества. `version.json` поднят до `2026.06.15.7`.
+- Контекст версии: новая таблица должна сгладить распределение предметов и замедлить рост количества выдачи. Не стоит возвращать старые блоки по 5 уровней или старые веса без отдельного балансного решения.
+- Затронутые файлы: `data/player/experience-table.jsonc`, `data/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: машинная сверка всех 50 уровней с тремя наборами весов, суммами `16410/15460/11800` и `amount` блоками 1-5; JSONC-парсинг `data/player/experience-table.jsonc`; `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`.
+
+### 2026-06-15 - Level-up награды сглаживаются по текущему инвентарю
+
+- `data/player/experience-table.jsonc` добавляет `rewardWeightReductionPercentPerInventoryItem: 1`.
+- `src/map-module.js` перед случайным выбором level-up награды пересчитывает каждый `reward.weight` по текущему количеству такого же `itemId` в инвентаре: `ceil(baseWeight * max(0, 1 - quantity * percent / 100))`.
+- При `baseWeight: 150` и `quantity: 31` итоговый вес становится `104`, как в балансном примере. При очень большом количестве предметов вес не уходит ниже `0`.
+- MAX-фильтр `limitByInventory` остается отдельным правилом: сначала предметы выше лимита убираются из level-up предложки, затем оставшиеся получают сглаженный вес.
+- `src/data-validation.js` проверяет новое поле как число от `0` до `100`.
+- `data/README.md` описывает формулу. `version.json` поднят до `2026.06.15.6`.
+- Контекст версии: level-up предложения не должны слишком часто повторять предметы, которых у игрока уже много. Не стоит заменять это прямым удалением предметов из пула: для жесткого удаления уже есть отдельный MAX-порог, а сглаживание должно быть мягким.
+- Затронутые файлы: `data/player/experience-table.jsonc`, `src/map-module.js`, `src/data-validation.js`, `data/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check src/map-module.js`; `node --check src/data-validation.js`; JSONC-парсинг `data/player/experience-table.jsonc`; формульная проверка примера `150/31 -> 104`; `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`.
+
+### 2026-06-15 - Веса level-up наград приведены к циклу из трех таблиц
+
+- `data/player/experience-table.jsonc` обновляет только `rewards[].weight` для уровней 1-50.
+- Уровни 1-2, 6-7, 11-12 и далее по фазе 1-2 используют первый набор весов: атака чаще, сумма весов `31860`.
+- Уровни 3-4, 8-9, 13-14 и далее по фазе 3-4 используют второй набор весов: защита чаще, сумма весов `32430`.
+- Уровни 5, 10, 15 и далее по фазе 5 используют третий набор весов: health-награды чаще, сумма весов `33750`.
+- Количество выдаваемых предметов `amount`, пороги опыта, `rewardCount`, картинки и тексты level-up не менялись.
+- `data/README.md` фиксирует новый цикл весов. `version.json` поднят до `2026.06.15.5`.
+- Контекст версии: веса наград за уровень должны соответствовать переданным таблицам и повторяться циклом 2/2/1 уровня. Не стоит снова править эти числа вручную по отдельным уровням без сверки всего цикла, иначе баланс расползется тихо и противно.
+- Затронутые файлы: `data/player/experience-table.jsonc`, `data/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: машинная сверка всех 50 уровней с тремя наборами весов и суммами `31860/32430/33750`; JSONC-парсинг `data/player/experience-table.jsonc`; `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`.
+
+### 2026-06-15 - Чит-команды вынесены в player JSON
+
+- Добавлен `data/player/cheats.json`: общий выключатель читов, режим ввода `typedSequence`, команда активации `iddqd`, звук подтверждения и scoped-команды `lvl` для карты и `win` для боя.
+- `src/map-module.js` загружает и валидирует конфиг читов, активирует читы только из главного меню, проигрывает звук подтверждения через общий audio-controller, выполняет `lvl` как обычный level-up до следующего порога опыта и передает в бой только battle-scoped команды.
+- `src/audio-module.js` получил общий `playSoundEffect(src, settings)` для data-driven звуков вне конкретной кнопки или боевого предмета.
+- `src/battle/battle-view.js`, `src/battle/battle-scaffold-view.js` и `src/battle/battle-contract.js` поддерживают optional `BattleRequest.cheats`; команда `win` завершает бой стандартной победой и чистит key listener при закрытии scaffold.
+- `src/data-validation.js` и `scripts/check-project.mjs` проверяют `data/player/cheats.json`, допустимые scopes/id и путь звука активации.
+- `data/README.md`, `src/battle/README.md` и `DECISIONS.md` фиксируют новый контракт. `version.json` поднят до `2026.06.15.4`.
+- Контекст версии: читы нужны как управляемый инструмент проверки и ручного прохождения, но список команд должен жить в данных, а не в тайных строках внутри JS. Не стоит возвращать хардкод команд или подключать читы к `window.__wildwestDebug`: это разные слои ответственности.
+- Затронутые файлы: `data/player/cheats.json`, `src/map-module.js`, `src/audio-module.js`, `src/battle/battle-view.js`, `src/battle/battle-scaffold-view.js`, `src/battle/battle-contract.js`, `src/data-validation.js`, `scripts/check-project.mjs`, `data/README.md`, `src/battle/README.md`, `DECISIONS.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS-модулей; JSON-парсинг `data/player/cheats.json` и `version.json`; `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; временный CDP smoke для `iddqd`, `lvl` и `win`.
+
+### 2026-06-15 - Ограниченные предметы показываются как MAX в событиях карты
+
+- `data/settings/items.jsonc` добавляет флаг `limitByInventory: true` для `item_granate`, `item_granate_power`, `item_bullet`, `item_bullet_power`, `item_Knife`, `item_Knife_power`, `item_Bandage`, `item_Bandage_power`, `item_Shield`, `item_Shield_power`, `red` и `green`.
+- `data/player/experience-table.jsonc` добавляет общий порог `limitedItemInventoryThreshold: 50`.
+- `src/map-module.js` фильтрует ограниченные предметы только перед выбором level-up наград. В reward-наградах карты/победы и в магазине предмет остается видимым, но получает MAX-состояние: затемненную иконку, красную плашку `ui.itemMax`, запрет покупки и пропуск начисления при получении reward-награды.
+- `src/styles.css` добавляет общее оформление `.item-max-badge`, затемнение иконки и состояние карточек `.shop-item-card--maxed`/`.reward-item--maxed`.
+- `data/locales/ru.json`, `data/locales/new_ru.json` и `data/locales/en.json` добавляют ключ `ui.itemMax` для надписи МАКС/MAX.
+- `src/data-validation.js` проверяет, что `limitByInventory` является boolean, а `limitedItemInventoryThreshold` - положительным целым числом.
+- `data/README.md` описывает новый контракт. `version.json` поднят до `2026.06.15.3`.
+- Контекст версии: ограничение должно быть data-driven: список предметов живет в каталоге предметов, а порог - в таблице опыта. Не стоит хардкодить эти itemId в `map-module.js`, иначе следующая балансная правка снова превратится в раскопки по коду.
+- Затронутые файлы: `data/settings/items.jsonc`, `data/player/experience-table.jsonc`, `src/map-module.js`, `src/styles.css`, `src/data-validation.js`, `data/locales/ru.json`, `data/locales/new_ru.json`, `data/locales/en.json`, `data/README.md`, `DECISIONS.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check src/map-module.js`; `node --check src/data-validation.js`; JSON-парсинг локалей и `version.json`; статическая проверка разделения MAX-поведения для level-up/reward/shop; `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=shop`; временный CDP smoke для MAX-состояния магазина и reward-окна.
+
+### 2026-06-15 - Награды за уровни растут блоками по 5 уровней
+
+- `data/player/experience-table.jsonc` обновляет `rewards[].amount` для уровней 1-50: уровни 1-5 дают по 1 предмету, 6-10 - по 2, 11-15 - по 3, 16-20 - по 4, 21-25 - по 5, 26-30 - по 6, 31-35 - по 7, 36-40 - по 8, 41-45 - по 9, 46-50 - по 10.
+- Пороги `requiredExperience`, веса наград, `rewardCount`, изображения и текстовые ключи не менялись.
+- `data/README.md` фиксирует текущую лестницу количества предметов, чтобы ее не приняли за случайный шум таблицы.
+- `version.json` поднят до `2026.06.15.1`, потому что изменились балансные данные наград за повышение уровня.
+- Контекст версии: награды за повышение уровня должны расти чаще и предсказуемее, блоками по 5 уровней, а не крупными десятками. Не стоит возвращать прежнюю схему без отдельного балансного решения: она делает поздние уровни беднее, чем теперь задумано.
+- Затронутые файлы: `data/player/experience-table.jsonc`, `data/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `ConvertFrom-Json` после удаления JSONC-комментариев для `data/player/experience-table.jsonc`; сводка `rewards[].amount` по уровням 0-50; `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`.
+
+### 2026-06-13 - Магазин Свити на первом уровне продает наградные предметы
+
+- `data/maps/WildWest.jsonc` обновляет только стартовый `shop` на `minLevel/maxLevel: 1`, в который ведет ответ Свити. Теперь там продаются предметы из пула наград за уровни: обычные `item_Knife`, `item_bullet`, `item_granate`, `item_Bandage`, `item_Shield` по 50 золота; усиленные `item_Knife_power`, `item_bullet_power`, `item_granate_power`, `item_Bandage_power`, `item_Shield_power` по 100 золота; `red` за 200 золота и `green` за 100 золота.
+- Поздний магазин `shop` для уровней 3-8 не менялся, чтобы стартовый обучающий/диалоговый сценарий не перетянул за собой всю экономику карты. Да, экономика и так хрупкая штука, незачем бить ее молотком ради одного прилавка.
+- `src/map-module.js` добавляет на карточки магазина диагностические `data-item-id`, `data-item-amount` и `data-gold-price`, чтобы smoke-проверка могла читать не локализованный текст, а реальные данные торговой позиции.
+- `src/styles.css` ограничивает длинный список товаров прокруткой внутри `.shop-items` и задает карточкам магазина стабильные строки/минимальную высоту, чтобы стартовая витрина из 12 позиций не вылезала под блок инвентаря и не накладывала иконки на цену или кнопку.
+- `scripts/browser-smoke.mjs` получил режим `--start=shop`: он проходит через диалог Свити, выбирает ответ `shop` и проверяет, что стартовый магазин показывает все ожидаемые товары с правильным количеством, ценой, иконкой и кнопкой выбора.
+- `data/README.md` описывает новый стартовый ассортимент магазина Свити и явно отделяет его от поздних payload-вариантов магазинов.
+- `version.json` поднят до `2026.06.13.4`, потому что изменились игровые данные, UI магазина, smoke-проверка и документация.
+- Контекст версии: стартовый диалог Свити должен давать игроку контролируемый доступ к тем же типам предметов, которые игра выдает за уровни. Это делает магазин понятной витриной прогрессии, а не ларьком с двумя случайными расходниками из прошлого дизайна.
+- Затронутые файлы: `data/maps/WildWest.jsonc`, `src/map-module.js`, `src/styles.css`, `scripts/browser-smoke.mjs`, `data/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node -e "..."` для структуры первого магазина WildWest и пересечения с `data/player/experience-table.jsonc`; `node --check src/map-module.js`; `node --check scripts/browser-smoke.mjs`; `node scripts/check-project.mjs`; `node scripts/browser-smoke.mjs --start=shop`; визуальная проверка скриншота shop-smoke; `node scripts/check-encoding.mjs`.
+
+### 2026-06-13 - Первый уровень WildWest показывает и Фокси, и диалог Свити
+
+- `data/maps/WildWest.jsonc` теперь создает на первом уровне две гарантированные стартовые точки: `battle_easy` с `easy_Foxy` и `opening_dialog` со Свити. Это не случайный выбор генератора, а две видимые альтернативы для игрока на старте.
+- `src/styles.css` возвращает читаемое число активного щита врага под иконку щита. Общий стиль `.battle-scaffold-meter > strong` теперь не задевает вложенный `.battle-scaffold-meter-shield-count`, а сам счетчик щита получает отдельную позицию, фон и слой поверх shield-overlay.
+- `scripts/browser-smoke.mjs` получил флаг `--start=battle|dialog`, проверяет наличие обеих стартовых точек WildWest и в dialog-режиме проверяет, что бой с `test` показывает число щита `10`.
+- `data/README.md` обновлен: первый уровень WildWest описан как две стартовые точки, а browser-smoke документирует `--start=battle|dialog`.
+- `version.json` поднят до `2026.06.13.3`, потому что изменились стартовый сценарий карты, CSS боевого HUD и smoke-проверка.
+- Контекст версии: первый уровень должен сразу показывать оба обучающих/проверочных входа, а не прятать один из них за случайностью. Число щита нужно держать отдельным читаемым бейджем, иначе активный щит есть механически, но игрок видит только картинку и вынужден гадать размер защиты, что для UI примерно как компас без стрелки.
+- Затронутые файлы: `data/maps/WildWest.jsonc`, `src/styles.css`, `scripts/browser-smoke.mjs`, `data/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check scripts/browser-smoke.mjs`; `node -e "JSON.parse(...)"` для `version.json`; `node scripts/check-project.mjs`; `node scripts/check-project.mjs --with-smoke`; `node scripts/browser-smoke.mjs --start=dialog`; `node scripts/check-encoding.mjs`.
+
+### 2026-06-13 - Первый уровень WildWest получил развилку между Фокси и стартовым диалогом
+
+- `data/maps/WildWest.jsonc` теперь на первом уровне создает одну случайную стартовую точку: либо `battle_easy` с `easy_Foxy`, либо `opening_dialog` со Свити. В диалоге доступны переходы в `battle_test` с врагом `test`, стартовый магазин, бесплатный доктор и стартовая награда.
+- Для `shop`, `heal` и `reward` добавлены payload-варианты на `minLevel/maxLevel: 1`, чтобы диалог первого уровня не ссылался на события, которые начинаются только позже.
+- `src/map/map-generation.js` экспортирует `getMapEventCatalog` и `pickEventPayload`, а `src/map-module.js` использует их при переходе из диалога в связанное событие. Раньше этот путь уже был написан, но фактически ссылался на недоступные helper'ы; прекрасный пример кода, который стоял в музее восковых фигур.
+- Кнопки ответов диалога получают диагностические `data-dialog-event-name`, `data-dialog-next-step-id` и `data-dialog-end`, чтобы browser-smoke мог стабильно выбирать нужный переход без гадания по локализованному тексту.
+- `src/data-validation.js` проверяет, что eventName-ответы активного dialog-события имеют payload целевого события на том же уровне карты.
+- `scripts/browser-smoke.mjs` обновлен под новый стартовый сценарий: он открывает бой напрямую через `battle_easy` или через диалоговый ответ `battle_test`, а затем проверяет ожидаемый enemy config.
+- `data/enemy/test.jsonc` получил отдельные `enemy.test.name` и `enemy.test.description`, чтобы стартовый тестовый бой не отображался как старый `Boss_1`.
+- `data/locales/ru.json`, `data/locales/new_ru.json` и `data/locales/en.json` получили новую стартовую реплику Свити, подписи для тестового боя/доктора и имя/описание тестового врага.
+- `data/README.md` обновлен под реальную работу первого уровня WildWest и нового smoke-сценария.
+- `version.json` поднят до `2026.06.13.2`, потому что изменился стартовый пользовательский сценарий карты и данные кампании.
+- Контекст версии: первый уровень должен быть не только обязательным боем с Фокси, но и возможной развилкой через диалог. Это дает раннюю проверку магазина, лечения, награды и тестового боя без отдельной debug-карты, но требует валидировать диалоговые переходы так же строго, как обычные точки карты.
+- Затронутые файлы: `data/maps/WildWest.jsonc`, `data/enemy/test.jsonc`, `src/map-module.js`, `src/map/map-generation.js`, `src/data-validation.js`, `scripts/browser-smoke.mjs`, `data/locales/ru.json`, `data/locales/new_ru.json`, `data/locales/en.json`, `data/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check src/map-module.js`; `node --check src/map/map-generation.js`; `node --check src/data-validation.js`; `node --check scripts/browser-smoke.mjs`; `node -e "JSON.parse(...)"` для локалей и `version.json`; `node scripts/check-project.mjs`; `node scripts/check-project.mjs --with-smoke`; `node scripts/check-encoding.mjs`.
+
+### 2026-06-13 - Отсутствующие боевые предметы затемняются в инвентаре
+
+- `src/battle/battle-inventory-view.js` теперь помечает слоты с количеством `0` классом `is-missing` и сохраняет фактическое количество в `data-item-quantity`. Слот остается на месте, но визуально видно, что предмета сейчас нет в инвентаре.
+- `src/styles.css` затемняет именно иконку отсутствующего предмета через `.battle-scaffold-inventory-slot.is-missing img`, а не убирает слот целиком. Количество `0` остается читаемым, но тоже приглушается.
+- `scripts/browser-smoke.mjs` теперь проверяет, что в стартовом бою слоты с `data-item-quantity="0"` получают `is-missing` и сохраняют иконку для затемнения.
+- `src/battle/README.md` обновлен: боевой инвентарь показывает отсутствующие предметы как затемненные, чтобы раскладка не прыгала и игрок видел полный набор возможных предметов.
+- `version.json` поднят до `2026.06.13.1`, потому что изменилось пользовательское отображение боевого инвентаря.
+- Контекст версии: скрывать отсутствующий предмет полностью плохо для памяти игрока и стабильности панели, а показывать его обычным цветом плохо для восприятия. Затемненная иконка говорит "предмет существует, но сейчас его нет" без циркового номера с исчезновением слота.
+- Затронутые файлы: `src/battle/battle-inventory-view.js`, `src/styles.css`, `scripts/browser-smoke.mjs`, `src/battle/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-inventory-view.js`; `node --check scripts/browser-smoke.mjs`; `node -e "JSON.parse(...)"` для `version.json`; `node scripts/check-project.mjs`; `node scripts/check-project.mjs --with-smoke`; `node scripts/check-encoding.mjs`.
+
+### 2026-06-12 - Размер иконок ярости стабилен между local и GitHub Pages
+
+- `.battle-scaffold-ultimate` в `src/styles.css` получил собственный `--inline-item-icon-size` со значением `2.1em` и ограничение `max-width/max-height: 2.2em` для встроенных иконок. Боевые описания ярости больше не зависят от того, какой `inlineItemIconEm` пришел из `current-settings.json` или сохранился в `localStorage` на конкретном origin.
+- Из русских enemy/ultimate описаний в `data/locales/ru.json` убраны локальные множители `\s{2}`. Размер иконки должен задаваться слоем UI, а не текстом локали, иначе GitHub Pages и локальный запуск легко расходятся по масштабу.
+- `data/README.md` и `src/battle/README.md` уточняют, что размер иконок в панели ярости фиксируется CSS-контекстом `.battle-scaffold-ultimate`, а не множителями внутри локализованной строки.
+- `version.json` поднят до `2026.06.12.5`, потому что изменились CSS, локали и пользовательское отображение боя.
+- Контекст версии: локально у разработчика могли быть старые сохраненные настройки, а GitHub Pages работает на другом origin и читает свои настройки/кэш. Если размер иконок живет в общем `inlineItemIconEm` и еще умножается локалью через `\s{2}`, публикация получает другой масштаб. Это не магия, просто CSS с ножом в темном переулке.
+- Затронутые файлы: `src/styles.css`, `data/locales/ru.json`, `data/README.md`, `src/battle/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node -e "JSON.parse(...)"` для активных локалей и `version.json`; `node scripts/check-project.mjs`; `node scripts/check-project.mjs --with-smoke`; `node scripts/check-encoding.mjs`.
+
+### 2026-06-12 - Описания особенностей показывают только нестандартные объекты
+
+- В `data/locales/ru.json`, `data/locales/new_ru.json` и `data/locales/en.json` уточнены описания текущих врагов: обычные предметы из `category: "match-3"` больше не объявляются как особенность только потому, что враг может чаще подмешивать их в бой.
+- Для Фокси, Свити, Кенди, Бумера и Булли теперь явно указаны именно усиленные предметы (`Bandage_power`, `bullet_power`, `Knife_power`, `granate_power`, `Shield_power`), потому что это `rare_match-3` и они не входят в обычный случайный добор.
+- У Куки и Рокета убраны упоминания обычного мусора как "может появиться": `trash_1` и `trash_2` и так входят в обычный боевой пул, поэтому UI не должен делать из них событие века с фанфарами.
+- `data/README.md` и `src/battle/README.md` уточняют критерий "нестандартного объекта": это предмет вне обычного `category: "match-3"` drop pool, например `rare_match-3` усиления, опасные бочки или особый мусор.
+- `version.json` поднят до `2026.06.12.4`, потому что изменились локали и пользовательский UI-текст.
+- Контекст версии: игроку нужно видеть новые угрозы и необычные объекты, но не каждое изменение частоты обычных предметов. Иначе боевой tooltip снова превращается в протокол заседания бухгалтерии механик.
+- Затронутые файлы: `data/locales/ru.json`, `data/locales/new_ru.json`, `data/locales/en.json`, `data/README.md`, `src/battle/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node -e "JSON.parse(...)"` для активных локалей; `node scripts/check-project.mjs`; `node scripts/check-project.mjs --with-smoke`; `node scripts/check-encoding.mjs`.
+
+### 2026-06-12 - Описания ярости скрывают внутренние правила конверта
+
+- В `data/locales/ru.json`, `data/locales/new_ru.json` и `data/locales/en.json` упрощены описания текущих врагов и их `Ярость:`/`Особенное:`: из UI убраны подробности вида "оружие может стать бинтом", "полезные предметы превращаются в мусор" и "гранаты усиливаются".
+- В описаниях оставлены только открытые для игрока сведения: что делает ярость, какие нестандартные объекты могут появиться в бою, стартовый щит/стены и изменения характеристик предметов вроде `-20% урона` или `+20% агрессии`.
+- `data/README.md` и `src/battle/README.md` уточняют правило: тексты ярости не должны быть пересказом `convert`; результат можно подсказать через "в бою может появиться {item:itemId}", а точные источники и цепочки игрок пусть изучает сам, иначе это уже не игра, а протокол вскрытия.
+- `version.json` поднят до `2026.06.12.3`, потому что изменились локали и пользовательский UI-текст.
+- Контекст версии: предыдущая версия слишком честно раскрывала внутреннюю механику врагов. Для обучения игрока достаточно показать угрозу и модификаторы, но не нужно заранее сдавать все правила генерации поля с потрохами.
+- Затронутые файлы: `data/locales/ru.json`, `data/locales/new_ru.json`, `data/locales/en.json`, `data/README.md`, `src/battle/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node -e "JSON.parse(...)"` для активных локалей; `node scripts/check-project.mjs`; `node scripts/check-project.mjs --with-smoke`; `node scripts/check-encoding.mjs`.
+
+### 2026-06-12 - Описания ярости показывают пассивки врагов
+
+- В `data/locales/ru.json`, `data/locales/new_ru.json` и `data/locales/en.json` переписаны описания текущих врагов: краткое описание врага стало подробнее, а описание ульты теперь разделено на `Ярость:`/`Особенное:` или `Rage:`/`Special:`.
+- В строке `Ярость:` описан срабатывающий эффект ульты, а в строке `Особенное:` вынесены пассивные превращения, стартовые препятствия/щит и stage-модификаторы предметов, чтобы игрок видел не только "что сейчас прилетит", но и "почему его любимые гранаты вдруг работают как налоговая декларация".
+- Видимое название ульты Бумера исправлено с ножевого счетчика на гранатный, потому что его механика уже привязана к гранатам, а старый текст уверенно врал в лицо.
+- `.battle-scaffold-ultimate` в `src/styles.css` теперь сохраняет переносы строк через `white-space: pre-line` и может прокручиваться, если локализованное описание длиннее доступной панели.
+- `data/README.md` и `src/battle/README.md` обновлены: описание ульты документируется как rich-text с поддержкой переносов, иконок предметов и договоренностью `Ярость/Особенное`.
+- `version.json` поднят до `2026.06.12.2`, потому что поменялись локали, CSS и пользовательский UI-текст.
+- Контекст версии: после добавления `itemStatModifiers`, пассивных `convert`, препятствий и щитов старые описания ярости скрывали половину реальной механики врага. Баланс без UI-объяснения превращается в загадку, а загадки хороши в детективах, не в боевой панели.
+- Затронутые файлы: `data/locales/ru.json`, `data/locales/new_ru.json`, `data/locales/en.json`, `src/styles.css`, `data/README.md`, `src/battle/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node -e "JSON.parse(...)"` для активных локалей; `node scripts/check-project.mjs`; `node scripts/check-project.mjs --with-smoke`; `node scripts/check-encoding.mjs`.
+
+### 2026-06-12 - Боевой UI скрывает хвосты floating point чисел
+
+- `src/battle/battle-formatters.js` получил `formatBattleNumber()`: числовые значения боя отображаются вниз до десятых и без `.0` у целых значений. Например, `56.199999999999996` показывается как `56.2`, а `100` остается `100`.
+- `formatText()` теперь форматирует числовые подстановки через `formatBattleNumber()`, но не трогает строковые значения вроде таймера `0:45`.
+- `src/battle/battle-stats-view.js` применяет общий formatter для HUD-метров, значков и шкал здоровья/ярости/лечения, вместо прямого `String(value)`.
+- `src/battle/battle-feedback-view.js` форматирует всплывающие `+/-` изменения тем же способом, чтобы feedback не показывал значения вроде `-6.1000000000000005`.
+- `scripts/check-battle-engine.mjs` получил проверки `formatBattleNumber()` и `formatText()` на floating point хвосты и сохранение строковых значений.
+- `src/battle/README.md` обновлен: `battle-formatters.js` теперь явно отвечает за числовое отображение боевых значений.
+- `version.json` поднят до `2026.06.12.1`, потому что исправлено пользовательское отображение боевых чисел.
+- Контекст версии: округление самих item stats не спасает от хвостов после сложения/вычитания в общем состоянии боя. Форматировать числа нужно на границе UI, иначе JavaScript продолжит показывать игроку внутреннюю бухгалтерию IEEE-754 с видом наивной честности.
+- Затронутые файлы: `src/battle/battle-formatters.js`, `src/battle/battle-view.js`, `src/battle/battle-stats-view.js`, `src/battle/battle-feedback-view.js`, `scripts/check-battle-engine.mjs`, `src/battle/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-formatters.js`; `node --check src/battle/battle-view.js`; `node --check src/battle/battle-stats-view.js`; `node --check src/battle/battle-feedback-view.js`; `node --check scripts/check-battle-engine.mjs`; `node scripts/check-battle-engine.mjs`; `node scripts/check-project.mjs`; `node scripts/check-project.mjs --with-smoke`; `node scripts/check-encoding.mjs`.
+
+### 2026-06-11 - Итоговые параметры предметов округляются вниз до десятых
+
+- `src/battle/battle-engine.js` теперь после базовых значений предмета, инвентарных `modificate` и стадийных `itemStatModifiers` округляет итоговые `damage`, `heal`, `aggression`, `calm` вниз до десятых. Пример: `4.15` становится `4.1`.
+- Для защиты от обычной JS-погрешности при вычислениях используется маленький epsilon перед `Math.floor`, чтобы математически ровные значения вроде `6 * 1.2` не проседали на одну десятую из-за бинарного представления числа.
+- `scripts/check-battle-engine.mjs` получил отдельный тест на округление вниз для дробных множителей.
+- `data/README.md` и `src/battle/README.md` обновлены: дробные значения больше не остаются как есть, они нормализуются до десятых вниз.
+- `version.json` поднят до `2026.06.11.9`, потому что изменилось правило расчета боевых параметров.
+- Контекст версии: без единого правила округления дробные множители быстро превратились бы в UI-шум и спорные десятые/сотые в логах. Округление вниз сохраняет консервативный баланс: множитель не дает случайной лишней выгоды из-за округления вверх.
+- Затронутые файлы: `src/battle/battle-engine.js`, `scripts/check-battle-engine.mjs`, `data/README.md`, `src/battle/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-engine.js`; `node --check scripts/check-battle-engine.mjs`; `node scripts/check-battle-engine.mjs`; `node scripts/check-project.mjs`; `node scripts/check-project.mjs --with-smoke`; `node scripts/check-encoding.mjs`.
+
+### 2026-06-11 - Stage-модификаторы предметов применены к текущим врагам
+
+- `data/enemy/easy_Boom.jsonc`: гранаты всех вариантов (`type: "granate"`) получают `damage: 0.8` и `aggression: 1.2`. Ярость Бумера исправлена с ножей на гранаты: и `rage.targetTypes`, и `ultimate.effects[].count.itemTypes` теперь используют `granate`.
+- `data/enemy/easy_Foxy.jsonc`: бинты всех вариантов (`type: "Bandage"`) получают `heal: 0.8` и `aggression: 1.2`.
+- `data/enemy/easy_Bully.jsonc`: щиты всех вариантов (`type: "Shield"`) получают `calm: 0.8` и `aggression: 1.2`. Сейчас у щитов базовая агрессия равна `0`, поэтому множитель не добавляет новую агрессию, а только сохранит правило, если агрессия появится в каталоге предметов.
+- `data/enemy/easy_Candy.jsonc`: ножи всех вариантов (`type: "Knife"`) получают `damage: 0.8` и `aggression: 1.2`.
+- `data/enemy/easy_Sweety.jsonc`: пули всех вариантов (`type: "bullet"`) получают `damage: 0.8` и `aggression: 1.2`.
+- `data/enemy/easy_Rusty.jsonc` и `data/enemy/easy_Cookie.jsonc`: весь текущий мусор (`junk_1`, `junk_2`, `junk_3`) получает `aggression: 1.2`.
+- `version.json` поднят до `2026.06.11.8`, потому что изменились активные боевые данные.
+- Контекст версии: модификаторы теперь покрывают перечисленный текущий набор easy-врагов и работают через `itemTypes`, поэтому обычные и усиленные варианты предметов попадают под одно правило без перечисления каждого `itemId`.
+- Затронутые файлы: `data/enemy/easy_Boom.jsonc`, `data/enemy/easy_Foxy.jsonc`, `data/enemy/easy_Bully.jsonc`, `data/enemy/easy_Candy.jsonc`, `data/enemy/easy_Sweety.jsonc`, `data/enemy/easy_Rusty.jsonc`, `data/enemy/easy_Cookie.jsonc`, `version.json`, `VERSIONS.md`.
+- Проверка: `node scripts/check-project.mjs`; `node scripts/check-project.mjs --with-smoke`; `node scripts/check-encoding.mjs`.
+
+### 2026-06-11 - Множители параметров предметов на стадиях врагов
+
+- В `src/battle/battle-engine.js` добавлена поддержка `stages[].itemStatModifiers`: текущая стадия врага может умножать итоговые `damage`, `heal`, `aggression` и `calm` активированных match-3 предметов.
+- Множители применяются после базовых значений из `data/settings/items.jsonc` и после инвентарных `modificate`, чтобы враг менял реальную боевую эффективность предмета, а не только его голый каталог.
+- Формат поддерживает селекторы `itemTypes` для всех предметов с общим `type`, включая усиленные варианты, и `itemId`/`itemIds` для точных itemId. Валидация в `src/data-validation.js` проверяет селекторы и разрешенные ключи `multipliers`.
+- В `data/enemy/easy_Foxy.jsonc` бинты получают `heal: 0.8`; в `data/enemy/easy_Boom.jsonc` гранаты получают `damage: 0.8` и `aggression: 1.2`.
+- Дробные результаты множителей на момент этой версии оставались как есть; следующая запись `2026-06-11 - Итоговые параметры предметов округляются вниз до десятых` вводит единое округление вниз до `0.1`.
+- `data/enemy/enemy.example.jsonc`, `data/README.md`, `src/battle/README.md` и `DECISIONS.md` обновлены под новый контракт. `scripts/check-battle-engine.mjs` получил проверки порядка применения после инвентарных бонусов и точности `itemId`-селектора.
+- `version.json` поднят до `2026.06.11.7`, потому что изменились правила боя, данные врагов и документация.
+- Контекст версии: это дает балансному слою врагов аккуратный рычаг против конкретных классов предметов без специальных условий в коде. Менять порядок применения без отдельной причины не стоит: если множители начнут считаться до `modificate`, предметы инвентаря станут обходить слабости и сопротивления врагов.
+- Затронутые файлы: `src/battle/battle-engine.js`, `src/data-validation.js`, `scripts/check-battle-engine.mjs`, `data/enemy/easy_Foxy.jsonc`, `data/enemy/easy_Boom.jsonc`, `data/enemy/enemy.example.jsonc`, `data/README.md`, `src/battle/README.md`, `DECISIONS.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-engine.js`; `node --check src/data-validation.js`; `node --check scripts/check-battle-engine.mjs`; `node scripts/check-battle-engine.mjs`; `node scripts/check-project.mjs`; `node scripts/check-project.mjs --with-smoke`; `node scripts/check-encoding.mjs`.
+
+### 2026-06-11 - Убран legacy fallback для `battle-ui`
+
+- `src/battle/battle-data.js` больше не падает назад на `data/battle/battle-ui.jsonc`, если активный `data/settings/battle-ui.jsonc` не загрузился. Ошибка активного конфига теперь видна сразу, без тихого перехода на старые данные.
+- `scripts/check-project.mjs` получил отдельную проверку `legacy battle-ui fallback`, которая падает, если в runtime-загрузчик боя вернутся маркеры `BATTLE_UI_CONFIG_URL_LEGACY` или `data/battle/battle-ui.jsonc`.
+- `PROJECT_REVIEW.md`, `data/README.md` и `src/battle/README.md` обновлены: активный runtime-путь боевого UI один - `data/settings/battle-ui.jsonc`. Старые файлы рядом остаются отдельной задачей legacy-чистки, но больше не маскируют runtime-ошибки.
+- `version.json` поднят до `2026.06.11.6`, потому что изменился код загрузки и проверок.
+- Контекст версии: silent fallback делал вид, что помогает, но на деле мог скрыть битый активный конфиг. Для отладки и будущей packaged/Steam-сборки лучше честный fail-fast, чем игра на старом JSON с невинным лицом.
+- Затронутые файлы: `src/battle/battle-data.js`, `scripts/check-project.mjs`, `PROJECT_REVIEW.md`, `data/README.md`, `src/battle/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-data.js`; `node --check scripts/check-project.mjs`; `node scripts/check-project.mjs`; `node scripts/check-project.mjs --with-smoke`; `node scripts/check-encoding.mjs`.
+
+### 2026-06-11 - Боевой лог получил JSON-трассу действий
+
+- Добавлен `src/battle/battle-trace.js`: бой теперь создает `battleTrace` после генерации стартовой доски, хранит seed/name/config врага, стартовое состояние поля/резерва/препятствий, действия игрока и финальный outcome.
+- `battle-board-actions.js` и `battle-shuffle-flow.js` записывают игровые действия: обычные swap-попытки, blocked-клики, skull/glove/gold/battery и ручной shuffle. Простое выделение первой клетки не пишется, чтобы trace не превращался в шумный журнал курсора.
+- Окно боевого лога получило кнопку `ui.downloadBattleTrace`, которая скачивает JSON-трассу текущего боя. `BattleResult` также возвращает `battleTrace` программно рядом с `logMessages`.
+- `scripts/browser-smoke.mjs` проверяет, что trace создается при входе в первый бой, содержит стартовую доску 8x9, что кнопка выгрузки есть в battle log modal, и что первый валидный ход попадает в `battleTrace.moves`.
+- `version.json` поднят до `2026.06.11.5`, потому что изменились код, локали и smoke-проверка.
+- Контекст версии: человеческий лог хорош для глаз, но плохо подходит для воспроизведения багов. Trace фиксирует машинно-читаемую основу для будущего replay/debug-инструмента без преждевременной сборки полноценного проигрывателя.
+- Затронутые файлы: `src/battle/battle-trace.js`, `src/battle/battle-view.js`, `src/battle/battle-board-actions.js`, `src/battle/battle-shuffle-flow.js`, `src/battle/battle-scaffold-view.js`, `src/battle/battle-outcome-flow.js`, `src/battle/battle-contract.js`, `src/battle/battle-popovers.js`, `src/styles.css`, `src/data-validation.js`, `scripts/browser-smoke.mjs`, `data/locales/en.json`, `data/locales/ru.json`, `data/locales/new_ru.json`, `index.html`, `data/README.md`, `src/battle/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS-файлов; `node scripts/check-project.mjs`; `node scripts/check-project.mjs --with-smoke`; `node scripts/check-encoding.mjs`.
+
+### 2026-06-11 - `check-project` получил режим browser-smoke
+
+- `scripts/check-project.mjs` теперь принимает флаг `--with-smoke`. Обычный запуск остается быстрым структурным чекером, а `node scripts/check-project.mjs --with-smoke` после всех проверок запускает `scripts/browser-smoke.mjs`.
+- Для browser-smoke внутри общего чекера выводится короткая сводка, например враг, число клеток и количество unversioned resources, чтобы результат не выглядел как загадочное `}` в конце JSON.
+- `README.md`, `data/README.md` и `PROJECT_REVIEW.md` обновлены: полный локальный чек теперь описан как `node scripts/check-project.mjs --with-smoke`, а отдельный `browser-smoke` оставлен как прямой запуск UI-smoke.
+- `version.json` поднят до `2026.06.11.4`, потому что изменился код проекта.
+- Контекст версии: `check-project` уже закрывал логику и данные, но UI-smoke жил отдельной командой. Это легко забыть перед релизом или крупной UI-правкой, потому что человек как CI - идея смелая, но юридически сомнительная.
+- Затронутые файлы: `scripts/check-project.mjs`, `README.md`, `data/README.md`, `PROJECT_REVIEW.md`, `version.json`, `VERSIONS.md`.
+- Проверка: `node --check scripts/check-project.mjs`; `node scripts/check-project.mjs`; `node scripts/check-project.mjs --with-smoke`; `node scripts/check-encoding.mjs`.
+
+### 2026-06-11 - Актуализирована документация проекта
+
+- Добавлен корневой `README.md` как короткая входная точка для запуска, проверок и ссылок на основные документы.
+- `data/README.md`, `src/architecture.md`, `PROJECT_REVIEW.md`, `BUG_REVIEW.md` и `DECISIONS.md` сверены с текущей работой: battle seed больше не описан как будущий шаг, browser-smoke отмечен как автоматизированный, контракт боя описывает текущие `BattleRequest` поля `enemyConfigUrl`, `seed` и `seedName`, а старые формулировки про "будущий" боевой модуль заменены текущим состоянием.
+- `version.json` не менялся: это документационная правка, не влияющая на загружаемый код, данные или ассеты игры.
+- Контекст версии: документация начала отставать от уже сделанных seed/debug/smoke/cache правок. Такие расхождения опасны тем, что разработчик чинит не текущий проект, а призрак недельной давности, что весело только первые три минуты.
+- Затронутые файлы: `README.md`, `data/README.md`, `src/architecture.md`, `PROJECT_REVIEW.md`, `BUG_REVIEW.md`, `DECISIONS.md`, `VERSIONS.md`.
+- Проверка: `node scripts/check-encoding.mjs`; `node scripts/check-project.mjs`; `node scripts/browser-smoke.mjs`.
+
+### 2026-06-11 - Убран legacy runtime state из `window.context`
+
+- Добавлен `src/debug-hooks.js`: единый dev/debug helper для `window.__wildwestDebug`, включаемый только через `?debug=1`, `?wildwestDebug=1` или `localStorage.wildwestDebug = "1"`.
+- `src/map-module.js`, `src/battle/battle-module.js` и `src/battle/battle-view.js` больше не пишут `window.context` и `window.contex`; helper дополнительно удаляет эти legacy aliases при попытке публикации debug state.
+- `scripts/browser-smoke.mjs` теперь открывает игру с `debug=1`, читает battle context из `window.__wildwestDebug.battle.context` и проверяет, что старые `window.context/window.contex` не раскрыты.
+- `index.html` добавляет `src/debug-hooks.js` в versioned import map.
+- `version.json` поднят до `2026.06.11.3`, потому что изменился код проекта.
+- Обновлены `data/README.md`, `src/architecture.md`, `PROJECT_REVIEW.md` и `DECISIONS.md` с новым debug-контрактом.
+- Контекст версии: глобальные aliases давали быстрый доступ из консоли, но делали runtime state неявным публичным API и тащили за собой опечатку `contex`. Debug state теперь остается полезным для разработки и smoke, но не торчит в обычном запуске.
+- Затронутые файлы: `src/debug-hooks.js`, `index.html`, `src/map-module.js`, `src/battle/battle-module.js`, `src/battle/battle-view.js`, `scripts/browser-smoke.mjs`, `version.json`, `data/README.md`, `src/architecture.md`, `PROJECT_REVIEW.md`, `DECISIONS.md`, `VERSIONS.md`.
+- Проверка: `node --check src/debug-hooks.js`; `node --check src/map-module.js`; `node --check src/battle/battle-module.js`; `node --check src/battle/battle-view.js`; `node --check scripts/browser-smoke.mjs`; `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs`.
+
+### 2026-06-11 - Исправлен mojibake-разделитель в статусе battle
+
+- В `src/map-module.js` исправлен разделитель в `selectionStatus` после открытия battle-события: теперь используется нормальный `·`, как в остальных ветках `activateNode()`.
+- `scripts/check-encoding.mjs` расширен проверкой коротких UTF-8 -> Windows-1251 mojibake-фрагментов, включая случай сломанного middle-dot.
+- В `PROJECT_REVIEW.md` закрытая находка переписана так, чтобы документация не хранила живой mojibake-образец, который теперь обязан ловиться проверкой.
+- `version.json` поднят до `2026.06.11.2`, потому что изменился код проекта.
+- Обновлен `data/README.md` с уточнением, что `check-encoding.mjs` ловит не только крупно сломанную кириллицу, но и короткие mojibake-фрагменты.
+- Контекст версии: одиночный сломанный символ легко пропустить глазами и ещё легче пропустить старой общей проверкой кодировки. Теперь такой мусор падает в автоматике, а не выползает в UI как маленький привет из ада кодировок.
+- Затронутые файлы: `src/map-module.js`, `scripts/check-encoding.mjs`, `PROJECT_REVIEW.md`, `version.json`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check scripts/check-encoding.mjs`; `node scripts/check-encoding.mjs`; `node scripts/check-project.mjs`.
+
+### 2026-06-11 - Автоматизирован browser-smoke
+
+- Добавлен `scripts/browser-smoke.mjs`: самодостаточный smoke без Playwright-зависимости. Скрипт поднимает временный static server, запускает системный Chrome/Edge через DevTools Protocol, открывает `index.html` с фиксированным seed, проходит `START` -> карта -> первая battle-точка и проверяет бой.
+- Smoke проверяет `easy_Foxy`, `enemyConfigUrl`, battle seed `battle:WildWest:L1_N1:data/enemy/easy_Foxy.jsonc:1`, доску `9x8`, 72 клетки, 72 иконки, отсутствие console/page/network ошибок и отсутствие unversioned запросов к `src/` и `data/`.
+- Скрипт сохраняет screenshot финального состояния в `artifacts/browser-smoke-*.png` и поддерживает `--headed`, `--keep-open`, `--chrome=<path>`, `--seed=<seed>`, `--port=<port>`, `--screenshot=<path>` и `--timeout=<ms>`.
+- `version.json` поднят до `2026.06.11.1`, потому что изменился код проекта.
+- Обновлен `data/README.md` с командой запуска и контрактом smoke.
+- Контекст версии: ручной browser-smoke уже показал, что сценарий работает, но без штатной команды UI-регрессии снова будут ловиться глазами после поломки. Этот smoke фиксирует главный путь игрока и базовый контракт боя без добавления npm-зависимостей.
+- Затронутые файлы: `scripts/browser-smoke.mjs`, `version.json`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check scripts/browser-smoke.mjs`; `node scripts/browser-smoke.mjs`; `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`.
+
+### 2026-06-10 - Версионированный cache-buster вместо `Date.now()`
+
+- Добавлен корневой `version.json` с единственным полем `version`; версия на момент изменения: `2026.06.10.1`.
+- `index.html` теперь читает `version.json`, версионирует `src/styles.css`, динамически загружает `src/map-module.js` с `?v=<version>` и устанавливает import map для JS-модулей проекта.
+- `src/app-version.js` стал общим helper-ом для добавления `?v=<version>` к локальным URL.
+- `data-loader.js`, `map-module.js`, `battle-module.js`, `battle-config.js` и `audio-module.js` больше не используют `Date.now()` для cache-busting данных, ассетов, музыки и динамических импортов.
+- Статичные HTML-ассеты и cursor URL из CSS получают версию из bootstrap, а иконки map-node теперь проходят через `resolveAssetPath()` вместо сырого пути из JSONC.
+- Старые ручные query-cache-buster у static imports в `battle-view.js` удалены; версионирование модулей централизовано через import map.
+- `scripts/check-project.mjs` проверяет, что `version.json` содержит только непустое поле `version`.
+- Обновлены `data/README.md`, `src/battle/README.md` и `DECISIONS.md` с правилом: менять `version.json` при каждом обновлении кода, данных или ассетов.
+- Контекст версии: `Date.now()` заставлял браузер видеть новый URL при каждом запуске, что удобно для сырой разработки, но плохо для packaged/Steam-сборки и делает кэш почти декоративным. Теперь неизменная версия оставляет URL стабильными, а смена версии явно инвалидирует кэш.
+- Затронутые файлы: `version.json`, `index.html`, `src/app-version.js`, `src/data-loader.js`, `src/map-module.js`, `src/audio-module.js`, `src/battle/battle-module.js`, `src/battle/battle-config.js`, `src/battle/battle-view.js`, `scripts/check-project.mjs`, `data/README.md`, `src/battle/README.md`, `DECISIONS.md`, `VERSIONS.md`.
+- Проверка: `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; браузерный smoke через локальный сервер с проверкой загрузки `version.json`, `src/map-module.js?v=2026.06.10.1`, JSON/JSONC и ассетов с тем же version query.
+
+### 2026-06-10 - Добавлен seed для боя
+
+- `src/map-module.js` теперь создает перед каждым battle-событием производный seed с именем `battle:<mapId>:<nodeId>:data/enemy/<enemyId>.jsonc:<attempt>`, пишет его в лог карты и передает в `BattleRequest`.
+- `BattleRequest` теперь несет `enemyConfigUrl`, а `battle-data.js` использует его при загрузке врага с fallback на `enemyId`.
+- `battle-scaffold-view.js` добавляет тот же battle seed в лог самого боя сразу после создания `context.battleLog`; при переносе `result.logMessages` в лог карты дубль seed-строки пропускается.
+- `src/battle/battle-module.js` создает deterministic RNG из `request.seed`; `battle-state`, `battle-board-actions`, `battle-shuffle-flow`, `battle-rage-flow` и `battle-resolution` получают игровой random через этот поток.
+- Импорты обновленных battle flow/state/action/scaffold модулей в `battle-view.js` получили cache-buster `2026-06-10-battle-seed` / `2026-06-10-battle-seed-log`, чтобы браузер не подмешивал старые battle-модули.
+- Сидированная случайность боя покрывает стартовое поле, reserve board, refill, стены, коробки, лозы, shuffle без ходов, gold-замену и random-target эффекты ярости. Визуальный разброс снарядов и частиц намеренно не привязан к gameplay RNG.
+- Добавлен ключ локали `log.battleSeed`; валидатор данных теперь требует его.
+- Обновлены `data/README.md`, `src/battle/README.md`, `src/architecture.md` и `DECISIONS.md` с правилами battle seed.
+- Контекст версии: теперь одного `run` seed достаточно, чтобы стабильно получить тот же `map` seed и тот же `battle` seed для конкретной ноды. Это нужно для воспроизведения багов боя без гадания по глобальному `Math.random()`.
+- Затронутые файлы: `src/map-module.js`, `src/battle/battle-contract.js`, `src/battle/battle-data.js`, `src/battle/battle-module.js`, `src/battle/battle-scaffold-view.js`, `src/battle/battle-state.js`, `src/battle/battle-view.js`, `src/battle/battle-board-actions.js`, `src/battle/battle-shuffle-flow.js`, `src/battle/battle-rage-flow.js`, `src/data-validation.js`, `data/locales/en.json`, `data/locales/ru.json`, `data/locales/new_ru.json`, `data/README.md`, `src/battle/README.md`, `src/architecture.md`, `DECISIONS.md`, `VERSIONS.md`.
+- Проверка: `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; Playwright smoke с `?seed=A7K9M2QX4T8ZB3NC`, стартом карты и открытием первого боя, где `request.seedName`, лог карты и battle log показали `battle:WildWest:L1_N1:data/enemy/easy_Foxy.jsonc:1`, а `enemyConfigUrl` совпал с реально загруженным конфигом; две отдельные загрузки с тем же run seed дали одинаковый battle seed и одинаковую стартовую доску боя.
+
+### 2026-06-10 - Добавлен seed для генерации карты
+
+- Добавлен общий модуль `src/seeded-random.js`: 16-символьные debug seed, нормализация seed из URL, производные seed и deterministic RNG.
+- `src/map/map-generation.js` теперь принимает `generateMap(config, { random })` и использует переданный RNG для количества точек, выбора событий, payload-вариантов, перемешивания событий и дополнительных связей карты. Вызов без `random` сохраняет прежний fallback на `Math.random()`.
+- При START `src/map-module.js` создает `run` seed или берет его из `?seed=<16 символов>` / `?runSeed=<16 символов>`, затем для каждой карты создает производный seed с именем `map:<mapId>:<campaignIndex>`, передает его генератору и пишет оба seed в лог событий.
+- Добавлены ключи локалей `log.runSeed` и `log.mapSeed`; валидатор данных теперь требует эти ключи.
+- Обновлены `data/README.md`, `src/architecture.md` и `DECISIONS.md` с правилом seed-воспроизводимости.
+- Контекст версии: баги генерации карты должны воспроизводиться по одному seed, а будущий seed для боя должен подключаться к тому же механизму, не смешивая карту, бой и визуальные эффекты в один поток случайности.
+- Затронутые файлы: `src/seeded-random.js`, `src/map/map-generation.js`, `src/map-module.js`, `src/data-validation.js`, `data/locales/en.json`, `data/locales/ru.json`, `data/locales/new_ru.json`, `data/README.md`, `src/architecture.md`, `DECISIONS.md`, `VERSIONS.md`.
+- Проверка: `node scripts/check-project.mjs`; отдельная deterministic-проверка `generateMap()` с одинаковым seed; Playwright smoke в браузере с `?seed=A7K9M2QX4T8ZB3NC`, где в логе появились `Seed [run]` и `Seed [map:WildWest:1]`.
+
+### 2026-06-10 - Добавлен общий чекер проекта
+
+- Добавлен `scripts/check-project.mjs`: одна команда запускает синтаксическую проверку JS/MJS, парсинг всех JSON/JSONC из `data`, `validateGameData()` через локальный `fetch`, проверку ссылок на `data/Assets`, сверку ключей активных локалей, баланс CSS-скобок, `check-battle-engine` и `check-encoding`.
+- В `data/README.md` добавлен раздел с командой запуска и границами ответственности чекера.
+- Контекст версии: проект уже держится на нескольких разрозненных проверках, и полагаться на память человека при каждом изменении - это не процесс, а суеверие с клавиатурой. Общий чекер нужен как быстрый предохранитель перед браузерной ручной проверкой; убирать его без замены не стоит, иначе ошибки данных и связей снова будут всплывать поздно.
+- Затронутые файлы: `scripts/check-project.mjs`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node scripts/check-project.mjs`.
+
+### 2026-06-08 - Унифицирован blur-эффект модальных окон
+
+- Общий `.modal-overlay` для настроек, лога и сдачи теперь использует такой же blur/brightness-подход, как battle mini-menu: затемнение больше не выглядит отдельным “плоским” режимом.
+- `modal-overlay` поднят выше battle popover-слоев, чтобы затухающая плашка mini-menu не мигала поверх окна настроек или сдачи.
+- CSS cache-buster обновлен до `2026-06-08-unified-modal-blur`, чтобы браузер сразу забрал новый стиль.
+- Контекст версии: боевые меню, сумка, настройки и сдача должны восприниматься как один pause-layer. Разные эффекты затемнения создавали визуальное мигание и ощущение переключения между разными интерфейсами.
+- Затронутые файлы: `src/styles.css`, `index.html`, `VERSIONS.md`.
+- Проверка: CSS braces check, `node scripts/check-encoding.mjs`; вручную открыть в бою mini-menu, сумку, настройки и сдачу и сравнить эффект затемнения/blur.
+
+### 2026-06-08 - UI-пауза теперь замораживает время часов
+
+- `pauseBattleRuntime()` теперь запоминает момент UI-паузы и активный `ragePausedUntil`; при `resumeBattleRuntime()` дедлайн часов сдвигается на длительность паузы.
+- Визуальный cooldown часов во время открытого battle mini-menu, сумки, настроек или окна сдачи считает время от момента начала паузы, а не от текущего `Date.now()`.
+- Обновлены cache-buster импорты `battle-runtime.js` и `battle-inventory-view.js`, чтобы браузер не использовал старые версии модулей.
+- Контекст версии: меню боя, сумка и настройки считаются настоящей паузой. Поэтому часы не должны скрытно терять секунды, пока игрок читает меню или инвентарь; иначе визуальная пауза превращается в фальшивую.
+- Затронутые файлы: `src/battle/battle-runtime.js`, `src/battle/battle-inventory-view.js`, `src/battle/battle-view.js`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-runtime.js`, `node --check src/battle/battle-inventory-view.js`, `node --check src/battle/battle-view.js`, `node scripts/check-battle-engine.mjs`, `node scripts/check-encoding.mjs`; вручную активировать часы, открыть сумку/mini-menu на несколько секунд и убедиться, что cooldown не прыгает вперед после закрытия.
+
+### 2026-06-08 - Исправлен визуальный cooldown часов в бою
+
+- Слот часов теперь сам обновляет отображение cooldown до финального `0`, даже если общий runtime-тик ярости в этот момент не перерисовал инвентарь.
+- Перерисовка инвентаря теперь тоже запускает синхронизацию часов, поэтому сторонний `renderBattleInventory()` больше не может оставить статичный серый слот с `1`.
+- Импорт `battle-inventory-view.js` в `battle-view.js` получил cache-buster, чтобы браузер не держал старую версию модуля после фикса.
+- При завершении cooldown с часов снимается устаревший `is-disabled`, если предмет снова доступен по количеству и не активирован другой спецпредмет.
+- Контекст версии: часы могли фактически стать доступными для клика, но визуально оставаться заблокированными с цифрой `1`. Это был UI-остаток, а не игровая блокировка; исправление не меняет длительность паузы ярости и расход предмета.
+- Затронутые файлы: `src/battle/battle-inventory-view.js`, `src/battle/battle-view.js`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-inventory-view.js`, `node --check src/battle/battle-view.js`, `node scripts/check-battle-engine.mjs`, `node scripts/check-encoding.mjs`; вручную прожать часы в бою и дождаться окончания cooldown.
+
+### 2026-06-08 - Добавлен принудительный landscape-режим на телефонах
+
+- В `data/settings/map-ui.jsonc` добавлен блок `orientation`: включение forced landscape на телефонах, проверка touch-устройства, пределы размеров телефона и угол поворота.
+- Весь игровой DOM обернут в `game-orientation-root`; при портретном телефоне этот слой визуально поворачивается на 90 градусов и занимает экран как горизонтальная игра, а не пытается ужаться в вертикальную щель.
+- Масштаб карты, загрузочного экрана и battle scaffold теперь используют эффективный landscape viewport, когда включен forced landscape.
+- Бой открывается внутрь `gameOrientationRoot`, чтобы динамический battle overlay поворачивался вместе с картой и меню.
+- Валидатор `map-ui` проверяет новый блок `orientation`.
+- CSS cache-buster обновлен до `2026-06-08-forced-landscape`.
+- Контекст версии: игра проектируется как горизонтальная, и мобильный портретный layout портит ощущение от интерфейса. Не стоит заменять forced landscape на “сжать горизонтальную игру в портретный viewport” без отдельного UX-решения.
+- Затронутые файлы: `index.html`, `src/styles.css`, `src/map-module.js`, `src/battle/battle-scaffold-view.js`, `src/data-validation.js`, `data/settings/map-ui.jsonc`, `data/settings/map-ui.example.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/map-module.js`, `node --check src/battle/battle-scaffold-view.js`, `node --check src/data-validation.js`, `node scripts/check-encoding.mjs`, JSON/JSONC parse для `data/settings/map-ui.jsonc`; вручную проверить телефон/эмулятор в портретном режиме.
+
+### 2026-06-08 - Исправлена адаптивность нижнего блока loading-screen
+
+- Подпись загрузки перенесена ниже progress bar: теперь текст не висит над полосой и визуально читается как подпись нижнего блока.
+- Логотип больше не рисуется в обрезанной верхней области: сцена остается полноэкранной, а сам PNG уменьшается через `max-width/max-height` с учетом нижнего блока progress bar и подписи.
+- При низкой высоте viewport включается компактный режим: progress bar становится короче и тоньше, подпись чуть уменьшается, а логотип получает больше места и меньше проседает по размеру.
+- В `logo.responsive` добавлены настройки адаптива логотипа: эталонный экран, скорость уменьшения, минимальный размер и компактный нижний резерв под progress bar.
+- Контекст версии: loading-screen является первым экраном игры, поэтому на маленьких окнах он не должен выглядеть как случайная авария верстки. Нижний блок должен иметь свою безопасную зону, но не должен забирать у логотипа половину экрана. Размер логотипа теперь настраивается из JSON, чтобы не править CSS при каждой визуальной подгонке.
+- Затронутые файлы: `data/settings/load.jsonc`, `data/settings/load.example.jsonc`, `index.html`, `src/styles.css`, `src/map-module.js`, `VERSIONS.md`.
+- Проверка: выполнить `node --check src/map-module.js`, `node scripts/check-encoding.mjs`, JSON/JSONC parse для `data/settings/load.jsonc` и `data/settings/load.example.jsonc`; вручную сжать окно по высоте и проверить, что progress bar не заезжает на логотип.
+
+### 2026-06-08 - Добавлен настраиваемый logo-screen загрузки
+
+- Добавлен `data/settings/load.jsonc` и пример `data/settings/load.example.jsonc`: фон загрузки, логотип, fade-in, белая волна, нижний progress bar, подпись, минимальное время показа и детализация статуса теперь настраиваются из данных.
+- Экран загрузки в `index.html` и `src/styles.css` переделан с темной карточки на fullscreen white logo-screen с нижней полосой прогресса.
+- `src/map-module.js` теперь читает `load.jsonc` в начале `boot()`, применяет CSS-переменные загрузочного экрана, скрывает конкретные имена файлов при загрузке и выдерживает `logo.minVisibleMs` перед закрытием overlay.
+- Анимации логотипа и волны запускаются при первом реальном показе loading overlay; волна больше не стартует от момента применения конфига и не пересобирается на поздних этапах загрузки.
+- Ошибки загрузки принудительно показывают статусный текст, даже если обычный loading-screen скрывает подробности.
+- CSS cache-buster в `index.html` обновлен на `2026-06-08-loading-logo-screen`.
+- Обновлены `data/README.md` и `src/architecture.md`.
+- Контекст версии: после переноса полной загрузки до стартового меню loading-screen стал первым полноценным экраном игры, а не технической заглушкой. Его оформление должно жить в данных, чтобы тайминги и визуал можно было настраивать без правок CSS/JS. Не стоит возвращать показ конкретных файлов по умолчанию: игроку это не помогает, а экран загрузки превращает в бухгалтерский отчет.
+- Затронутые файлы: `data/settings/load.jsonc`, `data/settings/load.example.jsonc`, `index.html`, `src/styles.css`, `src/map-module.js`, `data/README.md`, `src/architecture.md`, `VERSIONS.md`.
+- Проверка: выполнить `node --check src/map-module.js`, `node scripts/check-battle-engine.mjs`, `node scripts/check-encoding.mjs`, JSON/JSONC parse для `data/settings/load.jsonc` и `data/settings/load.example.jsonc`; вручную проверить первый экран загрузки, fade логотипа, волну, нижнюю progress bar и минимальное время показа.
+
+### 2026-06-08 - Полная загрузка игры перенесена до стартового меню
+
+- `boot()` в `src/map-module.js` теперь до показа главного меню загружает и валидирует кампанию, предметы, таблицу опыта, карты, врагов, battle/map UI и локали.
+- Полная предзагрузка ассетов активной кампании и prewarm JS-кода боя теперь выполняются во время первого загрузочного экрана, а не после нажатия START.
+- START больше не перечитывает кампанию и не запускает полный asset/code preload повторно, если данные уже готовы; оставлен fallback `isGameDataReady()`, который догружает всё при редком неготовом состоянии.
+- `preloadStartupAssets()` удален как отдельный шаг, потому что полный `preloadGameAssets()` уже включает стартовые ассеты меню.
+- Обновлены `data/README.md` и `src/architecture.md`.
+- Контекст версии: после RAM-кэша ассетов и prewarm боевого кода старт первого боя стал лучше, но START всё еще мог быть тяжелым. Теперь дорогая загрузка происходит до стартового меню, а кнопка START только начинает забег из прогретого состояния. Не стоит возвращать полную загрузку на START без отдельного UX-решения, иначе первый бой снова будет ловить задержки.
+- Затронутые файлы: `src/map-module.js`, `data/README.md`, `src/architecture.md`, `VERSIONS.md`.
+- Проверка: выполнить `node --check src/map-module.js`, `node scripts/check-battle-engine.mjs`, `node scripts/check-encoding.mjs`; вручную проверить первый экран загрузки, появление главного меню, START, первую карту и первый вход в battle-точку.
+
+### 2026-06-08 - Предзагрузка JS-кода боя до открытия первой battle-точки
+
+- `src/battle/battle-module.js` получил публичный `preloadBattleModule()`, который заранее импортирует `battle-contract.js`, `battle-data.js`, `battle-engine.js`, `battle-view.js` и их статические зависимости без создания боя.
+- Dynamic imports боя теперь используют стабильный cache-buster на время жизни страницы, а не новый `Date.now()` при каждом клике. Благодаря этому prewarm и реальный вход в бой используют один и тот же экземпляр ES-модулей.
+- `src/map-module.js` после предзагрузки ассетов активной кампании дополнительно вызывает `preloadBattleCode(...)` перед показом карты. Первый запуск боя больше не должен ждать загрузку/парсинг боевых JS-файлов прямо по клику.
+- Обновлены `data/README.md`, `src/architecture.md` и `src/battle/README.md`.
+- Контекст версии: после RAM-кэша ассетов первая battle-точка все еще могла открываться с задержкой из-за ленивой загрузки JS-модулей боя. Не стоит возвращать `Date.now()` прямо в момент клика: такой импорт делает каждый preload бесполезным, потому что браузер видит новый URL модуля.
+- Затронутые файлы: `src/map-module.js`, `src/battle/battle-module.js`, `data/README.md`, `src/architecture.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: выполнить `node --check` для `src/map-module.js` и `src/battle/battle-module.js`, `node scripts/check-battle-engine.mjs`, `node scripts/check-encoding.mjs`; вручную проверить START, первый вход в battle-точку и повторный вход в бой.
+
+### 2026-06-08 - Предзагрузка ассетов переведена в общий RAM-кэш
+
+- `src/asset-preloader.js` теперь не только прогревает URL, а скачивает локальные ассеты из `data/Assets` в `Blob`, создает `blob:` object URL и хранит их в общем RAM-кэше на время жизни страницы.
+- Для изображений предзагрузчик дополнительно создает и декодирует `Image`, чтобы карта и бой могли быстрее использовать уже прогретые картинки.
+- `resolveAssetPath()` в `src/map-module.js` и `src/battle/battle-config.js` сначала проверяет общий asset cache и возвращает cached URL, если ассет уже был предзагружен.
+- `src/audio-module.js` больше не добавляет `?v=<Date.now()>` к `blob:` и `data:` URL музыки, чтобы cached audio object URL не ломался.
+- Обновлены `src/architecture.md` и `data/README.md` с описанием RAM-кэша и его цены по памяти.
+- Контекст версии: после добавления полного preload игра могла повторно дергать тяжелые PNG/MP3 через cache-buster и не имела явного контракта быстрого доступа к уже загруженным ассетам. Общий RAM-кэш делает использование ассетов внутри текущей страницы предсказуемым. Не стоит убирать его без замены на другой явный asset-cache слой, иначе вернется скрытая нагрузка на браузерный кэш и декодирование.
+- Затронутые файлы: `src/asset-preloader.js`, `src/map-module.js`, `src/battle/battle-config.js`, `src/audio-module.js`, `src/architecture.md`, `data/README.md`, `VERSIONS.md`.
+- Проверка: выполнить `node --check` для измененных JS-файлов, `node scripts/check-encoding.mjs`, `node scripts/check-battle-engine.mjs`; вручную проверить загрузочный экран, вход на карту, вход в бой, музыку меню/карты/боя и повторное использование ассетов после START.
+
+### 2026-06-07 - `BUG_REVIEW.md` переведен на статусные карточки
+
+- Все игровые проверки в `BUG_REVIEW.md` приведены к единому формату: `СТАТУС`, `РИСК`, `ПРОВЕРИТЬ`, `ОЖИДАЕТСЯ`.
+- Строка статуса теперь явно содержит варианты `🔵 не проверено`, `🟡 есть визуальный баг`, `🔴 критический баг`, `🟢 все работает отлично`, чтобы после ручного QA можно было быстро пометить состояние каждой проверки.
+- Минимальный smoke-блок тоже переписан в полноценные карточки, а не оставлен списком действий без ожидаемого результата.
+- Контекст версии: баг-ревью должно быть рабочим чеклистом, а не набором заметок в стиле "потом разберемся". Единый формат нужен, чтобы после каждого прохода было видно, что проверено, что сломано визуально, а что является критическим багом.
+- Затронутые файлы: `BUG_REVIEW.md`, `VERSIONS.md`.
+- Проверка: выполнить `node scripts/check-encoding.mjs`; дополнительно убедиться, что в `BUG_REVIEW.md` не осталось старых строк формата `🟡 РИСК`, `🔵 ПРОВЕРИТЬ`, `🟢 ОЖИДАЕТСЯ`.
+
+### 2026-06-07 - Разделены архитектурное ревью и баг-ревью боевого окна
+
+- Добавлен `BUG_REVIEW.md`: отдельный живой QA-чеклист боевого окна с проверками runtime, swap/cascade, препятствий, HUD, светлячков, активных предметов, сумки, tooltip, shuffle, ярости, исходов боя и responsive-слоев.
+- Из `PROJECT_REVIEW.md` удалены блоки ручных игровых проверок `План живого поиска багов...` и строки `Проверки после исправления...`; документ теперь остается архитектурным ревью и ссылается на `BUG_REVIEW.md` для ручного QA.
+- `Regression Checklist` в `PROJECT_REVIEW.md` оставлен для автоматических и инфраструктурных проверок, а игровые smoke-сценарии перенесены в `BUG_REVIEW.md`.
+- Контекст версии: после длинного рефакторинга `battle-view.js` ревью начало смешивать архитектурные findings и ручные сценарии проверки. Это нужно держать раздельно, иначе следующий проход ревью снова превратится в свалку, где нельзя понять, что чинить, а что просто потыкать в браузере.
+- Затронутые файлы: `BUG_REVIEW.md`, `PROJECT_REVIEW.md`, `VERSIONS.md`.
+- Проверка: выполнить `node scripts/check-encoding.mjs`; дополнительно убедиться, что в `PROJECT_REVIEW.md` не осталось блоков `План живого поиска багов` и `Проверки после исправления`.
+
+### 2026-06-07 - Санитарная чистка rage helper wrappers в `battle-view.js`
+
+- Удалены недостижимые старые тела после `return` в rage helper wrappers: классификаторы ultimate effects, получение текущей rage/stage конфигурации, расчет ожидания damage feedback и `normalizeStringList`.
+- Удалены полностью неиспользуемые wrappers и imports для `handleBattleUltimateKamikazeEffect`, `getBattleUltimateDamageFeedbackWaitMs` и `getCurrentBattleStageConfig`; эти функции теперь живут только в `battle-rage-flow.js`, где реально используются.
+- Поведение боя не менялось: `battle-view.js` по-прежнему делегирует эти вызовы в `src/battle/battle-rage-flow.js`, а старые имена оставлены как thin wrappers для deps-контракта projectiles/rage слоев.
+- Контекст версии: после выноса rage flow в фасаде остались старые мертвые хвосты, которые уже не выполнялись, но создавали ложные следы при отладке и даже хранили побитый русский текст. Их не стоит возвращать: источник правды для этих правил теперь `battle-rage-flow.js`.
+- Затронутые файлы: `src/battle/battle-view.js`, `src/battle/README.md`, `src/architecture.md`, `PROJECT_REVIEW.md`, `VERSIONS.md`.
+- Проверка: выполнить `node --check` для `src/battle/battle-view.js` и `src/battle/battle-rage-flow.js`, затем ESM import `battle-view.js`, `node scripts/check-battle-engine.mjs` и `node scripts/check-encoding.mjs`.
+
+### 2026-06-07 - Вынесен player item/inventory helper слой боя
+
+- Добавлен `src/battle/battle-player-items.js`: подписи и описания предметов, список hand slots из `battle-ui`, чтение количества предмета и изменение количества в инвентаре вынесены из `battle-view.js`.
+- `battle-view.js` оставляет тонкие wrappers `getItemLabel`, `getItemDescription`, `getBattleHandItemIds`, `getInventoryQuantity` и `changeInventoryQuantity`, потому что board/popover/inventory/action слои все еще получают эти имена через deps.
+- Обновлены `src/battle/README.md`, `src/architecture.md` и `PROJECT_REVIEW.md`.
+- Контекст версии: после text/formatter среза в фасаде оставались мелкие item/inventory helpers, которые влияют на череп, перчатку, часы, золото и сумку. Их не стоит возвращать в `battle-view.js` без отдельной причины: состояние инвентаря и отображение предметных подписей должны быть отдельным слоем, а не частью orchestration боя.
+- Затронутые файлы: `src/battle/battle-player-items.js`, `src/battle/battle-view.js`, `src/battle/README.md`, `src/architecture.md`, `PROJECT_REVIEW.md`, `VERSIONS.md`.
+- Проверка: выполнить `node --check` для `src/battle/battle-player-items.js` и `src/battle/battle-view.js`, затем ESM import `battle-view.js`, `node scripts/check-battle-engine.mjs` и `node scripts/check-encoding.mjs`.
+
+### 2026-06-07 - Вынесен text/formatter слой боя из `battle-view.js`
+
+- Добавлен `src/battle/battle-formatters.js`: lookup локалей, battle text-key lookup, форматирование шаблонов статуса хода, формат времени и tooltip labels вынесены из фасада боя.
+- `battle-view.js` оставляет тонкие wrappers `translate`, `translateBattleText`, `formatMoveStatus`, `formatBattleSeconds` и `createBattleTooltipLabel`, потому что вынесенные слои все еще получают эти имена через deps.
+- Обновлены `src/battle/README.md`, `src/architecture.md` и `PROJECT_REVIEW.md`.
+- Контекст версии: после state/config срезов в фасаде оставалась текстовая обвязка. Ее не стоит возвращать в `battle-view.js` без отдельной причины: локализация и форматирование статусов не должны жить рядом с orchestration боя, иначе будущие правки локалей снова будут проходить через runtime-фасад.
+- Затронутые файлы: `src/battle/battle-formatters.js`, `src/battle/battle-view.js`, `src/battle/README.md`, `src/architecture.md`, `PROJECT_REVIEW.md`, `VERSIONS.md`.
+- Проверка: выполнить `node --check` для `src/battle/battle-formatters.js` и `src/battle/battle-view.js`, затем ESM import `battle-view.js`, `node scripts/check-battle-engine.mjs` и `node scripts/check-encoding.mjs`.
+
+### 2026-06-07 - Вынесен state/stage слой боя из `battle-view.js`
+
+- Добавлен `src/battle/battle-state.js`: форма `battleState`, подготовка новой попытки, создание и проверка reserve board, текущий индекс стадии, stage `convert` effects, а также sync стен/коробок/лоз вынесены из фасада боя.
+- `battle-view.js` переключен на импорт state helpers и продолжает передавать старые имена в deps других слоев, чтобы не менять поведение и DOM/flow-контракт.
+- Обновлены `src/battle/README.md`, `src/architecture.md` и `PROJECT_REVIEW.md`.
+- Контекст версии: после выноса config-слоя в фасаде оставались функции, которые мутируют `battleState` и знают про stage-bound препятствия. Их не стоит возвращать в `battle-view.js` без отдельной причины: подготовка попытки, reserve board и sync препятствий должны жить отдельно от DOM-координации и сценариев клика/ярости.
+- Затронутые файлы: `src/battle/battle-state.js`, `src/battle/battle-view.js`, `src/battle/README.md`, `src/architecture.md`, `PROJECT_REVIEW.md`, `VERSIONS.md`.
+- Проверка: выполнить `node --check` для `src/battle/battle-state.js` и `src/battle/battle-view.js`, затем ESM import `battle-view.js`, `node scripts/check-battle-engine.mjs` и `node scripts/check-encoding.mjs`.
+
+### 2026-06-07 - Вынесен config-слой боя из `battle-view.js`
+
+- Добавлен `src/battle/battle-config.js`: fallback-значения `battle-ui`, top-button config, board/layout/animation/sound getters, tooltip timing, enemy shield cap, clock-warning parsing и `resolveAssetPath()` теперь живут в отдельном модуле.
+- `battle-view.js` переключен на импорт config helpers и оставляет только тонкий wrapper `getBattleGenerationConfig()`, потому что генерация поля должна получать текущие stage `convert` эффекты из состояния боя.
+- Обновлены `src/battle/README.md`, `src/architecture.md` и `PROJECT_REVIEW.md`.
+- Контекст версии: после выноса scaffold/layout в фасаде остался пассивный набор config helper-ов. Их нельзя возвращать обратно в `battle-view.js` без отдельной причины: иначе визуальный фасад снова начнет хранить fallback-контракт `battle-ui`, парсинг таймингов и asset cache-busting рядом с orchestration боя.
+- Затронутые файлы: `src/battle/battle-config.js`, `src/battle/battle-view.js`, `src/battle/README.md`, `src/architecture.md`, `PROJECT_REVIEW.md`, `VERSIONS.md`.
+- Проверка: выполнить `node --check` для `src/battle/battle-config.js` и `src/battle/battle-view.js`, затем `node scripts/check-battle-engine.mjs` и `node scripts/check-encoding.mjs`.
+
+### 2026-06-07 - Вынесен scaffold/layout/cleanup боя из `battle-view.js`
+
+- Добавлен `src/battle/battle-scaffold-view.js`: сборка DOM-каркаса боя, создание `renderTargets`, viewport-scale, resize handling, нормализация render targets и cleanup DOM-ресурсов вынесены из фасада боя.
+- В `battle-view.js` оставлены thin wrappers со старыми именами и `createBattleScaffoldViewDeps()`, чтобы outcome, popovers, inventory и другие слои продолжали пользоваться прежним контрактом.
+- Обновлены `src/battle/README.md`, `src/architecture.md` и `PROJECT_REVIEW.md`.
+- Контекст версии: scaffold/layout/cleanup был последним крупным DOM-узлом внутри `battle-view.js` после выноса runtime, board, feedback, resolution, actions, stats, inventory, shuffle, outcome и rage flow. Его не стоит возвращать в фасад без отдельной причины: визуальная сборка окна и cleanup не должны жить рядом с порядком боя и engine calls.
+- Затронутые файлы: `src/battle/battle-scaffold-view.js`, `src/battle/battle-view.js`, `src/battle/README.md`, `src/architecture.md`, `PROJECT_REVIEW.md`, `VERSIONS.md`.
+- Проверка: выполнить `node --check` для `src/battle/battle-scaffold-view.js`, `src/battle/battle-view.js`, `src/battle/battle-outcome-flow.js`, `src/battle/battle-popovers.js`, затем `node scripts/check-battle-engine.mjs` и `node scripts/check-encoding.mjs`.
+
+### 2026-06-07 - Вынесен rage flow боя из `battle-view.js`
+
+- Добавлен `src/battle/battle-rage-flow.js`: таймер ярости, pending-срабатывание, порядок ultimate effects, камикадзе, финальные каскады после превращений и классификаторы эффектов ярости вынесены из фасада боя.
+- В `battle-view.js` оставлены thin wrappers со старыми именами и `createBattleRageFlowDeps()`, чтобы runtime, projectiles, scaffold и другие слои продолжали работать по прежнему контракту.
+- Обновлены `src/battle/README.md`, `src/architecture.md` и `PROJECT_REVIEW.md`.
+- Контекст версии: rage flow был последним крупным сценарным узлом внутри `battle-view.js` после выноса outcome/shuffle/inventory/stats/resolution/projectiles. Его не стоит возвращать в фасад без отдельной причины: порядок ярости, pending-срабатывание и `finally`-разблокировка поля слишком легко ломают бой при визуальных правках.
+- Затронутые файлы: `src/battle/battle-rage-flow.js`, `src/battle/battle-view.js`, `src/battle/README.md`, `src/architecture.md`, `PROJECT_REVIEW.md`, `VERSIONS.md`.
+- Проверка: выполнить `node --check` для `src/battle/battle-rage-flow.js`, `src/battle/battle-view.js`, `src/battle/battle-projectiles-view.js`, `src/battle/battle-runtime.js`, затем `node scripts/check-battle-engine.mjs` и `node scripts/check-encoding.mjs`.
+
+### 2026-06-07 - Вынесен outcome/settings flow боя из `battle-view.js`
+
+- Добавлен `src/battle/battle-outcome-flow.js`: настройки, сдача, победа, поражение, restart, outcome banner, финальный `finishBattle()`, `createScaffoldResult()` и `closeScaffold()` вынесены из фасада боя.
+- В `battle-view.js` оставлены thin wrappers со старыми именами и `createBattleOutcomeFlowDeps()`, чтобы board/rage/scaffold helper-слои продолжали вызывать прежний контракт.
+- Обновлены `src/battle/README.md`, `src/architecture.md` и `PROJECT_REVIEW.md`.
+- Контекст версии: outcome/settings flow вынесен после shuffle/idle как следующий сценарный слой, но без переноса scaffold/layout и cleanup, потому что они завязаны на DOM, масштаб, pointer tracker, tooltip, audio и feedback timers. Не стоит возвращать outcome flow в `battle-view.js` без отдельной причины: победа, поражение и restart не должны жить рядом с порядком ярости и DOM-сборкой поля.
+- Затронутые файлы: `src/battle/battle-outcome-flow.js`, `src/battle/battle-view.js`, `src/battle/README.md`, `src/architecture.md`, `PROJECT_REVIEW.md`, `VERSIONS.md`.
+- Проверка: выполнены `node --check` для `src/battle/battle-outcome-flow.js`, `src/battle/battle-view.js` и `src/battle/battle-runtime.js`; полный список проверок указан в ответе по задаче.
+
+### 2026-06-06 - Вынесен shuffle/idle flow боя из `battle-view.js`
+
+- Добавлен `src/battle/battle-shuffle-flow.js`: idle-подсказка доступного хода, сообщение "нет ходов", ручное перемешивание, урон за перемешивание, пересборка reserve board после shuffle и состояние/локализация кнопки shuffle вынесены из фасада боя.
+- В `battle-view.js` оставлены thin wrappers со старыми именами и `createBattleShuffleFlowDeps()`, чтобы runtime и scaffold продолжали работать по прежнему контракту.
+- Обновлены `src/battle/README.md`, `src/architecture.md` и `PROJECT_REVIEW.md`.
+- Контекст версии: shuffle/idle/no-moves flow был следующим компактным сценарным узлом после inventory HUD. Его вынесли без изменения engine, JSON, баланса, victory/defeat и порядка ярости. Не стоит возвращать этот flow в `battle-view.js` без отдельной причины: иначе ручной shuffle и idle-подсказки снова будут жить рядом с outcome и rage orchestration.
+- Затронутые файлы: `src/battle/battle-shuffle-flow.js`, `src/battle/battle-view.js`, `src/battle/README.md`, `src/architecture.md`, `PROJECT_REVIEW.md`, `VERSIONS.md`.
+- Проверка: выполнены `node --check` для `src/battle/battle-shuffle-flow.js`, `src/battle/battle-view.js` и `src/battle/battle-runtime.js`; полный список проверок указан в ответе по задаче.
+
+### 2026-06-06 - Вынесен inventory/special HUD боя из `battle-view.js`
+
+- Добавлен `src/battle/battle-inventory-view.js`: отрисовка слотов черепа, перчатки, часов, золота, сумки, кнопки mini-menu, cooldown часов, active special cursor и всплывающие сообщения недоступности вынесены из фасада боя.
+- В `battle-view.js` оставлены thin wrappers со старыми именами и `createBattleInventoryViewDeps()`, чтобы popover, board-action, runtime и cleanup слои не меняли существующий контракт.
+- Обновлены `src/battle/README.md`, `src/architecture.md` и `PROJECT_REVIEW.md`.
+- Контекст версии: inventory/special HUD вынесен после stat HUD как следующий render/input-HUD срез без изменения боевой математики, JSON или каскадов. Этот слой не стоит возвращать в `battle-view.js` без отдельной причины: иначе правки черепа/перчатки/часов/сумки снова будут проходить через файл, который координирует исходы боя и порядок ярости.
+- Затронутые файлы: `src/battle/battle-inventory-view.js`, `src/battle/battle-view.js`, `src/battle/README.md`, `src/architecture.md`, `PROJECT_REVIEW.md`, `VERSIONS.md`.
+- Проверка: выполнены `node --check` для `src/battle/battle-inventory-view.js`, `src/battle/battle-view.js`, `src/battle/battle-board-actions.js` и `src/battle/battle-stats-view.js`; полный список проверок указан в ответе по задаче.
+
+### 2026-06-06 - Вынесен stat HUD боя из `battle-view.js`
+
+- Добавлен `src/battle/battle-stats-view.js`: окно врага, портрет/задник, HP, агрессия, щит, урон, таймер ярости, предупреждение ярости и бары здоровья/лечения игрока вынесены из фасада боя.
+- В `battle-view.js` оставлены thin wrappers со старыми именами и `createBattleStatsViewDeps()`, чтобы runtime, rage, resolution и board-action слои продолжали вызывать прежний контракт обновления статов.
+- Обновлены `src/battle/README.md`, `src/architecture.md` и `PROJECT_REVIEW.md`.
+- Контекст версии: stat HUD вынесен после board actions как render-срез без изменения игровой логики. Этот слой не стоит возвращать в `battle-view.js` без отдельной причины: иначе будущая визуальная правка HP/агрессии/ярости снова будет проходить через файл, который координирует исходы боя и порядок ярости.
+- Затронутые файлы: `src/battle/battle-stats-view.js`, `src/battle/battle-view.js`, `src/battle/README.md`, `src/architecture.md`, `PROJECT_REVIEW.md`, `VERSIONS.md`.
+- Проверка: выполнены `node --check` для `src/battle/battle-stats-view.js` и `src/battle/battle-view.js`; полный список проверок указан в ответе по задаче.
+
+### 2026-06-06 - Вынесен слой действий поля из `battle-view.js`
+
+- Добавлен `src/battle/battle-board-actions.js`: обычный swap, действия черепа, перчатки, золота, батареи, клики по коробкам/лозам и пассивный `dmgperturn` после принятого обычного хода вынесены из фасада боя.
+- В `battle-view.js` оставлены thin wrappers со старыми именами и `createBattleBoardActionsDeps()`, чтобы `battle-board-view.js` и существующие callsite-ы не меняли контракт.
+- Обновлены `src/battle/README.md`, `src/architecture.md` и `PROJECT_REVIEW.md`.
+- Контекст версии: после выноса cascade/death/drop самым плотным рисковым узлом в `battle-view.js` оставалась обработка кликов по полю. Этот слой вынесен отдельно, чтобы будущие правки активных предметов и обычного swap не требовали копаться в scaffold, victory/defeat и rage orchestration. Не стоит возвращать board actions обратно в фасад без отдельной причины: это снова смешает input-сценарии, анимации, эффекты и исходы боя в один файл.
+- Затронутые файлы: `src/battle/battle-board-actions.js`, `src/battle/battle-view.js`, `src/battle/README.md`, `src/architecture.md`, `PROJECT_REVIEW.md`, `VERSIONS.md`.
+- Проверка: выполнены `node --check` для `src/battle/battle-board-actions.js` и `src/battle/battle-view.js`; полный список проверок указан в ответе по задаче.
+
+### 2026-06-06 - Вынесен cascade/death/drop слой из `battle-view.js`
+
+- Добавлен `src/battle/battle-resolution.js`: цикл обработки каскадов, death-анимация активированных предметов, drop/refill-анимация через reserve board и `sound_effect` предметов вынесены из фасада боя.
+- В `battle-view.js` оставлены thin wrappers со старыми именами и сценарная orchestration: обработчики кликов, победа/поражение, restart, ярость и порядок применения эффектов не менялись.
+- Обновлены `src/battle/README.md`, `src/architecture.md` и `PROJECT_REVIEW.md`.
+- Контекст версии: после выноса runtime, board-view, popovers, feedback и projectile visuals самым опасным узлом в фасаде оставался `resolveBattleCascades()`. Его перенесли отдельным слоем, чтобы правки падения, удаления и добора предметов не заставляли лезть в весь боевой экран. Не стоит возвращать cascade/death/drop обратно в фасад без отдельной причины: это как снова сложить аптечку, бензин и спички в один ящик и назвать это “удобным доступом”.
+- Затронутые файлы: `src/battle/battle-resolution.js`, `src/battle/battle-view.js`, `src/battle/README.md`, `src/architecture.md`, `PROJECT_REVIEW.md`, `VERSIONS.md`.
+- Проверка: выполнены `node --check` для `src/battle/battle-resolution.js` и `src/battle/battle-view.js`; полный список проверок указан в ответе по задаче.
+
+### 2026-06-06 - Вынесены projectile/rage visuals из `battle-view.js`
+
+- Добавлен `src/battle/battle-projectiles-view.js`: обычные светлячки изменения HP/лечения/агрессии/щита, projectile-анимации ярости, подсветка целей превращения и kamikaze burst теперь живут отдельным визуальным слоем.
+- В `battle-view.js` оставлены тонкие wrappers со старыми именами, а также `runBattleRageAction()`, `handleBattleUltimateKamikazeEffect()`, порядок применения ultimate effects, cascade flow и проверки lifecycle. Поведение и JSON/JSONC-форматы не менялись.
+- Обновлены `src/battle/README.md`, `src/architecture.md` и `PROJECT_REVIEW.md`, чтобы следующий рефакторинг не искал светлячков внутри фасада как иголку в стоге технического долга.
+- Контекст версии: projectile/rage visuals были следующим крупным визуальным хвостом внутри `battle-view.js`. Их вынесли отдельно, чтобы будущие правки светлячков, целей ярости и transform-подсветки не цепляли порядок применения ульты. Не стоит переносить `runBattleRageAction()` в этот же слой: это уже orchestration, а не визуал.
+- Затронутые файлы: `src/battle/battle-projectiles-view.js`, `src/battle/battle-view.js`, `src/battle/README.md`, `src/architecture.md`, `PROJECT_REVIEW.md`, `VERSIONS.md`.
+- Проверка: выполнены `node --check` для `src/battle/battle-projectiles-view.js` и `src/battle/battle-view.js`; полный список проверок указан в ответе по задаче.
+
+### 2026-06-06 - `battle-view.js` разобран до фасадного слоя боя
+
+- Добавлен `src/battle/battle-board-view.js`: рендер поля, иконок, стен, коробок, лоз, board message, gold preview и layout-переменных поля вынесен из `battle-view.js`.
+- Добавлен `src/battle/battle-popovers.js`: mini-menu, сумка, лог боя и общий battle tooltip вынесены из `battle-view.js`, включая таймеры показа/скрытия tooltip.
+- Добавлен `src/battle/battle-feedback-view.js`: состояние feedback, pending delta, suppression и базовая анимация изменения показателей вынесены из `battle-view.js`.
+- На момент этого среза `battle-view.js` остался фасадом и координатором: scaffold, запуск/перезапуск боя, victory/defeat, cascade flow, engine calls, rage effects, death/drop-анимации и projectile visuals еще оставались там, где они были связаны с порядком боя. Следующая запись выше выносит projectile visuals отдельным безопасным шагом.
+- `PROJECT_REVIEW.md` получил отметку `ИСПРАВЛЕНО ЧАСТИЧНО`: основной архитектурный риск P1 по `battle-view.js` снижен, но rage/projectile visuals оставлены отдельным будущим срезом, чтобы не смешивать перенос с боевыми эффектами.
+- Контекст версии: предыдущие два среза вынесли runtime и низкоуровневые анимации. Этот шаг убирает из `battle-view.js` крупные DOM-подсистемы, но не меняет JSON, баланс или порядок боя. Не стоит возвращать рендер поля, popover-логику и feedback state обратно в фасад: это снова превратит визуальную правку в прогулку по минному полю с табличкой “ну вроде работает”.
+- Затронутые файлы: `src/battle/battle-board-view.js`, `src/battle/battle-popovers.js`, `src/battle/battle-feedback-view.js`, `src/battle/battle-view.js`, `src/battle/README.md`, `src/architecture.md`, `PROJECT_REVIEW.md`, `VERSIONS.md`.
+- Проверка: выполнены `node --check` для `src/battle/battle-view.js`, `src/battle/battle-runtime.js`, `src/battle/battle-animations.js`, `src/battle/battle-board-view.js`, `src/battle/battle-popovers.js`, `src/battle/battle-feedback-view.js`, `src/battle/battle-module.js`, `node scripts/check-battle-engine.mjs`, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`. Визуальный in-app Browser-smoke не выполнен: browser tool в этой сессии не был доступен через tool search.
+
+### 2026-06-06 - Вынесены низкоуровневые анимации поля боя
+
+- Добавлен `src/battle/battle-animations.js`: swap, shake, blocked click, shuffle, cell lookup, `runCellAnimation()`, `getBattleElementAnimationState()` и `wait()` вынесены из `battle-view.js`.
+- `battle-view.js` продолжает владеть порядком боя и решать, когда запускать анимации; context-heavy death/drop, rage visuals, projectiles, health feedback и board-view намеренно оставлены на следующие отдельные срезы.
+- `PROJECT_REVIEW.md` получил вторую отметку `ИСПРАВЛЕНО ЧАСТИЧНО` и новый план живого поиска багов с `🟡 РИСК` / `🔵 ПРОВЕРИТЬ` для swap, invalid swap, стен, коробок, лоз, idle hint, shuffle и cascades.
+- Контекст версии: после выноса runtime следующим безопасным слоем были именно низкоуровневые DOM-анимации поля. Не стоит переносить rage/projectiles/health feedback тем же шагом, иначе маленький рефакторинг снова превратится в ремонт всего боя одним движением, то есть в прекрасный способ породить новые баги.
+- Затронутые файлы: `src/battle/battle-animations.js`, `src/battle/battle-view.js`, `src/battle/README.md`, `src/architecture.md`, `PROJECT_REVIEW.md`, `VERSIONS.md`.
+- Проверка: выполнены `node --check src/battle/battle-animations.js`, `node --check src/battle/battle-view.js`, `node --check src/battle/battle-module.js`, `node scripts/check-battle-engine.mjs`, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-06 - Добавлен план живого поиска багов к исправлению battle runtime
+
+- В `PROJECT_REVIEW.md` под отметкой `ИСПРАВЛЕНО ЧАСТИЧНО` для P1 finding по `battle-view.js` добавлен отдельный план живого поиска багов.
+- План перечисляет сценарии, которые надо проверить после выноса runtime: вход в бой, пауза overlay, idle hint, обычный ход, pending rage, defeat restart, victory flow и конкретные регрессии, которые мог породить вынос runtime.
+- Контекст версии: отметка `ИСПРАВЛЕНО` сама по себе не доказывает, что игра пережила правку. Живой regression-план нужен для повторного ревью, чтобы проверять не абстрактное "вроде работает", а именно зоны риска изменения.
+- Затронутые файлы: `PROJECT_REVIEW.md`, `VERSIONS.md`.
+- Проверка: выполнен `node scripts/check-encoding.mjs`.
+
+### 2026-06-06 - Вынесен первый runtime-слой боя
+
+- Добавлен `src/battle/battle-runtime.js`: lifecycle боя, attempt-token, runtime-таймер ярости, idle hint timer и pause/resume теперь живут отдельно от DOM-фасада.
+- `battle-view.js` подключает runtime через callbacks `onTick`, `onIdle` и `getIdleDelayMs`, поэтому view-specific логика тика ярости и idle-подсказки осталась на месте без изменения поведения боя.
+- `PROJECT_REVIEW.md` получил отметку `ИСПРАВЛЕНО ЧАСТИЧНО` для P1 finding по `battle-view.js`: первый безопасный слой вынесен, а animations/board-view остаются следующими отдельными шагами.
+- Контекст версии: `battle-view.js` был главным runtime-risk файлом, где визуальные правки могли задеть таймеры, lifecycle-token и restart. Runtime вынесен первым, потому что это снижает риск зависаний без пересборки UI, поля или боевой логики.
+- Затронутые файлы: `src/battle/battle-runtime.js`, `src/battle/battle-view.js`, `src/battle/README.md`, `src/architecture.md`, `PROJECT_REVIEW.md`, `VERSIONS.md`.
+- Проверка: выполнены `node --check src/battle/battle-runtime.js`, `node --check src/battle/battle-view.js`, `node --check src/battle/battle-module.js`, `node scripts/check-battle-engine.mjs`, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`. Визуальный in-app Browser-smoke не выполнен: браузерный инструмент в этой сессии не был доступен через tool search.
+
+### 2026-06-06 - Добавлен документ полного ревью проекта
+
+- Создан `PROJECT_REVIEW.md` с результатами проверки кода, данных, локалей, ассетов, архитектурных рисков, UI-рисков и тестовой инфраструктуры.
+- В документе зафиксированы findings от P1 до P3, отдельный список недостающих проверок, data/locale gaps, порядок исправлений batch-ами и regression checklist.
+- Код и игровые данные в этом проходе не исправлялись: ревью намеренно отделено от ремонта, чтобы следующие задачи можно было выполнять маленькими проверяемыми изменениями.
+- Контекст версии: проект вырос до состояния, где новые UI/боевые правки легко цепляют старые сценарии. Отдельный review-документ нужен как карта ремонта, а не как очередной устный список "надо бы потом".
+- Затронутые файлы: `PROJECT_REVIEW.md`, `VERSIONS.md`.
+- Проверка: выполнены `node scripts/check-encoding.mjs`, чтение `PROJECT_REVIEW.md` как UTF-8-текста и контрольное чтение верхней записи `VERSIONS.md`.
+
+### 2026-06-05 - Уточнен стиль слотов активных кнопок боя
+
+- Слот `bag` в левой колонке боя возвращен к стилю обычной кнопки меню: светлая полупрозрачная подложка, мягкая тень и активная золотая подсветка без темной впуклой ванны.
+- Слоты `item_skull`, `item_swap`, `item_time` и `gold` оставлены впуклыми, но стали немного светлее: осветлена внутренняя подложка, кант и нижний внутренний блик.
+- Query-version CSS обновлен до `2026-06-05-battle-special-slots-light-bag`.
+- Контекст версии: сумка является кнопкой открытия инвентаря, поэтому визуально должна быть ближе к `little_menu`, а череп/перчатка/часы/золото остаются активными предметами в отдельных углубленных слотах. Не стоит снова красить всю колонку одним общим стилем без отдельного правила для `bag`.
+- Затронутые файлы: `index.html`, `src/styles.css`, `VERSIONS.md`.
+- Проверка: выполнены CSS braces check, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-05 - Активные кнопки боя стали визуально впуклыми
+
+- Левые кнопки активных предметов боя получили темную внутреннюю подложку, более яркий кант и inset-тени, чтобы слот читался как углубление, а не выпуклая плитка.
+- Для hover и активного состояния оставлен яркий край, но без возврата к прежней выпуклой оптике.
+- Query-version CSS обновлен до `2026-06-05-battle-special-slots-inset`.
+- Контекст версии: активные предметы должны ощущаться как слоты/гнезда под иконки, а не как выступающие карточки. Не стоит возвращать общий светлый верхний блик для этой группы, иначе кнопки снова будут спорить с новым направлением интерфейса боя.
+- Затронутые файлы: `index.html`, `src/styles.css`, `VERSIONS.md`.
+- Проверка: выполнены CSS braces check, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-05 - Окно инвентаря боя поднято от нижней границы
+
+- В `positionBattleInventory()` вертикальный сдвиг всплывающего окна инвентаря увеличен: панель теперь поднимается от сумки на половину своей высоты, то есть еще на четверть выше прежнего положения.
+- Добавлен нижний ограничитель по границе боевого frame, чтобы окно инвентаря не заходило за нижний край при низко расположенной сумке.
+- Контекст версии: после выравнивания сумки по нижней грани окна лечения старая позиция инвентаря стала слишком низкой. Не стоит лечить это ручным CSS-сдвигом самой панели: позиция должна считаться от текущих размеров сумки, панели и боевого окна.
+- Затронутые файлы: `src/battle/battle-view.js`, `VERSIONS.md`.
+- Проверка: выполнены `node --check src/battle/battle-view.js`, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-05 - Сумка боя выровнена по шкале лечения
+
+- Слот сумки в левой колонке боя теперь получает динамический вертикальный отступ, чтобы его нижняя грань совпадала с нижней гранью окна лечения игрока.
+- Всплывающее окно инвентаря не получило отдельный ручной сдвиг: оно продолжает рассчитываться от текущего `getBoundingClientRect()` сумки, поэтому автоматически открывается от новой позиции.
+- Query-version CSS обновлен до `2026-06-05-battle-bag-heal-align`.
+- Контекст версии: сумка является отдельной кнопкой доступа к инвентарю, а не частью группы активных предметов. Поэтому выравнивание сделано только для `bag`, без сдвига черепа, перчатки, часов и золота.
+- Затронутые файлы: `index.html`, `src/battle/battle-view.js`, `src/styles.css`, `VERSIONS.md`.
+- Проверка: выполнены `node --check src/battle/battle-view.js`, CSS braces check, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-05 - Уточнена геометрия кнопки battle mini-menu
+
+- Заголовок врага теперь состоит из строки `.battle-scaffold-enemy-header-row`: слева укороченная плашка имени/стадии, справа отдельная квадратная кнопка `little_menu`.
+- Кнопка `little_menu` увеличена до высоты строки заголовка врага и остается квадратной.
+- Правый край кнопки выровнен по правому краю правого блока боя, то есть по линии окна врага.
+- Query-version CSS обновлен до `2026-06-05-battle-menu-header-square`.
+- Контекст версии: кнопка меню должна быть самостоятельным управляющим слотом, а не абсолютным элементом поверх плашки имени. Так плашка имени предсказуемо укорачивается, а кнопка не перекрывает текст и не уезжает при изменении масштаба боя.
+- Затронутые файлы: `index.html`, `src/battle/battle-view.js`, `src/styles.css`, `VERSIONS.md`.
+- Проверка: выполнены `node --check src/battle/battle-view.js`, CSS braces check, `node scripts/check-encoding.mjs`, `node scripts/check-battle-engine.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-05 - Кнопка battle mini-menu перенесена в заголовок врага
+
+- Кнопка `little_menu` больше не занимает первый слот в левой колонке спецпредметов боя.
+- В `battle-view.js` добавлена отдельная кнопка меню внутри `.battle-scaffold-enemy-header`: она расположена справа от имени/стадии врага и слегка выходит за край панели заголовка.
+- Всплывающая панель `Сдаться / Настройки / Лог` теперь якорится к новой кнопке в заголовке, а не к старой позиции в колонке спецпредметов.
+- Левая колонка спецпредметов начинается с черепа; перчатка, часы, золото и сумка сдвинуты вверх на один слот, чтобы не оставлять пустое место после переезда меню.
+- Query-version CSS обновлен до `2026-06-05-battle-menu-header`.
+- Контекст версии: меню боя стало частью верхнего правого блока управления, а не расходником в колонке активных предметов. Не стоит возвращать `little_menu` в `renderBattleInventory`, иначе кнопка снова начнет конкурировать с черепом/перчаткой/часами и всплывающая панель будет якориться в неправильном месте.
+- Затронутые файлы: `index.html`, `src/battle/battle-view.js`, `src/battle/README.md`, `src/styles.css`, `VERSIONS.md`.
+- Проверка: выполнены `node --check src/battle/battle-view.js`, CSS braces check, `node scripts/check-encoding.mjs`, `node scripts/check-battle-engine.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`. Визуальный in-app Browser-smoke не выполнен: браузерный инструмент упал на `windows sandbox failed: spawn setup refresh`.
+
+### 2026-06-05 - Увеличены шрифты окна настроек
+
+- В `data/settings/map-ui.jsonc` добавлена настройка `settingsMenuFontScale` со значением `1.5`.
+- Окно настроек сохраняет прежнюю ширину и общий масштаб панели, но заголовок, подписи, select, кнопки и range-контролы внутри стали крупнее.
+- Query-version CSS обновлен до `2026-06-05-settings-menu-font-scale`.
+- Контекст версии: окно настроек содержит мелкие подписи и контролы, поэтому одного мягкого масштаба панели недостаточно. Шрифт вынесен отдельным параметром, чтобы повышать читаемость без раздувания всех overlay-окон и без изменения геометрии самой панели.
+- Затронутые файлы: `index.html`, `src/map-module.js`, `src/data-validation.js`, `src/styles.css`, `data/settings/map-ui.jsonc`, `data/settings/map-ui.example.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Проверка: выполнены `node --check src/map-module.js`, `node --check src/data-validation.js`, CSS braces check, парсинг всех `data/**/*.json/jsonc`, `validateGameData`, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-05 - Добавлен мягкий масштаб окна настроек
+
+- В `data/settings/map-ui.jsonc` добавлены настройки `settingsMenuScaleReductionDivisor` и `settingsMenuScaleMultiplier`.
+- Окно настроек теперь уменьшается медленнее общего map overlay и дополнительно масштабируется на `1.2`, чтобы панель, подписи и кнопки не становились слишком мелкими на небольшом viewport.
+- Остальные overlay-окна карты остаются на основном масштабе: награды, магазин, лечение, лог, сдача и диалоги не получили новый множитель, чтобы не сломать уже выровненную центральную геометрию.
+- Query-version CSS обновлен до `2026-06-05-settings-menu-derived-scale`.
+- Контекст версии: настройки - это часто используемое окно с мелкими контролами, поэтому ему нужен такой же мягкий shrink, как HUD и главным кнопкам. Масштаб применен только к `settings-panel`, а не ко всему overlay, чтобы не повторить старый баг с окнами, уезжающими от центра.
+- Затронутые файлы: `index.html`, `src/map-module.js`, `src/data-validation.js`, `src/styles.css`, `data/settings/map-ui.jsonc`, `data/settings/map-ui.example.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Проверка: выполнены `node --check src/map-module.js`, `node --check src/data-validation.js`, CSS braces check, парсинг всех `data/**/*.json/jsonc`, `validateGameData`, `node scripts/check-encoding.mjs`, `node scripts/check-battle-engine.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-05 - Добавлены производные масштабы map UI
+
+- В `data/settings/map-ui.jsonc` добавлены настройки `hudScaleReductionDivisor`, `topButtonsScaleReductionDivisor`, `mainMenuScaleReductionDivisor` и `mainMenuScaleMultiplier`.
+- HUD-инвентарь и верхние кнопки карты теперь уменьшаются медленнее общего map UI: при общем уменьшении на 45% и делителе `1.5` они уменьшаются на 30%.
+- Главное меню использует ту же замедленную формулу уменьшения и дополнительно умножается на `1.2`, поэтому заголовок, кнопки и шрифты стали крупнее на 20%.
+- Overlay-окна карты остаются на основном масштабе, чтобы награды, диалоги и торговля не меняли уже выровненную центральную геометрию.
+- Query-version CSS обновлен до `2026-06-05-map-ui-derived-scale`.
+- Контекст версии: разные части UI читаются по-разному. HUD и верхние кнопки не должны становиться микроскопическими так же быстро, как большие окна; стартовое меню должно быть чуть крупнее, потому что это первый экран, а не техническая панель.
+- Затронутые файлы: `index.html`, `src/map-module.js`, `src/data-validation.js`, `src/styles.css`, `data/settings/map-ui.jsonc`, `data/settings/map-ui.example.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Проверка: выполнены `node --check src/map-module.js`, `node --check src/data-validation.js`, CSS braces check, парсинг всех `data/**/*.json/jsonc`, `validateGameData`, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-05 - Добавлен масштаб стартового меню
+
+- Контент главного меню перенесен в `main-menu-frame/main-menu-panel`: фон остается полноэкранным, а блок с названием и кнопками масштабируется через текущий `--map-ui-current-scale`.
+- В расчет map UI масштаба добавлены root-переменные `--map-ui-design-width` и `--map-ui-design-height`, чтобы стартовое меню могло использовать тот же виртуальный размер без отдельной системы.
+- Query-version CSS обновлен до `2026-06-05-main-menu-scale`.
+- Контекст версии: стартовое меню должно масштабировать интерфейсные элементы, но не фон. Масштабировать весь `main-menu` целиком нельзя, иначе фон перестанет надежно покрывать viewport и начнет выглядеть как картинка в рамке, а не экран меню.
+- Затронутые файлы: `index.html`, `src/map-module.js`, `src/styles.css`, `data/README.md`, `VERSIONS.md`.
+- Проверка: выполнены `node --check src/map-module.js`, CSS braces check, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-05 - Исправлено позиционирование scaled map UI
+
+- Постоянный UI карты больше не центрируется внутри виртуального frame: HUD масштабируется от верхнего левого угла viewport, а верхние кнопки карты - от верхнего правого угла viewport.
+- Overlay-окна продолжают использовать виртуальный центр, но наградное окно теперь сохраняет `translate(-50%, -50%)` внутри `rewardWindowIn`, поэтому окно повышения уровня и награды остается по центру во время и после анимации.
+- Query-version CSS обновлен до `2026-06-05-map-ui-scale-fix`.
+- Контекст версии: постоянные HUD-кнопки и overlay-окна требуют разной привязки. HUD должен держаться за края экрана, а окна - за центр. Смешивать эти две системы нельзя: получим ровно тот же съезд вправо/вниз, только с новым именем.
+- Затронутые файлы: `index.html`, `src/map-module.js`, `src/styles.css`, `data/README.md`, `VERSIONS.md`.
+- Проверка: выполнены `node --check src/map-module.js`, CSS braces check, `node scripts/check-encoding.mjs`.
+
+### 2026-06-05 - Добавлен адаптивный масштаб map UI
+
+- В `data/settings/map-ui.jsonc` добавлен раздел `layout`: виртуальный размер интерфейса карты, отступ от viewport, мягкое увеличение на больших экранах и нижний предел масштаба.
+- Постоянный интерфейс карты (`map-actions`, `status-row`, `map-hud`) перенесен в отдельный `map-ui-frame/map-ui-panel`: он масштабируется целиком, но `map-board`, точки, пути, птицы и прокрутка карты остаются в прежней геометрии.
+- Overlay-окна карты (`settings`, `event log`, `surrender`, `shop`, `heal`, `reward`, `dialog`, `eventDialog`) получили общий `map-ui-overlay-frame/map-ui-overlay-panel` и масштабируются в той же виртуальной системе.
+- Диалоговый персонаж теперь считается внутри виртуальной сцены: `characterWidthPct` задает процент от dialog panel, а не `vw`, поэтому персонаж, текст и ответы держат композицию вместе.
+- Валидатор проверяет `map-ui.layout`, а `data/settings/map-ui.example.jsonc` получил русские комментарии к новым настройкам.
+- Query-version CSS обновлен до `2026-06-05-map-ui-scale`.
+- Контекст версии: это отдельная система масштаба для интерфейса карты, а не масштабирование самой карты. Не стоит переносить `transform` на `map-board`, иначе координаты нод, пути, птицы и drag-scroll начнут жить в разных реальностях, а это уже не интерфейсная правка, а ритуал вызова багов.
+- Затронутые файлы: `index.html`, `src/map-module.js`, `src/data-validation.js`, `src/styles.css`, `data/settings/map-ui.jsonc`, `data/settings/map-ui.example.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Проверка: выполнены `node --check src/map-module.js`, `node --check src/data-validation.js`, `node --check src/battle/battle-view.js`, CSS braces check, парсинг всех `data/**/*.json/jsonc`, `validateGameData`, `node scripts/check-encoding.mjs`, `node scripts/check-battle-engine.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`. Визуальный in-app Browser-smoke не выполнен: браузерный инструмент упал на запуске сессии.
+
+### 2026-06-05 - Стабилизированы кнопки карты и overlay-окна
+
+- Верхние кнопки карты `сдаться`, `настройки` и `лог` получили отдельный квадратный CSS-контракт: `aspect-ratio: 1 / 1`, запрет flex/grid-растяжения, нулевые минимальные размеры, `overflow: hidden` и абсолютное центрирование иконок.
+- Мобильное правило `.map-actions` больше не растягивает кнопки через `flex: 1`: панель может переноситься, но сами icon-only кнопки не превращаются в прямоугольники.
+- Overlay-окна карты (`settings`, `event log`, `surrender`, `shop`, `heal`, `reward`, `dialog`, `eventDialog`) получили безопасные `max-width/max-height`, `min-width/min-height: 0`, `box-sizing` и внутренний `overflow`, чтобы маленький viewport не превращал окно в археологический раскоп интерфейса.
+- Картинки и иконки внутри shop/heal/reward/dialog окон закреплены через block/contain-центрирование, чтобы baseline обычного `img` не тянул элементы вниз.
+- Query-version CSS обновлен до `2026-06-05-map-overlay-stability`.
+- Контекст версии: карта не использует боевой виртуальный `transform`-layout, поэтому ее верхние кнопки и окна должны держаться отдельным CSS-контрактом. Это не стоит смешивать с масштабом боя: иначе одна правка будет чинить battle overlay и ломать map overlay с той же невинной улыбкой.
+- Затронутые файлы: `src/styles.css`, `index.html`, `data/README.md`, `VERSIONS.md`.
+- Проверка: выполнены `node --check src/map-module.js`, `node --check src/battle/battle-view.js`, `node --check src/data-validation.js`, CSS braces check, парсинг всех `data/**/*.json/jsonc`, `validateGameData`, `node scripts/check-encoding.mjs`, `node scripts/check-battle-engine.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-05 - Иконки mini-menu закреплены по центру
+
+- Иконка якоря `little_menu` внутри overlay теперь центрируется абсолютно от середины кнопки.
+- Иконки кнопок `сдаться`, `настройки` и `лог` внутри mini-menu overlay тоже центрируются абсолютно и больше не зависят от baseline/line-height поведения обычного `img`.
+- Query-version CSS обновлен до `2026-06-05-mini-menu-icon-center`.
+- Контекст версии: слоты mini-menu уже были квадратными, но сами иконки при сильном уменьшении могли визуально сползать вниз. Центрирование иконок должно быть отдельным правилом, потому что квадратная кнопка сама по себе не гарантирует стабильное положение вложенного изображения.
+- Затронутые файлы: `src/styles.css`, `index.html`, `data/README.md`, `VERSIONS.md`.
+- Проверка: запланированы CSS braces check, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-05 - Overlay-кнопки боя закреплены квадратами
+
+- Кнопка-якорь `little_menu` внутри overlay теперь рассчитывается так же, как сумка: берется максимальная сторона исходной кнопки, а позиция центрируется вокруг нее.
+- Overlay-кнопки сумки, мини-меню и кнопки, которые раскрывает мини-меню, получили жесткий квадратный CSS-контракт: `aspect-ratio: 1 / 1`, `min-width/min-height: 0`, запрет grid/flex-растяжения, `line-height: 0`, `overflow: hidden`.
+- Панель мини-меню теперь явно задает квадратную grid-колонку и квадратные auto-rows по `--battle-popup-top-button-size`, чтобы кнопки сдачи, настроек и лога не вытягивались при сильном уменьшении окна.
+- Query-version CSS обновлен до `2026-06-05-battle-overlay-square-buttons`.
+- Контекст версии: при очень маленьком масштабе браузерные правила кнопок и grid-растяжения могли визуально превращать квадратные overlay-кнопки в прямоугольники. Это нужно держать как отдельный контракт, потому что сами overlay живут вне масштабируемой боевой панели.
+- Затронутые файлы: `src/battle/battle-view.js`, `src/styles.css`, `index.html`, `data/README.md`, `VERSIONS.md`.
+- Проверка: запланированы `node --check src/battle/battle-view.js`, CSS braces check, `node scripts/check-battle-engine.mjs`, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-05 - Кнопка сумки в overlay закреплена квадратом
+
+- Кнопка-якорь сумки, которая показывается поверх затемнения при открытом инвентаре, теперь получает квадратный размер: берется максимальная сторона исходной кнопки, а позиция центрируется вокруг нее.
+- Иконка сумки внутри overlay-кнопки теперь занимает фиксированные `82%` ширины и высоты кнопки, а не только ограничивается через `max-width/max-height`.
+- Query-version CSS обновлен до `2026-06-05-bag-anchor-square`.
+- Контекст версии: исходная кнопка сумки в боевом HUD трансформируется CSS-сдвигами и масштабом. Если слепо копировать ее `getBoundingClientRect()` как ширину и высоту overlay-кнопки, при открытии инвентаря кнопка может визуально стать прямоугольной, а иконка - съехать вниз.
+- Затронутые файлы: `src/battle/battle-view.js`, `src/styles.css`, `index.html`, `data/README.md`, `VERSIONS.md`.
+- Проверка: запланированы `node --check src/battle/battle-view.js`, CSS braces check, `node scripts/check-battle-engine.mjs`, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-05 - Плашка сумки боя поднята выше
+
+- Позиция окна сумки теперь рассчитывает высоту панели по количеству слотов и поднимает панель вверх на четверть этой высоты относительно кнопки сумки.
+- Добавлен верхний предохранитель: если расчетный сдвиг уводит панель выше отмасштабированного боевого wrapper'а, она прижимается к верхнему допустимому краю.
+- Контекст версии: при маленьком размере окна главная проблема была не только в масштабе, но и в вертикальной позиции. Простой сдвиг вверх уменьшает выход панели за нижний край без новой сложной системы позиционирования.
+- Затронутые файлы: `src/battle/battle-view.js`, `data/README.md`, `VERSIONS.md`.
+- Проверка: запланированы `node --check src/battle/battle-view.js`, CSS braces check, `node scripts/check-battle-engine.mjs`, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-05 - Исправлен масштаб окна сумки боя
+
+- У окна сумки убран жесткий минимальный размер слота `36px`: теперь слоты предметов уменьшаются линейно вместе с масштабом боевого окна.
+- Числа количества предметов в сумке теперь получают отдельные масштабируемые размеры, отступы и минимальную ширину, чтобы на маленьком экране не становиться размером со слот.
+- Позиция окна сумки теперь ограничивается правым краем отмасштабированного боевого wrapper'а, а не только viewport'ом. Если справа мало места, панель сдвигается внутрь окна боя.
+- Query-version CSS обновлен до `2026-06-05-battle-inventory-scale-fix`.
+- Контекст версии: сумка является отдельным `fixed`-оверлеем и не может автоматически наследовать `transform` основного окна боя. Все ее размеры должны явно вычисляться из текущего масштаба, иначе на маленьких экранах сумка начинает отставать от поля боя и вылезать за границы.
+- Затронутые файлы: `src/battle/battle-view.js`, `src/styles.css`, `index.html`, `data/README.md`, `VERSIONS.md`.
+- Проверка: запланированы `node --check src/battle/battle-view.js`, CSS braces check, парсинг JSON/JSONC, `node scripts/check-battle-engine.mjs`, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-05 - Масштаб плашек сумки и мини-меню боя
+
+- Плашки сумки и мини-меню теперь получают тот же `--battle-current-scale`, что и основное окно боя.
+- Размеры кнопок, слотов, отступов, скруглений и сдвига всплывающих плашек рассчитываются из текущего масштаба боя в JS и передаются в CSS отдельными переменными.
+- Отступ панели сумки от кнопки сумки тоже учитывает текущий масштаб, чтобы на маленьких экранах панель не выглядела как инородный кирпич сбоку.
+- Query-version CSS обновлен до `2026-06-05-battle-popover-scale`, чтобы браузер не держался за старый файл стилей с трогательной, но вредной верностью.
+- Контекст версии: мини-меню и сумка являются отдельными `fixed`-оверлеями, а не дочерними элементами масштабируемой `.battle-scaffold-panel`. Поэтому их нельзя оставлять на наследовании масштаба: они его просто не наследуют.
+- Затронутые файлы: `src/battle/battle-view.js`, `src/styles.css`, `index.html`, `data/README.md`, `VERSIONS.md`.
+- Проверка: запланированы `node --check src/battle/battle-view.js`, CSS braces check, парсинг JSON/JSONC, `node scripts/check-battle-engine.mjs`, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-04 - Единый адаптивный масштаб окна боя
+
+- `layout.minScale` снижен до `0.1`, чтобы мобильный экран мог сжать бой ниже 50% и уместить его по высоте.
+- Исправлена центровка уменьшенного боя: добавлен `.battle-scaffold-frame`, который получает реальный отмасштабированный размер, а внутренняя `.battle-scaffold-panel` остается виртуальным кадром `designWidthPx` x `designHeightPx`.
+- `transform-origin` у боевой панели перенесен в `top left`, чтобы масштабированная панель не уезжала относительно собственного wrapper'а при уменьшении окна браузера.
+- В `data/settings/battle-ui.jsonc` добавлен блок `layout`: виртуальный размер окна боя, отступ от viewport, минимальный масштаб и мягкое увеличение на больших экранах.
+- `battle-scaffold-panel` больше не подбирает собственную ширину/высоту через `vh/vw`: бой верстается в стабильном размере `designWidthPx` x `designHeightPx` и масштабируется целиком через `--battle-scale`.
+- На больших экранах лишний масштаб применяется частично через `upscaleFactor`: при значении `0.5` экран, который мог бы вместить бой в масштабе `2`, показывает его в масштабе `1.5`.
+- При изменении размера окна браузера бой пересчитывает масштаб, положение мини-меню/сумки и вспомогательные отступы боковых кнопок.
+- Старые battle-правила внутри мобильного `@media (max-width: 720px)` убраны, чтобы маленький viewport не перестраивал бой в другой layout поверх общего масштабирования.
+- Контекст версии: боевой UI был подогнан вручную под один размер экрана, а отдельные `vh/vw/clamp`-правила заставляли его выглядеть по-разному на разных мониторах. Единый виртуальный размер нужно держать как базовое правило; точечные viewport-подстройки внутри боя стоит добавлять только после проверки, что они не ломают масштабирование целого окна.
+- Затронутые файлы: `src/battle/battle-view.js`, `src/styles.css`, `src/data-validation.js`, `data/settings/battle-ui.jsonc`, `data/settings/battle-ui.example.jsonc`, `data/README.md`, `src/battle/README.md`, `index.html`, `VERSIONS.md`.
+- Проверка: запланированы `node --check`, парсинг JSON/JSONC, `node scripts/check-battle-engine.mjs`, `node scripts/check-encoding.mjs` и browser-smoke на нескольких размерах окна.
+
+### 2026-06-04 - Экран загрузки и предзагрузка ассетов
+
+- При открытии страницы теперь показывается отдельный экран загрузки: до главного меню игра читает настройки, локаль и предзагружает базовые ассеты меню, курсоров и звука.
+- Перед стартом забега после валидации данных игра предзагружает локальные ассеты активной кампании: карты, предметы, `map-ui`, `battle-ui`, врагов, фоны боев, награды, звуки и другие пути из `data/Assets`.
+- Добавлен `src/asset-preloader.js`, который рекурсивно собирает пути к локальным изображениям и аудио из уже загруженных JSON/JSONC-объектов и грузит их с тем же `resolveAssetPath`, что использует игра.
+- `validateGameData()` теперь возвращает `battleConfigCache` с уже прочитанными `battle-ui` и enemy JSON, чтобы предзагрузчик не перечитывал эти файлы отдельно.
+- Добавлены локализованные ключи `loading.*` во все активные локали.
+- Контекст версии: первый показ игры после публикации на GitHub Pages не должен выглядеть как зависание из-за поздней загрузки картинок. Загрузчик нужно держать автоматическим и строить список ассетов из данных, а не вести ручной список, иначе он быстро устареет и снова начнет пропускать важные файлы.
+- Затронутые файлы: `index.html`, `src/map-module.js`, `src/asset-preloader.js`, `src/data-validation.js`, `src/styles.css`, `data/locales/en.json`, `data/locales/ru.json`, `data/locales/new_ru.json`, `data/README.md`, `VERSIONS.md`.
+- Проверка: выполнены `node --check src/map-module.js`, `node --check src/asset-preloader.js`, `node --check src/data-validation.js`, CSS braces check, парсинг JSON/JSONC, `node scripts/check-battle-engine.mjs`, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-04 - Активное золото в бою
+
+- Кнопка `gold` в боевом окне теперь работает как активный инструмент: при нажатии золото берется "в руку", рядом с курсором показывается иконка золота, а повторное нажатие отменяет режим без траты золота.
+- При активном золоте наведение на предмет поля показывает его `goldprice`; если у предмета нет корректного `goldprice`, поверх предмета показывается красный `X`.
+- Клик по предмету с ценой списывает указанное количество золота и заменяет предмет случайным предметом из каталога, у которого `goldloot: 1`.
+- Выбранный через золото предмет проходит через существующие player `transform_chance`, поэтому шансы усиленных версий работают так же, как при обычной генерации поля.
+- Итоговый предмет после золотого преобразования не может иметь тот же `itemId`, что и исходная клетка: если применить золото к `granate`, `granate` не останется в этой клетке даже при наличии `goldloot: 1`.
+- Коробки остаются неактивными: предмет под коробкой не показывает рабочую цену и не может быть преобразован золотом. Лианы не блокируют преобразование золотом.
+- Контекст версии: золото становится управляемым способом очистки/переброса неудобных предметов на поле, но источник доступных целей остается в `items.jsonc`, а не в коде. Не стоит хардкодить список возможной добычи в `battle-view`, иначе `goldloot` перестанет быть настройкой баланса.
+- Затронутые файлы: `src/battle/battle-engine.js`, `src/battle/battle-view.js`, `src/styles.css`, `scripts/check-battle-engine.mjs`, `data/README.md`, `index.html`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-view.js`, CSS braces check, `node scripts/check-battle-engine.mjs`, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-04 - Иконка урона врага перенесена в окно противника
+
+- Значение урона врага больше не отображается в верхней плашке рядом с таймером ярости.
+- Внутри окна противника добавлен крупный значок урона над нижней полосой агрессии.
+- Значок урона сдвинут на `20px` левее относительно первой позиции, чтобы лучше лечь в окно противника.
+- Число урона теперь отображается прямо внутри иконки урона и принудительно закреплено слоем поверх самой иконки.
+- Число урона внутри иконки опущено на `8px` и уменьшено примерно на `20%`, чтобы лучше попасть в центр рисунка.
+- Новый значок сохраняет `data-battle-stat="enemy-damage"`, поэтому светлячки урона игроку продолжают брать источник из иконки урона врага.
+- Query-version CSS обновлен до `2026-06-04-enemy-damage-number`, чтобы браузер подтянул новую компоновку.
+- Контекст версии: урон врага должен читаться как часть угрозы в портрете противника, рядом с агрессией, а не как отдельный header-параметр. Не стоит возвращать его в верхнюю плашку без пересмотра всей правой колонки.
+- Затронутые файлы: `src/battle/battle-view.js`, `src/styles.css`, `index.html`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-view.js`, CSS braces check, `node scripts/check-battle-engine.mjs`, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-04 - Увеличено окно информации о ярости
+
+- Нижнее окно информации о ярости в правой части боя увеличено по высоте примерно в 2.2 раза.
+- `battle-scaffold-enemy-info` получил увеличенную адаптивную минимальную высоту, а `battle-scaffold-ultimate` растягивается на доступную область.
+- Окно информации о ярости сдвинуто ниже на `111px`, чтобы увеличение высоты не воспринималось как рост вверх к окну противника.
+- Окно противника растянуто вниз на тот же offset, чтобы визуально занимать пространство между заголовком врага и окном информации о ярости.
+- Query-version CSS обновлен до `2026-06-04-enemy-window-fill-rage-gap`, чтобы браузер подтянул новую высоту и позицию подложки.
+- Контекст версии: описание ярости должно читаться как отдельный важный блок, а не как маленькая строка под портретом врага. Не стоит возвращать высоту к авто-размеру по тексту, пока ярость остаётся ключевой механикой боя.
+- Затронутые файлы: `src/styles.css`, `index.html`, `VERSIONS.md`.
+- Проверка: CSS braces check, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-04 - Мини-меню боя через кнопку little_menu
+
+- Верхние кнопки боя `сдаться`, `настройки` и `лог` убраны из постоянного верхнего положения и перенесены в раскрывающуюся панель.
+- Кнопка `little_menu` в колонке специальных предметов открывает и закрывает эту панель.
+- Пока панель открыта, окно боя сильно затемняется, клик вне панели закрывает меню и не передается игровому полю.
+- Затемнение ослаблено после проверки компоновки, сама кнопка `little_menu` дублируется поверх затемнения и остается видимой/кликабельной.
+- Панель мини-меню привязана к текущей экранной позиции кнопки черепа, чтобы выезжать рядом с боевыми действиями, а не из общего верхнего HUD.
+- Открытое мини-меню ставит runtime боя на паузу; при закрытии меню таймеры возобновляются, если бой еще активен.
+- Query-version CSS обновлен до `2026-06-04-battle-mini-menu`, чтобы браузер подтянул новые стили.
+- Контекст версии: верхние боевые действия редко нужны каждую секунду, поэтому они уходят в мини-меню и освобождают экран боя. Не стоит возвращать эти кнопки в постоянный верхний HUD без отдельной причины, иначе мы снова перегрузим интерфейс.
+- Затронутые файлы: `src/battle/battle-view.js`, `src/styles.css`, `src/battle/README.md`, `index.html`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-view.js`, `node scripts/check-battle-engine.mjs`, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-03 - Уменьшена высота окна врага и выровнено описание ярости
+
+- Высота `battle-scaffold-enemy-visual` в правой колонке ограничена отдельной строкой сетки `clamp(290px, 44vh, 430px)`, чтобы окно противника стало ниже примерно на 20% относительно прежнего растягивания на все свободное место.
+- Правая колонка теперь выравнивает ряды сверху через `align-content: start`, поэтому нижняя инфо-подложка поднимается вслед за уменьшенным окном врага.
+- Внутри нижней подложки описание ярости выровнено симметрично: `battle-scaffold-ultimate` больше не имеет внешнего бокового отступа, занимает всю доступную ширину и использует равные внутренние отступы.
+- Пустой технический контейнер `battle-scaffold-stats` скрывается, чтобы не создавать лишний перекос над описанием ярости.
+- Query-version CSS обновлен до `2026-06-03-enemy-visual-height`.
+- Контекст версии: это маленькая визуальная итерация правой колонки. Цель - уменьшить окно врага, не ломая уже перенесенные полосы здоровья/агрессии и header с уроном/яростью.
+- Затронутые файлы: `src/styles.css`, `index.html`, `VERSIONS.md`.
+- Проверка: CSS braces check, `node --check src/battle/battle-view.js`, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-03 - Плашка заголовка врага с уроном и яростью
+
+- Над окном врага добавлена полупрозрачная плашка шириной правой колонки.
+- Имя врага и стадия собраны в левую часть плашки и выровнены влево.
+- Урон врага и таймер ярости перенесены в правую часть этой же плашки.
+- Runtime-обновление таймера ярости и warning-анимация теперь ищут иконку ярости в новом header-контейнере.
+- Источник анимации урона игроку теперь также ищет иконку урона в header, а не только в старом блоке статистики.
+- Query-version CSS обновлен до `2026-06-03-enemy-header-panel`.
+- Контекст версии: header врага должен стать одной читаемой верхней полосой над портретом, а не набором отдельных текстовых блоков. Это освобождает нижний инфо-блок под описание ярости и будущие элементы.
+- Затронутые файлы: `src/battle/battle-view.js`, `src/styles.css`, `index.html`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-view.js`, CSS braces check, `node scripts/check-encoding.mjs`, `node scripts/check-battle-engine.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-03 - Имя и стадия врага вынесены над окном врага
+
+- Видимая кнопка ручного перемешивания убрана из текущего интерфейса боя, но код `handleManualBattleShuffle()` и связанная логика не удалялись.
+- Для правой колонки боя добавлен отдельный header: имя врага и стадия теперь располагаются над `battle-scaffold-enemy-visual`.
+- Окно врага с задником и персонажем смещено ниже за счет новой сетки правой колонки `header / visual / info`.
+- Блок информации под окном врага оставлен для урона, ярости и описания ульты.
+- Query-version CSS обновлен до `2026-06-03-enemy-header-shuffle-hidden`.
+- Контекст версии: это маленькая итерация по правой колонке. Кнопку перемешивания убираем только визуально, чтобы позже вернуть ее в другое место без повторной сборки механики.
+- Затронутые файлы: `src/battle/battle-view.js`, `src/styles.css`, `index.html`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-view.js`, CSS braces check, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-03 - Полосы здоровья и агрессии врага перенесены на картинку
+
+- Полоса здоровья врага теперь рендерится поверх `battle-scaffold-enemy-visual` в верхней части изображения врага.
+- Полоса агрессии врага теперь рендерится поверх `battle-scaffold-enemy-visual` в нижней части изображения врага.
+- Задник и персонаж врага увеличены за счет большего visual-блока и более крупного изображения стадии.
+- Анимации и светлячки обновлены так, чтобы искать здоровье врага в новом overlay-контейнере, а не только в текстовом блоке статистики.
+- Query-version CSS обновлен до `2026-06-03-enemy-visual-meters`.
+- Контекст версии: это отдельная маленькая итерация по правой части боя. Полосы врага должны читаться как часть сцены с персонажем, а не как отдельные строки в инфо-плашке; не стоит возвращать их в `enemyStats`, пока мы собираем интерфейс по частям.
+- Затронутые файлы: `src/battle/battle-view.js`, `src/styles.css`, `index.html`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-view.js`, CSS braces check, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-03 - Увеличена подложка окна боя
+
+- `battle-scaffold-panel` получил фиксированный landscape-кадр: ширина до `1320px`, высота до `760px`, с ограничением по текущему viewport.
+- После проверки подложка усилена до более вытянутого кадра: ширина до `1500px`, высота до `860px`, минимальная высота до `760px`, а внешний отступ overlay уменьшен до `8px`.
+- В `index.html` добавлен query-version к `src/styles.css`, чтобы браузер не показывал старую CSS-версию из кэша после изменения размеров.
+- Следующей маленькой правкой окно переведено в fit-режим: внутренний scroll у `battle-scaffold-panel` отключен, layout занимает высоту панели, поле ограничено доступной высотой, а размеры слотов инвентаря стали адаптивными через `clamp()` от высоты viewport.
+- Query-version CSS обновлен до `2026-06-03-battle-panel-fit`, чтобы браузер подтянул новую fit-версию стилей.
+- Внутреннюю компоновку боя, кнопки, механику и JSON-форматы не меняли.
+- Контекст версии: это первая маленькая итерация по пересборке боевого интерфейса. Сначала нужно получить правильный размер общей подложки, а уже потом двигать отдельные блоки; иначе снова получится дорогой ремонт с непонятной причиной поломки.
+- Затронутые файлы: `src/styles.css`, `VERSIONS.md`.
+- Проверка: CSS braces check, `node --check src/battle/battle-view.js`, `node scripts/check-encoding.mjs`, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-03 - Первый срез разборки map-module
+
+- Генерация графа карты вынесена из `src/map-module.js` в новый модуль `src/map/map-generation.js`.
+- `src/map-module.js` остался фасадом: он по-прежнему запускает игру, загружает данные, рендерит карту и вызывает `generateMap()`, но больше не хранит внутри себя правила выбора событий и построения дорог.
+- Добавлена короткая карта ответственности модулей `src/architecture.md`.
+- Контекст версии: это первый безопасный шаг уменьшения больших файлов без изменения поведения. Не стоит возвращать генерацию карты обратно в `map-module.js`: иначе файл снова станет смесью UI, данных, дорог и событий, где любой маленький фикс будет играть в русскую рулетку с соседними механиками.
+- Затронутые файлы: `src/map-module.js`, `src/map/map-generation.js`, `src/architecture.md`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/map-module.js`, `node --check src/map/map-generation.js`, `node --check src/battle/battle-view.js`, `node scripts/check-battle-engine.mjs`, `node scripts/check-encoding.mjs`, парсинг JSON/JSONC, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-02 - Cache-buster для локальных ассетов карты и боя
+
+- `resolveAssetPath` в карте и боевом view теперь добавляет версионный query-параметр к локальным ассетам при загрузке страницы.
+- Это исправляет ситуацию, когда замененная PNG-иконка с тем же именем, например `data/Assets/icons/agressive.png`, визуально не менялась в игре из-за браузерного кэша.
+- Контекст версии: JSON и JS уже грузились с защитой от кэша, но сами изображения оставались по старому URL. Не стоит убирать cache-buster, иначе замена ассетов без переименования снова будет выглядеть так, будто игра игнорирует правки.
+- Затронутые файлы: `src/map-module.js`, `src/battle/battle-view.js`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/map-module.js`, `node --check src/battle/battle-view.js`, `node scripts/check-encoding.mjs`.
+
+### 2026-06-02 - Ярость ждет спокойного поля, но таймер больше не паузится на ходах
+
+- Таймер ярости в бою снова тикает во время swap, падения, добора, каскадов, ручного перемешивания и других действий на поле.
+- Если таймер дошел до `0`, пока поле занято, ярость помечается как `pendingRageAction`, значение таймера остается `0`, а ульта запускается после завершения текущих анимаций и обработки поля.
+- При новой попытке боя pending-состояние ярости сбрасывается, чтобы старая ожидающая ульта не могла вмешаться в перезапущенный бой.
+- Документация боя обновлена под новый контракт: часы и настройки все еще ставят таймер на настоящую паузу, но обычные действия на поле больше не замораживают отсчет.
+- Контекст версии: пауза таймера на каждом действии защищала от старого async-бага, но делала бой менее живым. Новый контракт сохраняет безопасность порядка действий: таймер доходит до нуля честно, но ульта не вклинивается внутрь текущего каскада.
+- Затронутые файлы: `src/battle/battle-view.js`, `src/battle/README.md`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-view.js`, `node scripts/check-battle-engine.mjs`, `node scripts/check-encoding.mjs`, парсинг всех JSON/JSONC, HTTP-smoke `http://127.0.0.1:5173/index.html`.
+
+### 2026-06-02 - Босс стал обычным battle-событием карты
+
+- Убрана специальная runtime-генерация отдельного `bossNode`: карта теперь состоит только из уровней `levels[]`.
+- Добавлено общее правило завершения карты: если после прохождения точки у нее нет `connectedTo`, выполняется `onComplete` текущей карты из `data/settings/campaign.jsonc`.
+- Если последняя точка выдала опыт и открыла level-up награду, завершение карты откладывается до выбора награды уровня, чтобы переход на следующую карту не стирал очередь level-up.
+- `boss` в `data/maps/WildWest.jsonc` теперь является обычным событием из `events[]` с `type: "battle"` и иконкой `data/Assets/icons/boss.png`.
+- На 9-м уровне WildWest добавлена одна гарантированная boss-точка, которая запускает `boss_Fireman` через обычный battle payload.
+- Валидатор больше не требует отдельный объект `boss` в карте; старый объект остается допустимым как совместимость, но новый стандарт - boss как named battle event.
+- Импорт `data-validation.js` в `src/map-module.js` получил версионный query-параметр, чтобы браузер не держал старый валидатор после смены формата boss-события.
+- Проверка покрытия событий теперь ищет payload не только по типу события, но и по `eventName`, чтобы boss-событие не могло случайно пройти валидацию за счет любого другого battle payload.
+- Контекст версии: отдельный `eventType: "boss"` создавал вредную магию - клик по боссу сразу завершал карту и обходил бой. Теперь босс проходит через тот же маршрут, что простые, обычные и сложные бои: event catalog -> level event -> battle payload -> battle module. Это меньше особых случаев и меньше шансов, что финальный бой снова окажется декоративной дверью.
+- Затронутые файлы: `src/map-module.js`, `src/data-validation.js`, `data/maps/WildWest.jsonc`, `data/maps/forest-map.example.jsonc`, `data/README.md`, `DECISIONS.md`, `VERSIONS.md`.
+- Проверка: `node --check src/map-module.js src/data-validation.js`, парсинг JSON/JSONC, проверка ссылок WildWest, `node scripts/check-encoding.mjs`, `node scripts/check-battle-engine.mjs`.
+
+### 2026-06-02 - Пересобрана текущая карта WildWest
+
+- `data/maps/WildWest.jsonc` пересобрана под короткий маршрут Wild West: 8 подготовительных уровней и 9-й уровень с boss-событием.
+- Уровень 1 теперь всегда состоит из одной простой битвы `battle_easy` с иконкой клоун-черепа и врагом `easy_Foxy`.
+- Уровни 2-7 используют обычные белые черепа `battle` с врагами `easy_Candy`, `easy_Sweety`, `easy_Boom`; на уровнях 5 и 7 дополнительно появляются сложные зеленые черепа `battle_hard` с `easy_Rusty` и `easy_Cookie`.
+- Уровни 3, 4, 6 и 8 получили небоевые варианты по описанным правилам: магазин с перчаткой/часами, бесплатный или платный лекарь, небольшая награда золотом.
+- Boss-событие запускает `boss_Fireman` на заднике `WildWest_3`.
+- Для 8-го уровня добавлено локальное `connectionCountWeights` без варианта `count: 3`, потому что на уровне с двумя точками такой вариант нарушает контракт валидатора.
+- Пустые секции `skip` и `dialog` оставлены явными массивами, чтобы карта проходила схему данных даже без этих событий в текущем маршруте.
+- Контекст версии: карта стала явным балансным сценарием вместо общей тестовой мешанины. Простые, обычные и сложные бои разведены через разные `eventName`, чтобы можно было менять их веса, иконки и payload-варианты без правки JS и без угадывания, какой именно череп сегодня решил быть боем.
+- Затронутые файлы: `data/maps/WildWest.jsonc`, `VERSIONS.md`.
+- Проверка: парсинг JSON/JSONC, проверка ссылок карты на события, payload, врагов, ассеты и товары магазина, `node scripts/check-encoding.mjs`, `node scripts/check-battle-engine.mjs`.
+
+### 2026-06-02 - Звуки для базовых match-3 семейств
+
+- В `data/settings/items.jsonc` добавлены `sound_effect` для обычных и усиленных match-3 предметов: гранат, пуль, ножей, щитов, бинтов и мусора.
+- `granate` и `granate_power` используют `data/Assets/sound/item_granate.mp3`.
+- `bullet` и `bullet_power` используют `data/Assets/sound/item_bullet.mp3`.
+- `Knife` и `Knife_power` используют `data/Assets/sound/item_Knife.mp3`.
+- `Shield` и `Shield_power` используют `data/Assets/sound/item_shield.mp3`.
+- `Bandage` и `Bandage_power` используют `data/Assets/sound/item_Bandage.mp3`.
+- `trash_1`, `trash_2` и `trash_3` используют `data/Assets/sound/item_trash.mp3`.
+- Контекст версии: звуки остаются настройкой предметов, а не боевого кода. Это важно не ломать, потому что каталог предметов должен быть единственным местом, где настраивается аудио конкретной сущности; иначе любая новая банка мусора снова потащит нас в JS, и это будет уже не разработка, а археология с лопатой.
+- Затронутые файлы: `data/settings/items.jsonc`, `VERSIONS.md`.
+- Проверка: парсинг JSON/JSONC, проверка существования `sound_effect`-файлов, `node scripts/check-encoding.mjs`, `node scripts/check-battle-engine.mjs`.
+
+### 2026-06-01 - Звуки активации match-3 предметов
+
+- Добавлена поддержка необязательного поля `sound_effect` в `data/settings/items.jsonc`.
+- Если у активированного предмета есть `sound_effect`, battle-view проигрывает указанный звук в момент активации предметов перед их исчезновением.
+- Если несколько активированных клеток в одном шаге используют один и тот же звук, звук проигрывается один раз за этот шаг, чтобы не накладывать одинаковый эффект поверх себя.
+- Если у предмета нет `sound_effect`, звук не проигрывается.
+- Звук использует общий `settings.soundVolume`, а при закрытии боя активные item-звуки останавливаются вместе с боевым окном.
+- Валидатор данных теперь проверяет, что `sound_effect` является строкой с путем из `data/Assets/sound/`.
+- Контекст версии: звуки привязаны к item-конфигу, а не к коду, чтобы позже можно было добавлять аудио для любых match-3 предметов без правки battle-view. Хардкодить гранаты в JS нельзя, иначе каталог предметов перестанет быть источником правды.
+- Затронутые файлы: `src/battle/battle-view.js`, `src/data-validation.js`, `src/battle/README.md`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/*.js src/data-validation.js`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`, `node scripts/check-battle-engine.mjs`.
+
+### 2026-06-01 - Исправлен перезапуск долгого боя после поражения
+
+- Исправлен сценарий, где после долгого боя и поражения кнопка `Начать сначала` могла не пересобрать поле сразу и не запускала таймер ярости до следующего клика по полю.
+- `showBattleDefeat()` теперь нормализует `renderTargets` и использует полный набор ссылок боевого окна, даже если поражение пришло из обработчика клетки с урезанными DOM-ссылками.
+- Для каждой попытки боя добавлен отдельный attempt-token: при перезапуске старая попытка отменяется, а старые async-анимации/каскады больше не могут менять новое поле или блокировать таймер.
+- При `Start over` перезапуск теперь пересоздает поле, сбрасывает состояние выбора/спецпредметов/ярости/резолва, перерисовывает UI и заново запускает runtime-таймеры.
+- Контекст версии: долгие бои чаще оставляют незавершенные async-цепочки анимаций, поэтому одного lifecycle всего окна боя недостаточно. Attempt-token нужен именно для повторов внутри одного и того же боевого окна; убирать его нельзя без альтернативной защиты от старых await-цепочек.
+- Затронутые файлы: `src/battle/battle-view.js`, `src/battle/README.md`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-view.js`, `node scripts/check-encoding.mjs`, `node scripts/check-battle-engine.mjs`.
+
+### 2026-06-01 - Новые враги Toxxy и Venom
+
+- Добавлены enemy JSON `data/enemy/easy_Toxxy.jsonc` и `data/enemy/easy_Venom.jsonc`.
+- Toxxy сделан копией Fireman по боевой схеме: HP `50`, шанс `10%` превратить `bullet`, `Knife` и `granate` в бочку, ярость через `60` секунд и урон `x2` по количеству бочек.
+- Для Toxxy используется ядовитая бочка `chemical` и музыка `battle_3`.
+- Venom сделан копией Fireman по боевой схеме: HP `50`, шанс `10%` превратить `bullet`, `Knife` и `granate` в бочку, ярость через `60` секунд и урон `x2` по количеству бочек.
+- Для Venom используется радиоактивная бочка `radioactive` и музыка `battle_1`.
+- Добавлены ключи локалей для имени, описания, стадии, ярости и награды Toxxy/Venom во все активные локали.
+- Контекст версии: враги добавлены отдельными конфигами без подключения к карте, чтобы расширить семейство бочечных врагов и не менять баланс генерации боев без отдельного шага.
+- Затронутые файлы: `data/enemy/easy_Toxxy.jsonc`, `data/enemy/easy_Venom.jsonc`, `data/locales/ru.json`, `data/locales/en.json`, `data/locales/new_ru.json`, `VERSIONS.md`.
+- Проверка: парсинг JSON/JSONC, проверка ссылок Toxxy/Venom на предметы/локали/ассеты/музыку, `node scripts/check-encoding.mjs`, `node scripts/check-battle-engine.mjs`.
+
+### 2026-06-01 - Новый враг Rocket
+
+- Добавлен enemy JSON `data/enemy/easy_Rocket.jsonc`.
+- Rocket имеет одну стадию, музыку `battle_2`, HP `50` и стартовый щит `10`.
+- Пассивная особенность стадии `convert` с шансом `20%` превращает новые `Shield` и `Bandage` в обычный мусор `trash_1` или `trash_2`.
+- Ярость `kamikaze` срабатывает через `45` секунд: наносит игроку урон текущим здоровьем врага, затем наносит такой же урон самому врагу.
+- Добавлены ключи локалей для имени, описания, стадии, ярости и награды Rocket во все активные локали.
+- Контекст версии: Rocket добавлен как отдельный конфиг врага без подключения к карте. Его роль - ломать защитно-лечебные элементы и угрожать камикадзе, поэтому подключение к пулу боев лучше делать отдельным балансным шагом.
+- Затронутые файлы: `data/enemy/easy_Rocket.jsonc`, `data/locales/ru.json`, `data/locales/en.json`, `data/locales/new_ru.json`, `VERSIONS.md`.
+- Проверка: парсинг JSON/JSONC, проверка ссылок Rocket на предметы/локали/ассеты/музыку, `node scripts/check-encoding.mjs`, `node scripts/check-battle-engine.mjs`.
+
+### 2026-06-01 - Новый враг Bully
+
+- Добавлен enemy JSON `data/enemy/easy_Bully.jsonc`.
+- Bully имеет одну стадию, музыку `battle_3`, HP `50` и стартовый щит `10`.
+- Пассивная особенность стадии `convert` с шансом `20%` превращает новые `Knife`, `granate` и `bullet` в `Shield`.
+- Вторая пассивная особенность стадии `convert` с шансом `5%` превращает новый `Shield` в `Shield_power`.
+- Ярость `RestoreEnemyShieldByBoardItems` срабатывает через `45` секунд и восстанавливает щит по количеству всех щитов на поле через тип `Shield`, включая обычные и усиленные щиты.
+- Добавлены ключи локалей для имени, описания, стадии, ярости и награды Bully во все активные локали.
+- Контекст версии: Bully добавлен как отдельный конфиг врага без подключения к карте, чтобы сначала проверить его защитную роль и не смешивать добавление врага с балансом генерации событий.
+- Затронутые файлы: `data/enemy/easy_Bully.jsonc`, `data/locales/ru.json`, `data/locales/en.json`, `data/locales/new_ru.json`, `VERSIONS.md`.
+- Проверка: парсинг JSON/JSONC, проверка ссылок Bully на предметы/локали/ассеты/музыку, `node scripts/check-encoding.mjs`, `node scripts/check-battle-engine.mjs`.
+
+### 2026-06-01 - Новые враги Candy и boom
+
+- Добавлены enemy JSON `data/enemy/Candy.jsonc` и `data/enemy/boom.jsonc`.
+- Candy имеет одну стадию, музыку `battle_1`, HP `50`, превращает `granate` и `bullet` в `Knife` с шансом `20%`, а `Knife` в `Knife_power` с шансом `5%`.
+- Ярость Candy срабатывает через `45` секунд и наносит игроку урон по количеству всех ножей на поле через тип `Knife`, включая обычные и усиленные ножи.
+- boom имеет одну стадию, музыку `battle_2`, HP `50`, превращает `Knife` и `bullet` в `granate` с шансом `20%`, а `granate` в `granate_power` с шансом `5%`.
+- Ярость boom оставлена по формулировке задачи: через `45` секунд наносит игроку урон по количеству всех ножей на поле, хотя сам враг наращивает гранаты.
+- Добавлены ключи локалей для имени, описания, стадии, ярости и награды Candy/boom во все активные локали.
+- Контекст версии: враги добавлены отдельными конфигами без подключения к карте, чтобы новый баланс не менял генерацию боев сам по себе. Конвертации заданы на уровне стадии, чтобы позже можно было менять их от стадии к стадии.
+- Затронутые файлы: `data/enemy/Candy.jsonc`, `data/enemy/boom.jsonc`, `data/locales/ru.json`, `data/locales/en.json`, `data/locales/new_ru.json`, `VERSIONS.md`.
+- Проверка: парсинг JSON/JSONC, проверка ссылок Candy/boom на предметы/локали/ассеты/музыку, `node scripts/check-encoding.mjs`, `node scripts/check-battle-engine.mjs`.
+
+### 2026-06-01 - Новый враг Sweety
+
+- Добавлен новый enemy JSON `data/enemy/Sweety.jsonc`.
+- Sweety имеет одну стадию с базовым HP `50`, изображением `data/Assets/enemy/Sweety.png` и таймером ярости `45` секунд.
+- Пассивная особенность стадии `convert` с шансом `20%` превращает новые `granate` и `Knife` в `bullet`.
+- Вторая пассивная особенность стадии `convert` с шансом `5%` превращает новый `bullet` в `bullet_power`.
+- Ярость `damagePlayerByBoardItems` наносит игроку урон по количеству всех пуль на поле через тип `bullet`, включая обычные и усиленные пули.
+- Добавлены ключи локалей для имени, описания, стадии, ярости и награды Sweety во все активные локали.
+- Контекст версии: Sweety добавлен как отдельный конфиг врага без подключения к карте, чтобы не менять генерацию боев без отдельного балансного решения. Его роль - наращивать пулю на поле и затем наказывать игрока за накопленные пули.
+- Затронутые файлы: `data/enemy/Sweety.jsonc`, `data/locales/ru.json`, `data/locales/en.json`, `data/locales/new_ru.json`, `VERSIONS.md`.
+- Проверка: парсинг JSON/JSONC, проверка ссылок Sweety на предметы/локали/ассет, `node scripts/check-encoding.mjs`.
+
+### 2026-06-01 - Новый враг Rusty
+
+- Добавлен новый enemy JSON `data/enemy/Rusty.jsonc`.
+- Rusty использует настройки по образцу Cookie: одна стадия с базовым HP `50`, изображением `data/Assets/enemy/Rusty.png`, таймером ярости `45` секунд и боевой музыкой `data/Assets/sound/battle_1.mp3`.
+- Ярость `damagePlayerByBoardItems` наносит игроку урон по количеству мусора всех трех типов на поле: `junk_1`, `junk_2`, `junk_3`.
+- Добавлены ключи локалей для имени, описания, стадии, ярости и награды Rusty во все активные локали.
+- Контекст версии: Rusty добавлен как отдельный конфиг врага без подключения к карте, чтобы не менять генерацию боев без отдельного балансного решения. Его роль - наказывать игрока за накопленный мусор, а не превращать поле или лечиться от него.
+- Затронутые файлы: `data/enemy/Rusty.jsonc`, `data/locales/ru.json`, `data/locales/en.json`, `data/locales/new_ru.json`, `VERSIONS.md`.
+- Проверка: парсинг JSON/JSONC, проверка ссылок Rusty на предметы/локали/ассеты, `node scripts/check-encoding.mjs`.
+
+### 2026-06-01 - `\s{}` масштабирует inline-иконку от базового размера
+
+- Rich-text маркер размера `{item:itemId}\s{N}` теперь задает множитель от базового `inlineItemIconEm`, а не абсолютный размер в `em`.
+- CSS inline-иконок использует `--inline-item-icon-scale`, поэтому глобальный размер из настроек и локальный множитель работают вместе.
+- Документация обновлена: `{item:bullet}\s{1.5}` теперь означает "в 1.5 раза больше базовой иконки".
+- Контекст версии: базовый размер иконок должен настраиваться централизованно, а `\s{}` должен быть локальным усилителем для отдельных иконок. Абсолютное значение ломало эту иерархию и делало результат непредсказуемым после изменения `inlineItemIconEm`.
+- Затронутые файлы: `src/rich-text.js`, `src/styles.css`, `data/README.md`, `data/settings/battle-tutorial.example.jsonc`, `VERSIONS.md`.
+- Проверка: `node --check`, парсинг JSON/JSONC, проверка item-маркеров в локалях, `node scripts/check-encoding.mjs`.
+
+### 2026-06-01 - Inline-иконки в тексте увеличены
+
+- Базовый размер inline-иконок `{item:itemId}` увеличен примерно в два раза.
+- В `default-settings.json` и `settings.example.jsonc` значение `inlineItemIconEm` изменено с `1.05` на `2.1`.
+- В текущих настройках `current-settings.json` пользовательское значение `inlineItemIconEm` изменено с `1.15` на `2.3`.
+- Запасной размер в CSS и fallback в `map-module.js` также обновлены до `2.1em`, чтобы иконки оставались крупными даже при неполных настройках.
+- Контекст версии: после добавления иконок в описания ярости маленький размер хуже читается в боевом окне и tooltip. Не стоит уменьшать этот параметр без проверки читаемости в обоих местах.
+- Затронутые файлы: `data/settings/default-settings.json`, `data/settings/current-settings.json`, `data/settings/settings.example.jsonc`, `src/map-module.js`, `src/styles.css`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check`, парсинг JSON/JSONC, проверка item-маркеров в локалях, `node scripts/check-encoding.mjs`.
+
+### 2026-06-01 - Иконки предметов в описаниях ярости
+
+- Описания ярости врагов в активных локалях переписаны на rich-text маркеры `{item:itemId}` вместо текстовых названий предметов.
+- Боевой UI теперь рендерит описание ярости через общий `renderInlineRichText`, поэтому маркеры вроде `{item:granate}` показываются как иконки прямо в окне боя.
+- Обновлена документация по rich-text маркерам: они теперь поддерживаются не только в tooltip предметов, но и в описании ярости врага.
+- Контекст версии: описание ярости должно визуально совпадать с боевым полем, где игрок видит иконки, а не словарь itemId в голове. Не стоит возвращать чистый текст для предметов без причины, иначе читать эффекты врагов снова придется как сухой балансный лист.
+- Затронутые файлы: `src/battle/battle-view.js`, `data/locales/ru.json`, `data/locales/en.json`, `data/locales/new_ru.json`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check`, парсинг JSON/JSONC, проверка item-маркеров в локалях, `node scripts/check-encoding.mjs`.
+
+### 2026-06-01 - Новый враг Cookie
+
+- Добавлен новый enemy JSON `data/enemy/Cookie.jsonc`.
+- Cookie имеет одну стадию с базовым HP `50`, изображением `data/Assets/enemy/Cookie.png`, таймером ярости `45` секунд и боевой музыкой `data/Assets/sound/battle_1.mp3`.
+- Ярость `convertItems` превращает все `granate`, `Knife` и `bullet` на поле в один из двух обычных видов мусора: `trash_1` или `trash_2`.
+- Добавлены ключи локалей для имени, описания, стадии, ярости и награды Cookie во все активные локали.
+- Контекст версии: Cookie добавлен как отдельный конфиг врага без подключения к карте, чтобы не менять генерацию боев без отдельного балансного решения. Его ярость портит уже лежащее на поле оружие, а не пассивно меняет будущую генерацию.
+- Затронутые файлы: `data/enemy/Cookie.jsonc`, `data/locales/ru.json`, `data/locales/en.json`, `data/locales/new_ru.json`, `VERSIONS.md`.
+- Проверка: парсинг JSON/JSONC, проверка ссылок Cookie на предметы/локали/ассеты, `node scripts/check-encoding.mjs`.
+
+### 2026-06-01 - Новый враг Foxy
+
+- Добавлен новый enemy JSON `data/enemy/Foxy.jsonc`.
+- Foxy имеет одну стадию с базовым HP `50`, изображением `data/Assets/enemy/Foxy.png` и таймером ярости `60` секунд.
+- Пассивная особенность стадии `convert` с шансом `20%` превращает новые обычные `bullet`, `Knife` и `granate` в `Bandage`.
+- Вторая пассивная особенность стадии `convert` с шансом `5%` превращает новый `Bandage` в `Bandage_power`.
+- Ярость `HealingEnemyByBoardItems` лечит Foxy по количеству всех бинтов на поле через тип `Bandage`, включая обычные и усиленные бинты.
+- Добавлены ключи локалей для имени, описания, стадии, ярости и награды Foxy во все активные локали.
+- Контекст версии: Foxy добавлен как отдельный конфиг врага без подключения к карте, чтобы не менять генерацию событий без отдельного решения. Два `convert`-правила живут внутри стадии: первое портит оружие в бинты, второе иногда усиливает уже сгенерированные бинты.
+- Затронутые файлы: `data/enemy/Foxy.jsonc`, `data/locales/ru.json`, `data/locales/en.json`, `data/locales/new_ru.json`, `VERSIONS.md`.
+- Проверка: парсинг JSON/JSONC, проверка ссылок Foxy на предметы/локали/ассет, `node scripts/check-encoding.mjs`.
+
+### 2026-06-01 - Ярость Fireman наносит урон от огненных бочек
+
+- У врага `Fireman` ярость заменена с лечения от `flame` на урон игроку через `damagePlayerByBoardItems`.
+- Ярость считает точные предметы `itemId: ["flame"]` и наносит `количество огненных бочек * 2` урона.
+- Ключи локалей ульты Fireman переименованы с `flameHeal` на `flameDamage`, чтобы текст и поведение не противоречили друг другу.
+- Контекст версии: Fireman должен наказывать игрока за накопленные огненные бочки, а не лечиться от них. Не стоит возвращать лечение без отдельного решения по роли врага, иначе его пассивный `convert` и ярость снова начнут рассказывать разные истории.
+- Затронутые файлы: `data/enemy/Fireman.jsonc`, `data/locales/ru.json`, `data/locales/en.json`, `data/locales/new_ru.json`, `VERSIONS.md`.
+- Проверка: парсинг JSON/JSONC, проверка ссылок Fireman на предметы/локали/ассет, `node scripts/check-encoding.mjs`.
+
+### 2026-06-01 - `convert` перенесен в стадии врага
+
+- Пассивная настройка генерации `convert` теперь читается только из текущей стадии врага: `stages[].convert`.
+- Корневой `enemy.convert` больше не используется рантаймом и теперь считается ошибкой данных при валидации активного врага.
+- Невидимое резервное поле боя пересоздается при смене стадии, чтобы будущие выпадающие предметы сразу использовали `convert` новой стадии.
+- Существующие враги с пассивным `convert` перенесены на stage-level формат: `Cherry`, `Fireman`, `test`, `test 1`; у двухстадийных тестовых врагов прежний общий `convert` продублирован в обе стадии, чтобы сохранить старое поведение.
+- Обновлены `enemy.example.jsonc`, `rage.example.jsonc`, `data/README.md` и `src/battle/README.md`.
+- Контекст версии: `convert` зависит от текущей фазы боя, поэтому он должен жить рядом с HP, яростью и ультой стадии. Возврат к корневому `convert` снова сделает разные стадии врага слишком одинаковыми и создаст два источника правды.
+- Затронутые файлы: `src/battle/battle-view.js`, `src/data-validation.js`, enemy JSONC-файлы с `convert`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: парсинг JSON/JSONC, проверка отсутствия корневого `convert` в `data/enemy`, `node --check`, `node scripts/check-battle-engine.mjs`, `node scripts/check-encoding.mjs`.
+
+### 2026-06-01 - Новый враг Fireman
+
+- Добавлен новый enemy JSON `data/enemy/Fireman.jsonc`.
+- Fireman имеет одну стадию с базовым HP `50`, изображением `data/Assets/enemy/Fireman.png` и таймером ярости `60` секунд.
+- Пассивная особенность `convert` с шансом `10%` превращает новые обычные `bullet`, `Knife` и `granate` в огненную бочку `flame`.
+- Ярость `HealingEnemyByBoardItems` лечит Fireman по количеству огненных бочек на поле через тип `flame`.
+- Добавлены ключи локалей для имени, описания, стадии, ярости и награды Fireman во все активные локали.
+- Контекст версии: Fireman добавлен как отдельный конфиг врага без подключения к карте, чтобы можно было вручную привязать его к нужному событию и не менять баланс генерации боев. Пассивный `convert` использует точные `itemId`, чтобы усиленные версии оружия не превращались в огненные бочки без явного решения.
+- Затронутые файлы: `data/enemy/Fireman.jsonc`, `data/locales/ru.json`, `data/locales/en.json`, `data/locales/new_ru.json`, `VERSIONS.md`.
+- Проверка: парсинг JSON/JSONC, проверка ссылок Fireman на предметы/локали/ассет, `node scripts/check-encoding.mjs`.
+
+### 2026-06-01 - Новый враг Cherry
+
+- Добавлен новый enemy JSON `data/enemy/Cherry.jsonc`.
+- Cherry имеет одну стадию с базовым HP `50`, изображением `data/Assets/enemy/Cherry.png` и таймером ярости `60` секунд.
+- Пассивная особенность `convert` со 100% шансом превращает новые обычные `bullet`, `Knife` и `granate` в `trash_3`.
+- Ярость `HealingEnemyByBoardItems` лечит Cherry по количеству всего мусора на поле через типы `junk_1`, `junk_2`, `junk_3`.
+- Добавлены ключи локалей для имени, описания, стадии, ярости и награды Cherry во все активные локали.
+- Контекст версии: Cherry добавлен как отдельный конфиг врага без подключения в карту, чтобы не менять баланс и генерацию событий без отдельного решения. Пассивный `convert` использует точные `itemId`, а не `itemTypes`, чтобы усиленные предметы не превращались в мусор случайно.
+- Затронутые файлы: `data/enemy/Cherry.jsonc`, `data/locales/ru.json`, `data/locales/en.json`, `data/locales/new_ru.json`, `VERSIONS.md`.
+- Проверка: парсинг JSON/JSONC, проверка ссылок Cherry на предметы/локали/ассет, `node scripts/check-encoding.mjs`.
+
+### 2026-05-28 - Ярость камикадзе
+
+- Добавлен новый поддержанный эффект ульты `kamikaze`: игрок получает урон, равный текущему здоровью врага, затем враг получает самоурон на то же значение.
+- В боевом UI эффект отыгрывается в две фазы: красные светлячки летят от иконки здоровья врага к здоровью игрока, затем красные светлячки разлетаются от здоровья врага в разные стороны и показывается самоурон врага.
+- Для визуальной очередности добавлены отдельные phase-функции в `battle-engine`: сначала урон игроку, потом самоурон врага. Это важно, потому что обычный `applyBattleUltimateEffects` применяет чистую логику сразу, а UI должен показать порядок без театральной путаницы.
+- Первая стадия тестового врага `data/enemy/test.jsonc` теперь использует `kamikaze`, чтобы эффект можно было проверить в игре.
+- Исправлена соседняя ошибка передачи лимита щита: `RestoreEnemyShieldByBoardItems` снова получает `enemyShieldMax`, а лечение HP больше не получает лишний параметр щита.
+- Обновлены `data/enemy/rage.example.jsonc`, enemy-шаблон, локали и документация.
+- Контекст версии: `kamikaze` специально вынесен отдельным эффектом, а не собран как цепочка `damagePlayerByBoardItems` + обычный урон врагу. У него другой источник урона, другая анимация и другой порядок фаз, поэтому склеивание с предметными эффектами быстро превратит ярость в кашу с красивым названием.
+- Затронутые файлы: `src/battle/battle-engine.js`, `src/battle/battle-view.js`, `src/data-validation.js`, `scripts/check-battle-engine.mjs`, `data/settings/battle-ui.jsonc`, `data/settings/battle-ui.example.jsonc`, `data/enemy/test.jsonc`, `data/enemy/enemy.example.jsonc`, `data/enemy/rage.example.jsonc`, `data/locales/ru.json`, `data/locales/en.json`, `data/locales/new_ru.json`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS/MJS-файлов, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `validateGameData`, `node scripts/check-encoding.mjs`, browser smoke боя.
+
+### 2026-05-28 - Ярость с восстановлением щита врага от предметов поля
+
+- Добавлен новый поддержанный эффект ульты `RestoreEnemyShieldByBoardItems`: он считает предметы на поле через `count.itemTypes` или точные `count.itemId`/`count.itemIds` и восстанавливает щит врага на `count * modifier`.
+- Для `itemTypes` сохраняется текущее правило: выбираются все предметы с указанным `type`, включая усиленные версии. Для точных `itemId` усиленные предметы не попадают в выборку, если их id не указан явно.
+- Во время эффекта синие светлячки летят от найденных предметов к самой иконке щита врага, затем проигрывается анимация щита с числом восстановления. Если щита было `0`, иконка щита появляется до полета светлячков.
+- Лимит восстановления щита вынесен в `data/settings/battle-ui.jsonc` -> `limits.enemyShieldMax`; щит может подниматься выше стартового `stage.shield`, но не выше `99`.
+- У тестового врага первая стадия теперь использует эту ярость по типу `Shield`.
+- `data/enemy/rage.example.jsonc`, enemy-шаблон и документация обновлены под новый эффект.
+- Контекст версии: восстановление щита - отдельная механика, а не разновидность лечения HP. Не стоит склеивать ее с `HealingEnemyByBoardItems`, иначе щит и здоровье начнут иметь общий контракт и будущие эффекты защиты станет сложнее балансировать. Отдельный лимит в battle UI нужен, чтобы баланс щитов менялся настройкой, а не правкой кода.
+- Затронутые файлы: `src/battle/battle-engine.js`, `src/battle/battle-view.js`, `src/styles.css`, `src/data-validation.js`, `scripts/check-battle-engine.mjs`, `data/settings/battle-ui.jsonc`, `data/settings/battle-ui.example.jsonc`, `data/enemy/test.jsonc`, `data/enemy/enemy.example.jsonc`, `data/enemy/rage.example.jsonc`, `data/locales/ru.json`, `data/locales/en.json`, `data/locales/new_ru.json`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS/MJS-файлов, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `validateGameData`, `node scripts/check-encoding.mjs`, browser smoke боя.
+
+### 2026-05-28 - Ярость с лечением врага от предметов поля
+
+- Добавлен новый поддержанный эффект ульты `HealingEnemyByBoardItems`: он считает предметы на поле через `count.itemTypes` или точные `count.itemId`/`count.itemIds` и лечит врага на `count * modifier`.
+- Для `itemTypes` сохраняется текущее правило: выбираются все предметы с указанным `type`, включая усиленные версии. Для точных `itemId` усиленные предметы не попадают в выборку, если их id не указан явно.
+- Во время эффекта зеленые светлячки летят от найденных предметов к иконке здоровья врага, затем проигрывается стандартная анимация HP с числом лечения.
+- У тестового врага первая стадия теперь использует эту ярость по типу `Bandage`.
+- `data/enemy/rage.example.jsonc`, enemy-шаблон и документация обновлены под новый эффект.
+- Контекст версии: лечение врага должно быть полноценным эффектом ярости, а не будущей заглушкой в JSON. Не стоит возвращать его в список "зарезервировано", иначе конфиги начнут выглядеть рабочими, но визуальная и боевая логика снова разъедутся.
+- Затронутые файлы: `src/battle/battle-engine.js`, `src/battle/battle-view.js`, `src/data-validation.js`, `scripts/check-battle-engine.mjs`, `data/enemy/test.jsonc`, `data/enemy/enemy.example.jsonc`, `data/enemy/rage.example.jsonc`, `data/locales/ru.json`, `data/locales/en.json`, `data/locales/new_ru.json`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS/MJS-файлов, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `validateGameData`, `node scripts/check-encoding.mjs`, browser smoke боя.
+
+### 2026-05-28 - Шпаргалка по ярости врагов
+
+- Создан справочный файл `data/enemy/rage.example.jsonc` с копируемыми примерами `rage`, `ultimate.effects`, цепочки эффектов и пассивного enemy `convert`.
+- В пример вынесены реально поддержанные на тот момент эффекты ульты: `convertItems` и `damagePlayerByBoardItems`; будущие `healSelfByBoardItems` и `freezeRandomItems` явно помечены как не реализованные.
+- В `data/README.md` добавлена ссылка на новую шпаргалку рядом с enemy-шаблонами.
+- Контекст версии: формат ярости уже стал достаточно гибким, чтобы его легко перепутать, особенно между `itemTypes`, точными `itemId` и пассивным `convert`. Шпаргалку не стоит удалять без равноценной замены, иначе новые враги снова будут собираться по памяти и молитве.
+- Затронутые файлы: `data/enemy/rage.example.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Проверка: парсинг JSON/JSONC и `node scripts/check-encoding.mjs`.
+
+### 2026-05-28 - Щит стадий врага
+
+- В enemy stage добавлено поддерживаемое поле `shield`: щит живет в состоянии текущей стадии и сбрасывается при переходе на следующую стадию.
+- Боевой engine теперь списывает щит по количеству активированных предметов с уроном: один повреждающий предмет снимает `1` щит и не наносит HP-урон; когда щит закончился, оставшиеся предметы наносят полный урон.
+- В боевом UI поверх иконки здоровья врага появляется иконка щита с крупным числом оставшихся щитов. Путь к иконке задается через `data/settings/battle-ui.jsonc` -> `icons.enemyShield`.
+- Валидатор enemy JSON проверяет `stage.shield` как целое число от `0`, а пример врага и документация описывают новое поле.
+- Добавлены no-dependency тесты на поглощение урона щитом и сброс щита при смене стадии.
+- Контекст версии: щит должен быть именно защитой от количества активированных предметов, а не от суммы урона. Не стоит менять это на "пул HP поверх HP" без отдельного решения, иначе усиленные предметы начнут съедать щит слишком быстро и механика станет другой.
+- Затронутые файлы: `src/battle/battle-engine.js`, `src/battle/battle-view.js`, `src/styles.css`, `src/data-validation.js`, `scripts/check-battle-engine.mjs`, `data/settings/battle-ui.jsonc`, `data/settings/battle-ui.example.jsonc`, `data/enemy/enemy.example.jsonc`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS/MJS-файлов, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`, `validateGameData`, browser smoke боя.
+
+### 2026-05-24 - Весовые развилки дорог карты
+
+- В формат карты добавлено поле `pathRules.connectionCountWeights`: теперь карта может задавать, сколько исходящих дорог точка пытается получить по весам. Для `WildWest` включен стиль `1 путь = 20`, `2 пути = 65`, `3 пути = 15`, а `maxConnectionsFromNode` поднят до `3`, чтобы точки могли иногда давать третью ветку.
+- Добавлено поле `pathRules.maxSinglePathChain`: оно ограничивает длинные коридоры, где игрок несколько уровней подряд идет только по одному пути. В `WildWest` стоит `2`, поэтому после пары одиночных переходов генератор начинает пытаться дать следующую развилку.
+- `levels[].paths.connectionCountWeights` может переопределить общий стиль для отдельного уровня. Старые `minConnectionsFromNode`, `maxConnectionsFromNode` и `extraConnectionChance` остаются рабочими, чтобы не ломать существующие карты.
+- Генератор дорог использует `connectionCountWeights` как желаемое количество исходящих связей, но по-прежнему старается не добавлять пересекающиеся линии. Если красивую связь провести нельзя, точка может получить меньше веток, потому что читаемость карты важнее декоративной паутины.
+- Контекст версии: длинные цепочки из одного пути делают карту слишком линейной и убирают смысл выбора маршрута. Это правило не стоит убирать без отдельной замены, иначе генератор снова будет строить аккуратные, но скучные коридоры.
+- Затронутые файлы: `src/map-module.js`, `src/data-validation.js`, `data/maps/WildWest.jsonc`, `data/maps/forest-map.example.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS, парсинг JSON/JSONC, `validateGameData`, `node scripts/check-encoding.mjs`, browser smoke карты.
+
+### 2026-05-24 - Настройки разброса точек карты и более чистые дороги
+
+- Разброс точек карты вынесен из JS в `data/settings/map-ui.jsonc`: `nodes.positionJitterPct.x/y` задает диапазон стабильного смещения в процентах карты.
+- Добавлена настройка `nodes.layoutPasses`: optional-проходы визуальной раскладки после генерации дорог. Безопасный дефолт `0`, потому что генератор дорог уже сам старается не добавлять пересекающиеся связи.
+- Генератор дорог теперь проверяет новые связи между соседними уровнями и по возможности не добавляет ребро, если оно пересекает уже выбранное ребро. Если иначе нельзя сохранить вход/выход для точки, связь все равно добавляется ради проходимости.
+- Контекст версии: пересечения дорог мешают читать карту и принимать маршрутные решения. Не стоит возвращать прежнюю сортировку только по connection score без отдельной причины: она может снова развести порядок точек и порядок связей в разные стороны.
+- Затронутые файлы: `src/map-module.js`, `src/data-validation.js`, `data/settings/map-ui.jsonc`, `data/settings/map-ui.example.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS, парсинг JSON/JSONC, `validateGameData`, `node scripts/check-encoding.mjs`, browser smoke карты.
+
+### 2026-05-20 - Новые опасные бочки `flame` и `chemical`
+
+- В каталог предметов добавлены `flame` и `chemical` сразу после `radioactive`.
+- Оба предмета оформлены как `rare_match-3` с отдельным `type`, агрессией, `dmgperturn`, путями к обычной и большой иконке.
+- Добавлены ключи имени и описания во все активные локали: `ru`, `en`, `new_ru`.
+- Код игры не менялся: новые предметы используют уже существующее поведение rare match-3 предметов с пассивным уроном после обычного хода.
+- Контекст версии: `flame` и `chemical` нужны как новые опасные сущности того же класса, что и радиоактивный заряд. Не стоит переводить их в обычный `category: "match-3"` без отдельного решения, иначе они начнут случайно падать как базовые предметы, а не появляться через правила/эффекты.
+- Затронутые файлы: `data/settings/items.jsonc`, `data/locales/ru.json`, `data/locales/en.json`, `data/locales/new_ru.json`, `VERSIONS.md`.
+- Проверка: парсинг JSON/JSONC, `node scripts/check-encoding.mjs`, `validateGameData`.
+
+### 2026-05-20 - Приоритет вражеских превращений новых предметов
+
+- Генерация новых предметов теперь применяет пассивный `convert` врага раньше трансформаций инвентаря игрока.
+- Если вражеское превращение сработало, предмет считается уже измененным врагом и игрок не проверяет для него `transform_chance`. Если враг не сработал или правило не подходит, тогда предмет может быть улучшен инвентарем игрока.
+- Расчет возможных типов генерации для проверки поля приведен к тому же порядку, чтобы валидатор логики не жил в своей уютной альтернативной реальности.
+- Добавлен no-dependency тест: граната при 50% вражеском превращении в мусор и 50% игроковом улучшении сначала проверяет врага, затем игрока.
+- Контекст версии: это правило важно для баланса конфликтующих модификаторов. Не стоит менять порядок на "игрок раньше врага" без отдельного решения, иначе защитные/усиливающие предметы игрока начнут обходить вражеские опасности еще до их проверки.
+- Затронутые файлы: `src/battle/battle-engine.js`, `scripts/check-battle-engine.mjs`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS/MJS-файлов, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`, `validateGameData`.
+
+### 2026-05-20 - Коробки делают предметы полностью неактивными
+
+- Пассивный урон `dmgperturn` теперь игнорирует предметы, закрытые коробками.
+- Эффекты ярости `convertItems` и `damagePlayerByBoardItems` тоже пропускают клетки под коробками, поэтому ульта врага не превращает и не считает спрятанные предметы.
+- Подсветка и светлячки целей ярости также не берут предметы под коробками, чтобы визуал не обещал действие, которого механика уже не делает.
+- Лианы намеренно не исключены из этих эффектов: предмет под лианой остается активной частью поля, как и было решено ранее.
+- Контекст версии: коробка должна быть настоящей блокировкой клетки, а не только запретом на клик. Не стоит возвращать boxed-клетки в пассивный урон или сканирование ульты без отдельного решения, иначе игрок будет получать урон от предметов, с которыми он вообще не может взаимодействовать.
+- Затронутые файлы: `src/battle/battle-engine.js`, `src/battle/battle-view.js`, `scripts/check-battle-engine.mjs`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS/MJS-файлов, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`, `validateGameData`.
+
+### 2026-05-20 - Светлячки урона `dmgperturn` летят от предметов
+
+- Для пассивного урона `dmgperturn` красные светлячки теперь используют иконки опасных предметов на поле как источник полета к здоровью игрока.
+- Feedback состояния HP сохраняет `sourceElements` и при первом создании шкалы, и при обновлении, чтобы источник анимации не терялся.
+- Для `dmgperturn` отключен fallback на иконку урона врага: если источник-предмет не найден, игра лучше не покажет светлячков, чем покажет ложный источник.
+- Контекст версии: урон после хода должен читаться как свойство предметов на поле, а не атака врага. Не стоит возвращать общий fallback источника для этого случая, иначе игрок будет видеть неправильную причинно-следственную связь.
+- Затронутые файлы: `src/battle/battle-view.js`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-view.js`, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`, `validateGameData`.
+
+### 2026-05-20 - Пассивный урон предметов за обычный swap
+
+- Match-3 предметы теперь могут задавать `dmgperturn`: после принятого обычного swap игра считает такие предметы на видимом поле и наносит игроку `количество * dmgperturn` урона.
+- Урон запускается только для обычного обмена соседних клеток, который дал комбинацию. Череп, перчатка, батарея, ручное перемешивание и каскады этот пассивный урон не вызывают.
+- Визуальная обратная связь использует существующую систему: красные светлячки летят от опасных предметов к иконке здоровья игрока, затем проигрывается изменение HP.
+- Валидатор проверяет `dmgperturn` у match-3 и rare match-3 предметов, а no-dependency тест покрывает расчет урона и source cells.
+- Контекст версии: `dmgperturn` нужен как угроза от состояния поля, но он должен быть привязан именно к действию игрока, а не к каскадам. Не стоит переносить его в общий `applyBattleMatchEffects`, иначе радиоактивные предметы начнут наказывать игрока за автоматические цепочки.
+- Затронутые файлы: `src/battle/battle-engine.js`, `src/battle/battle-view.js`, `src/data-validation.js`, `scripts/check-battle-engine.mjs`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS/MJS-файлов, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`, `validateGameData`.
+
+### 2026-05-20 - Пассивное превращение новых предметов врагом
+
+- В enemy JSON добавлено поле `convert`: список правил `convertItems`, которые применяются к новым предметам при стартовой генерации, доборе и пополнении резервного поля.
+- `chance` задается долей от `0` до `1`: `0.2` значит 20%, `1` значит 100%. `from.itemId`/`from.itemIds` выбирает точные предметы, `from.itemTypes` выбирает по типу, а `to.itemId`/`to.itemIds` задает возможные случайные результаты.
+- У тестового врага после `vines` добавлено правило: новые `trash_1` и `trash_2` с шансом 20% становятся `radioactive`.
+- Для `radioactive` добавлены недостающие ключи имени и описания во все активные локали, чтобы валидатор не блокировал старт.
+- Валидатор проверяет `convert` у врага и у стадии, а no-dependency тест покрывает превращение новых предметов по точному `itemId`.
+- Контекст версии: это поле отвечает именно за генерацию новых элементов, а не за уже лежащее поле и не за ульту. Не стоит смешивать его с `ultimate.effects`, иначе пассивная настройка врага начнет неожиданно менять состояние поля в середине хода.
+- Затронутые файлы: `src/battle/battle-engine.js`, `src/battle/battle-view.js`, `src/data-validation.js`, `scripts/check-battle-engine.mjs`, `data/enemy/test.jsonc`, `data/enemy/enemy.example.jsonc`, `data/locales/ru.json`, `data/locales/en.json`, `data/locales/new_ru.json`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS/MJS-файлов, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`, `validateGameData`.
+
+### 2026-05-20 - Подробные ошибки JSON/JSONC
+
+- Общий загрузчик данных теперь перехватывает ошибки `JSON.parse` и дополняет их путем к файлу, строкой, колонкой, исходным сообщением парсера, подсказкой и фрагментом строки с указателем `^`.
+- Для JSONC комментарии отдельными строками больше не удаляются полностью перед парсингом, а заменяются пустыми строками, чтобы номера строк в ошибках совпадали с файлом.
+- Окно сообщения сохраняет пробелы в многострочном тексте, чтобы указатель позиции ошибки не съезжал.
+- Контекст версии: данные проекта активно редактируются вручную, и ошибка вида `Unexpected token ]` без имени файла превращает поиск проблемы в гадание по внутренностям. Не стоит возвращать короткие ошибки парсинга без файла и строки.
+- Затронутые файлы: `src/data-loader.js`, `src/data-validation.js`, `src/styles.css`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS-файлов, синтетическая ошибка JSONC через `loadJsonc`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`, `validateGameData`.
+
+### 2026-05-20 - Точный выбор предметов в ультах по itemId
+
+- Селекторы ульты теперь принимают не только `itemIds`, но и привычный `itemId` в `from` и `count`; значение может быть строкой или массивом строк.
+- `itemTypes` по-прежнему выбирает все предметы с указанным `type`, включая усиленные варианты вроде `granate_power`. Для точного выбора только обычной гранаты нужно использовать `itemId`/`itemIds`.
+- Подсветка целей ярости в `battle-view` синхронизирована с той же логикой, чтобы визуально выделялись именно выбранные по id предметы.
+- Добавлен тест, который проверяет, что `from.itemId: ["granate"]` не превращает `granate_power`, хотя у них общий тип.
+- Контекст версии: типы нужны для match-3 и массовых эффектов, но сценарные ульты часто должны трогать только конкретный предмет. Не стоит смешивать `itemId` и `type`, иначе улучшенные предметы будут неожиданно попадать в эффекты.
+- Затронутые файлы: `src/battle/battle-engine.js`, `src/battle/battle-view.js`, `src/data-validation.js`, `scripts/check-battle-engine.mjs`, `data/enemy/enemy.example.jsonc`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS/MJS-файлов, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`, `validateGameData`.
+
+### 2026-05-20 - Случайная цель преобразования ульты
+
+- `convertItems` теперь поддерживает новый формат `to.itemIds`: для каждой найденной клетки случайно выбирается один предмет из списка целей.
+- Старый формат `to.itemId` сохранен и продолжает работать для детерминированных преобразований.
+- Валидатор enemy JSON принимает оба формата и добавляет все цели из `to.itemIds` в обязательные itemId.
+- Добавлен no-dependency тест, который проверяет случайный выбор разных целей внутри одного `convertItems`.
+- Контекст версии: ульты должны уметь не только строго менять один тип в один результат, но и создавать вариативность поля из данных. Старый `to.itemId` не стоит удалять, потому что он нужен для точных сценарных эффектов.
+- Затронутые файлы: `src/battle/battle-engine.js`, `src/data-validation.js`, `scripts/check-battle-engine.mjs`, `data/enemy/enemy.example.jsonc`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS/MJS-файлов, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`, `validateGameData`.
+
+### 2026-05-20 - Последовательная цепочка эффектов ярости
+
+- `battle-view` больше не применяет весь `ultimate.effects` одним визуальным пакетом. Эффекты ярости теперь проходят строго по порядку из JSON: анимация цели эффекта, применение эффекта, промежуточный рендер, затем следующий эффект.
+- Для цепочек вроде `Bandage -> granate`, затем урон по `granate`, затем `granate -> trash_1` урон считается после первого преобразования, а последнее преобразование ждет окончания анимации урона.
+- Каскады после преобразований запускаются только после завершения всей цепочки ульты, а не между отдельными эффектами. Поле остается заблокированным, пока идет ярость и ее анимации.
+- `rage.targetTypes`/`rage.targetItemIds` теперь остаются запасной визуальной целью для ульт без собственных effect-селекторов; `convertItems` использует `from.*`, а `damagePlayerByBoardItems` использует `count.*`.
+- Контекст версии: порядок массива `ultimate.effects` должен быть не только логическим, но и видимым игроку. Если снова применять весь массив разом, промежуточные состояния становятся нечитаемыми, а каскады могут вмешиваться до завершения задуманной последовательности ульты.
+- Затронутые файлы: `src/battle/battle-view.js`, `scripts/check-battle-engine.mjs`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS/MJS-файлов, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`, `validateGameData`.
+
+### 2026-05-20 - Питомец Патч как диалоговая встреча
+
+- На первый уровень `WildWest` добавлена гарантированная `dialog`-точка `patch_pet_dialog`.
+- Питомец Патч использует новый локальный ассет `data/Assets/enemy/patch_pet.svg`, отдельный `characterNameTextKey` и локализованные реплики для `en`, `ru` и `new_ru`.
+- Ответы Патча ведут в уже существующие события `reward` и `shop` или завершают диалог без новой игровой системы.
+- Контекст версии: запрос был про питомца, но в проекте еще нет companion-механики. Поэтому Патч добавлен как контентная встреча поверх существующего `dialog`-контракта: его видно в игре сразу, но формат данных, JS-архитектура и баланс боя не расширяются без отдельного решения.
+- Затронутые файлы: `data/maps/WildWest.jsonc`, `data/locales/en.json`, `data/locales/ru.json`, `data/locales/new_ru.json`, `data/Assets/enemy/patch_pet.svg`, `data/README.md`, `VERSIONS.md`.
+- Проверка: парсинг JSON/JSONC, `node scripts/check-encoding.mjs`, `validateGameData`, HTTP smoke для `index.html` и нового ассета.
+
+### 2026-05-20 - Эффект ярости: урон по предметам поля
+
+- В `battle-engine` добавлен эффект ульты `damagePlayerByBoardItems`: он считает предметы на поле по `count.itemTypes` или `count.itemIds`, умножает количество на `modifier` и наносит этот урон игроку.
+- `battle-view` показывает урон от этой ульты через существующую систему боевой обратной связи: красные светлячки летят от найденных предметов на поле к иконке здоровья игрока, затем проигрывается анимация изменения HP.
+- Вторая стадия тестового врага получила эффект по типу `granate` с `modifier: 1`.
+- Валидатор enemy JSON проверяет селекторы и `modifier` для `damagePlayerByBoardItems`; no-dependency тест `check-battle-engine` покрывает расчет урона и source cells.
+- Контекст версии: эффекты ярости нужно добавлять маленькими независимыми блоками. Урон по предметам не должен обходить общий UI-feedback, иначе игрок не увидит, какие предметы стали источником атаки и почему изменилось здоровье.
+- Затронутые файлы: `src/battle/battle-engine.js`, `src/battle/battle-view.js`, `src/data-validation.js`, `scripts/check-battle-engine.mjs`, `data/enemy/test.jsonc`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS-файлов, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`, `validateGameData`.
+
+### 2026-05-20 - Ярость не тикает во время движения поля
+
+- Таймер ярости больше не уменьшается, пока поле находится в `isResolving` или на нем идут активные swap/shake/death/drop/shuffle/rage-wave анимации.
+- Удалена логика `pendingRageAction`/watchdog из боевого view: ярость больше не ставится в очередь посреди хода, потому что таймер боя теперь честно паузится на время обработки поля.
+- Контекст версии: сценарий "осталась 1 секунда ярости, игрок начал swap, во время swap таймер дошел до 0" ломал порядок async-анимаций и мог оставлять поле заблокированным. Правильный контракт проще: таймер ярости тикает только когда игрок реально может взаимодействовать с полем.
+- Затронутые файлы: `src/battle/battle-view.js`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-view.js`, `node --check src/battle/battle-engine.js`, `node --check src/data-validation.js`, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`, `validateGameData`.
+
+### 2026-05-20 - Watchdog ожидающей ярости
+
+- Для состояния `pendingRageAction` добавлен watchdog: если ярость дошла до `0` во время обработки поля, она больше не зависит только от финального callback текущего хода.
+- Watchdog ждет, пока на поле идут активные swap/shake/death/drop/shuffle/rage-wave анимации. Если поле визуально спокойно, но `isResolving` висит дольше 6 секунд, состояние считается зависшим: блокировка снимается и ожидающая ярость запускается.
+- При запуске ярости, рестарте боя и закрытии боя watchdog очищается, чтобы старый таймер не вмешивался в новый lifecycle.
+- Контекст версии: предыдущий `try/finally` защищал саму ярость, но не состояние "ярость ждет окончания чужого каскада". Если путь каскада не доходил до общей финализации, runtime уже стоял на паузе, а поле оставалось заблокированным. Watchdog нужен как последняя страховка от вечной блокировки.
+- Затронутые файлы: `src/battle/battle-view.js`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-view.js`, `node --check src/battle/battle-engine.js`, `node --check src/data-validation.js`, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`, `validateGameData`.
+
+### 2026-05-20 - Fail-safe разблокировка после ярости
+
+- `runBattleRageAction` обернут в `try/finally`: флаги `isRageResolving`, `pendingRageAction` и `isResolving` теперь сбрасываются даже если анимация ярости или каскад после ульты прервались в середине.
+- Если ярость сорвалась после установки таймера в `0`, финализация возвращает таймер к значению стадии, чтобы runtime не зациклился на мгновенном повторном срабатывании.
+- Рестарт боя дополнительно очищает `isRageResolving` и `pendingRageAction`.
+- Контекст версии: ярость может срабатывать рядом с каскадами, паузой таймера и другими async-анимациями. У нее должен быть защитный финализатор, иначе один ранний выход оставляет поле навечно заблокированным.
+- Затронутые файлы: `src/battle/battle-view.js`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-view.js`, `node --check src/battle/battle-engine.js`, `node --check src/data-validation.js`, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`, `validateGameData`.
+
+### 2026-05-20 - Мягче светлячки целей преобразования
+
+- У подсветки целей `convertItems` убран центральный огонек поверх предмета.
+- Орбитальные огоньки стали крупнее, дальше от центра и мягче за счет blur/glow.
+- Контекст версии: цель подсветки - показать, какие предметы будут преобразованы, не закрывая сам предмет. Центральный огонек мешал читаемости и создавал ощущение лишней точки прямо на иконке.
+- Затронутые файлы: `src/styles.css`, `VERSIONS.md`.
+- Проверка: визуальная CSS-правка без JS; автоматические проверки не требуются.
+
+### 2026-05-20 - Очередь ярости и подсветка целей преобразования
+
+- Если таймер ярости доходит до `0` во время каскада или другой обработки поля, ярость больше не вклинивается в середину анимации: runtime ставится на паузу, ярость помечается как ожидающая и запускается после освобождения поля.
+- Для эффекта `convertItems` во время срабатывания ярости вокруг предметов, которые будут преобразованы, крутятся золотые светлячки; после применения эффекта подсветка снимается.
+- Контекст версии: ярость не должна ломать порядок обработки хода. Очередь сохраняет правило "сначала закончить текущий каскад, потом ульта", а подсветка целей делает преобразование читаемым до фактической замены предметов.
+- Затронутые файлы: `src/battle/battle-view.js`, `src/styles.css`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-view.js`, `node --check src/battle/battle-engine.js`, `node --check src/data-validation.js`, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`, `validateGameData`.
+
+### 2026-05-20 - Первый эффект ярости: преобразование предметов
+
+- В `battle-engine` добавлен первый поддержанный эффект ульты `convertItems`: он заменяет предметы на поле, найденные по `from.itemTypes` или `from.itemIds`, на `to.itemId`.
+- `battle-view` теперь после визуальной сцены ярости применяет эффекты текущей ульты, перерисовывает поле и сразу запускает общий каскадный пайплайн, если преобразование создало новые комбинации.
+- У тестового врага ульта `dustToBandage` заполнена эффектом: весь хлам типов `junk_1`, `junk_2`, `junk_3` превращается в `Bandage`; визуальная цель ярости первой стадии тоже переключена на эти типы.
+- Валидатор данных проверяет структуру `convertItems` и добавляет `to.itemId`/`from.itemIds` в обязательные itemId.
+- Контекст версии: эффекты ярости нужно добавлять маленькими независимыми шагами. Преобразование меняет те же сущности, что и падение/добор предметов, поэтому после него нельзя оставлять поле с готовыми комбинациями без обработки; важно использовать общий `resolveBattleCascades`, а не отдельную копию логики.
+- Затронутые файлы: `src/battle/battle-engine.js`, `src/battle/battle-view.js`, `src/data-validation.js`, `scripts/check-battle-engine.mjs`, `data/enemy/test.jsonc`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS-файлов, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `validateGameData`.
+
+### 2026-05-20 - Визуальное срабатывание ярости врага
+
+- При достижении таймера ярости `0` бой останавливает runtime-таймер, блокирует поле, запускает белую волну по всем иконкам предметов и отправляет золотые светлячки из иконки ярости к целевым предметам.
+- Цели визуальной ярости задаются в enemy JSON внутри `rage.targetTypes` или `rage.targetItemIds`; у тестового врага ярость теперь реагирует на тип `granate`.
+- В `data/settings/battle-ui.jsonc` добавлены `icons.lightGold` и настройки `animations.rageWaveMs`, `rageProjectileCount`, `rageProjectileMs`, `rageProjectileArcHeightPx`, `rageProjectileSpreadPx`, `rageProjectileSizePx`.
+- Контекст версии: это первый слой ульты без боевого эффекта. Его не стоит смешивать с будущими эффектами превращения/урона, потому что сейчас проверяется только безопасный lifecycle: таймер стопится, поле блокируется, а после анимации бой возвращается в активное состояние.
+- Затронутые файлы: `src/battle/battle-view.js`, `src/styles.css`, `src/data-validation.js`, `data/settings/battle-ui.jsonc`, `data/settings/battle-ui.example.jsonc`, `data/enemy/test.jsonc`, `data/enemy/enemy.example.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS-файлов, парсинг JSON/JSONC, `node scripts/check-battle-engine.mjs`, `validateGameData`.
+
+### 2026-05-20 - Иконки предметов внутри текстовых ключей
+
+- Добавлен общий mini rich-text формат для локалей: маркер `{item:itemId}` заменяется на иконку предмета из `data/settings/items.jsonc`.
+- Tooltip предметов на карте и в бою теперь рендерят такие маркеры как inline-иконки; если `itemId` не найден, маркер остается обычным текстом.
+- Размер inline-иконок вынесен в общие настройки `inlineItemIconEm`; по умолчанию стоит `1.05em`, чтобы иконка была примерно размером с букву.
+- Для отдельной иконки можно переопределить размер прямо в локали через `{item:itemId}\s{1.5}`; в JSON нужно писать `\\s{1.5}`.
+- Tooltip предметов теперь поддерживает переносы строк через `\n`, размер шрифта вынесен в `tooltipFontSizePx`, а максимальная ширина окна - в `tooltipMaxWidthPx`.
+- В описании `items.bullet.description` во всех активных локалях добавлен пример с `{item:bullet}` и `{item:bullet_power}`.
+- Описания боевых предметов-модификаторов в `ru`, `en` и `new_ru` приведены к тому же формату: связанные обычные/усиленные предметы и здоровье показываются через inline-иконки.
+- Контекст версии: описания предметов часто говорят о других предметах, и текстовые названия плохо читаются в игре. Иконки должны браться из единого каталога предметов, а локали должны хранить только ссылку на `itemId`, чтобы не дублировать пути к ассетам.
+- Затронутые файлы: `src/rich-text.js`, `src/map-module.js`, `src/battle/battle-view.js`, `src/styles.css`, `data/settings/default-settings.json`, `data/settings/current-settings.json`, `data/settings/settings.example.jsonc`, `data/locales/en.json`, `data/locales/ru.json`, `data/locales/new_ru.json`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/rich-text.js`, `node --check src/map-module.js`, `node --check src/battle/battle-view.js`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`, `validateGameData`.
+
+### 2026-05-19 - Диалоги карты получили печать текста
+
+- В `data/settings/map-ui.jsonc` добавлены настройки `dialog.textLetterMs` и `dialog.answersFadeMs`.
+- Текст `dialog`-события теперь появляется по буквам; клик по диалоговому окну во время печати сразу раскрывает всю фразу.
+- Варианты ответа скрыты до полной фразы и затем плавно появляются с длительностью из `map-ui`.
+- Контекст версии: скорость чтения и драматургия диалога являются общим поведением интерфейса карты, поэтому тайминги должны лежать в `map-ui`, а не в отдельных событиях и не в JS. Не стоит возвращать эти значения в код, иначе настройка диалогов снова станет менее управляемой.
+- Затронутые файлы: `src/map-module.js`, `src/styles.css`, `src/data-validation.js`, `data/settings/map-ui.jsonc`, `data/settings/map-ui.example.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/map-module.js`, `node --check src/data-validation.js`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`, `validateGameData`.
+
+### 2026-05-19 - Размер персонажа диалога переведен в проценты
+
+- `dialog` payload теперь использует `characterWidthPct` вместо пиксельного `characterWidthPx`.
+- Убрано CSS-ограничение `72vw`, из-за которого большие значения `characterWidthPx` визуально не меняли размер картинки.
+- `characterWidthPct: 100` означает ширину персонажа во всю ширину экрана; старое `characterWidthPx` осталось runtime-fallback для старых диалогов.
+- Контекст версии: постановка диалогового персонажа должна быть понятной в процентах экрана, так же как координаты X/Y. Не стоит возвращать скрытый CSS-потолок ширины, иначе автор данных снова не будет понимать, почему размер не меняется.
+- Затронутые файлы: `src/map-module.js`, `src/styles.css`, `src/data-validation.js`, `data/maps/WildWest.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/map-module.js`, `node --check src/data-validation.js`, парсинг JSON/JSONC, `validateGameData`.
+
+### 2026-05-19 - Диалоговый персонаж получил координату по вертикали
+
+- В `dialog` payload добавлен `characterCenterYPct`, который задает центр персонажа по вертикали в процентах высоты экрана.
+- `characterCenterXPct` и `characterCenterYPct` теперь образуют понятную пару координат X/Y для постановки персонажа; `characterBottomPx` оставлен только как fallback для старых диалогов.
+- Контекст версии: автор диалога должен управлять позицией ассета по обеим осям в самом событии, без правки CSS или `map-ui`. Не стоит возвращаться к вертикальному позиционированию только через отступ снизу.
+- Затронутые файлы: `src/map-module.js`, `src/styles.css`, `src/data-validation.js`, `data/maps/WildWest.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/map-module.js`, `node --check src/data-validation.js`, парсинг JSON/JSONC, `validateGameData`.
+
+### 2026-05-19 - Комментарии example-конфигов переведены на русский
+
+- `data/settings/map-ui.example.jsonc` получил русские комментарии вместо английских.
+- `data/settings/battle-ui.example.jsonc` восстановлен как читаемый русский пример: новые английские комментарии переведены, старые побитые кодировкой комментарии переписаны нормальным русским текстом.
+- Контекст версии: example-файлы должны быть рабочей подсказкой для редактирования данных, а не смесью языков и битой кодировки. Не стоит возвращать англоязычные или нечитаемые комментарии в пользовательские JSONC-примеры.
+- Затронутые файлы: `data/settings/map-ui.example.jsonc`, `data/settings/battle-ui.example.jsonc`, `VERSIONS.md`.
+- Проверка: парсинг example JSONC, `node scripts/check-encoding.mjs`.
+
+### 2026-05-19 - Постановка персонажа диалога перенесена в event payload
+
+- `data/settings/map-ui.jsonc` больше не хранит персонажа диалога, его размер и позицию; там остались только общие параметры затемнения и blur карты.
+- Каждый `dialog` payload теперь обязан задавать `characterImage`, `characterWidthPx`, `characterBottomPx` и `characterCenterXPct`.
+- Валидатор проверяет эти поля в карте до старта забега.
+- Контекст версии: персонаж, его ассет и координаты являются содержанием конкретной диалоговой сцены, а не общим стилем карты. Не стоит возвращать эти поля в `map-ui`, иначе разные диалоги снова будут зависеть от одной глобальной настройки.
+- Затронутые файлы: `src/map-module.js`, `src/data-validation.js`, `data/settings/map-ui.jsonc`, `data/settings/map-ui.example.jsonc`, `data/maps/WildWest.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/map-module.js`, `node --check src/data-validation.js`, парсинг JSON/JSONC, `validateGameData`.
+
+### 2026-05-19 - Добавлено событие карты `dialog`
+
+- В карту добавлен новый тип события `dialog`: точка открывает диалоговый overlay, затемняет и размывает карту, показывает персонажа и варианты ответа.
+- Ответы диалога умеют продолжать диалог через `nextStepId`, завершать его через `end: true` или запускать любое событие карты через `eventName` (`battle`, `reward`, `heal`, `shop`, `skip` и будущие типы).
+- `data/settings/map-ui.jsonc` получил блок `dialog` для силы затемнения/blur и позиции/размера персонажа; пример и валидатор обновлены.
+- В `data/maps/WildWest.jsonc` добавлен тестовый диалог Свити и локализационные ключи для всех активных языков.
+- Контекст версии: диалог должен быть обычным типом точки карты, а не отдельной веткой сценария. Не стоит выносить переходы ответов в JS, потому что дизайнерская логика диалога должна жить в JSON карты.
+- Затронутые файлы: `index.html`, `src/map-module.js`, `src/styles.css`, `src/data-validation.js`, `data/settings/map-ui.jsonc`, `data/settings/map-ui.example.jsonc`, `data/maps/WildWest.jsonc`, `data/locales/en.json`, `data/locales/ru.json`, `data/locales/new_ru.json`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/map-module.js`, `node --check src/data-validation.js`, парсинг JSON/JSONC, `validateGameData`.
+
+### 2026-05-19 - Исправлены боевые светлячки лечения и смены стадии
+
+- В feedback-логике боя полный снимок состояния игрока теперь сохраняется до применения match-3 эффектов, поэтому срабатывание шкалы лечения показывает восстановление HP даже при полном здоровье.
+- Урон по врагу больше не подавляется визуально при смене стадии: красные светлячки и отрицательное число урона остаются видимыми, а смена стадии не маскирует сам факт нанесенного урона.
+- Контекст версии: игрок должен видеть результат своих действий, даже если механика сразу обнулила шкалу лечения или переключила стадию врага. Не стоит снова подавлять эти анимации без новой системы боевой обратной связи.
+- Затронутые файлы: `src/battle/battle-view.js`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-view.js`, `node scripts/check-battle-engine.mjs`.
+
+### 2026-05-19 - Птицы больше не растягивают карту за нижний край
+
+- Слой `mapEffects` теперь клипует декоративных птиц по границам карты.
+- Деспавн птиц считается по layout-размеру `mapBoard`, а не по `scrollHeight`, который мог раздуваться самой улетевшей птицей.
+- Контекст версии: птица должна быть частью карты, но не должна менять размер карты. Не стоит возвращать расчет границ через `scrollHeight`, иначе нижний край снова начнет убегать от анимации.
+- Затронутые файлы: `src/map-module.js`, `src/styles.css`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/map-module.js`, HTTP-smoke `index.html`.
+
+### 2026-05-19 - Иконки событий карты получили прозрачные кнопки и золотое наведение
+
+- Кнопки точек карты стали полностью прозрачными: видимой остается только иконка события.
+- В `data/settings/map-ui.jsonc` добавлен блок `nodes`: `hoverScale`, `activeLightIcon`, `activeLightSizePx`, `hoverLightIcon`, `hoverLightSizePx`.
+- Доступная сейчас точка показывает спокойную белую подсветку `light_white`; при наведении или keyboard focus она меняется на `light_gold`, а иконка увеличивается. Недоступные и уже пройденные точки подсветку не показывают.
+- Пройденные точки остаются полностью непрозрачными, даже если они больше не доступны для повторного клика.
+- Контекст версии: точки карты должны читаться как иконки на самой карте, а не как отдельные круглые UI-кнопки. Не стоит возвращать фон/рамку кнопок без отдельного решения по визуальному стилю карты.
+- Затронутые файлы: `src/map-module.js`, `src/styles.css`, `src/data-validation.js`, `data/settings/map-ui.jsonc`, `data/settings/map-ui.example.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS-файлов, парсинг `data/settings/map-ui.jsonc`, HTTP-smoke `index.html`.
+
+### 2026-05-19 - Ручное перемешивание боя стало сильнее
+
+- `shuffleBattleBoardWithMovement()` теперь выбирает лучший вариант из большего числа случайных перестановок и оценивает не только смену предмета в клетке, но и расстояние переезда, смену строки/колонки и сохранение соседних кусков.
+- Добавлена проверка battle-engine, что shuffle уводит предметы достаточно далеко и не выглядит как перенос цельных групп.
+- Контекст версии: ручное перемешивание должно визуально решать тупиковое/плохое поле. Не стоит возвращать простую перестановку по первому подходящему варианту, иначе shuffle снова может выглядеть как слабое движение строк или блоков.
+- Затронутые файлы: `src/battle/battle-engine.js`, `scripts/check-battle-engine.mjs`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-engine.js`, `node --check scripts/check-battle-engine.mjs`, `node scripts/check-battle-engine.mjs`.
+
+### 2026-05-18 - Птицы карты привязаны к карте, а не к экрану
+
+- Слой `mapEffects` перенесен внутрь `mapBoard`, чтобы декоративные птицы жили в координатах карты и двигались вместе с ней при вертикальном скролле.
+- Спавн птиц по-прежнему считается относительно видимой области карты, поэтому анимация появляется у края экрана. Удаление теперь считается по границам всей карты, чтобы птица не исчезала только из-за прокрутки.
+- Контекст версии: декоративная анимация должна ощущаться частью карты, а не HUD-оверлеем. Не стоит возвращать `mapEffects` sibling-слоем рядом с `.map-viewport`, иначе при прокрутке птицы снова будут закреплены за экраном.
+- Затронутые файлы: `index.html`, `src/map-module.js`, `src/styles.css`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/map-module.js`, парсинг `data/settings/map-ui.jsonc`, HTTP-smoke `index.html`.
+
+### 2026-05-18 - Лианы участвуют в матчах, стены избегают коробок
+
+- Лианы больше не исключают клетку из обычных совпадений: предмет под лианой активируется и удаляется, если стал частью активной комбинации.
+- Ограничения управления лианами сохранены: клетку под лианой нельзя выбрать обычным swap, подсказка хода не предлагает двигать такой предмет, батарея не использует его как цель, ручной shuffle его не перемещает, а перчатка и череп остаются разрешенными исключениями.
+- Генерация стен теперь учитывает коробки: стена не создается на ребре, если хотя бы одна из двух соседних клеток закрыта коробкой. Лианы рядом со стенами разрешены.
+- При старте боя коробки теперь создаются до стен, чтобы генератор стен видел актуальный список закрытых клеток.
+- Контекст версии: лиана должна мешать управлению предметом, но не отменять уже сложившуюся комбинацию; стена около коробки визуально и логически избыточна, потому что коробка уже блокирует клетку. Не стоит снова исключать лианы из match detection или генерировать стены рядом с коробками без отдельного решения по UX.
+- Затронутые файлы: `src/battle/battle-engine.js`, `src/battle/battle-view.js`, `scripts/check-battle-engine.mjs`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS/MJS-файлов, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`, HTTP-smoke `index.html`.
+
+### 2026-05-18 - Лианы как мягкие блокеры клеток боя
+
+- В enemy JSON добавлен поддерживаемый параметр `vines`: его можно указать на корне врага или внутри стадии. Значение больше `0` накрывает указанное количество случайных не-коробочных клеток лианами.
+- `battle-engine` хранит лианы отдельным списком клеток: такие клетки не участвуют в обычных совпадениях, подсказках доступного хода, батарейных активациях и ручном shuffle, но не блокируют падение и добор предметов.
+- `battle-view` рисует лианы отдельным слоем поверх квадрата и иконки предмета, используя `icons.vines` из `data/settings/battle-ui.jsonc`.
+- Обычное взаимодействие с клеткой под лианой блокируется с локализованным статусом `battle.status.vinesBlocked`; череп может активировать предмет под лианой, а перчатка может свободно поменять его с другой клеткой.
+- Валидатор данных проверяет `vines` у врага/стадии и путь `icons.vines` в `battle-ui`.
+- Контекст версии: лиана должна быть покрытием клетки, а не предметом и не второй коробкой. Не стоит добавлять ее в матрицу предметов или включать в гравитационные блокеры, иначе предметы перестанут нормально падать под лиану и появится путаница между сущностью предмета и состоянием клетки.
+- Затронутые файлы: `src/battle/battle-engine.js`, `src/battle/battle-view.js`, `src/styles.css`, `src/data-validation.js`, `scripts/check-battle-engine.mjs`, `data/settings/battle-ui.jsonc`, `data/settings/battle-ui.example.jsonc`, `data/enemy/enemy.example.jsonc`, `data/locales/ru.json`, `data/locales/en.json`, `data/locales/new_ru.json`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS/MJS-файлов, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `validateGameData`, `node scripts/check-encoding.mjs`, HTTP-smoke `index.html`.
+
+### 2026-05-18 - Payload событий карты привязан к `eventName`
+
+- В payload-разделах карты (`battle`, `reward`, `heal`, `shop`, `skip`) добавлено поле `eventName`.
+- При создании точки карта теперь выбирает payload не только по `type` и уровню, но и по имени события из каталога `events`.
+- Это позволяет держать несколько событий одного типа, например `easy_battle` и `hard_battle`, с разными наборами боев, магазинов или наград.
+- Валидатор проверяет, что `eventName` существует в каталоге событий и что тип catalog-события совпадает с payload-разделом.
+- Контекст версии: `type` отвечает за кодовую механику, а `eventName` отвечает за конкретную балансную группу. Не стоит снова выбирать payload только по `type`, иначе разные события одного типа начнут смешивать свои варианты.
+- Затронутые файлы: `src/map-module.js`, `src/data-validation.js`, `data/maps/WildWest.jsonc`, `data/maps/123.jsonc`, `data/maps/WildWest — копия.jsonc`, `data/maps/forest-map.example.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/map-module.js`, `node --check src/data-validation.js`, парсинг JSON/JSONC, `validateGameData`, `node scripts/check-encoding.mjs`.
+
+### 2026-05-18 - Каталог событий карты отделен от весов уровней
+
+- Общий список `events` вынесен на верхний уровень карты: каждая запись хранит только `name`, `type` и `icon`.
+- Внутри `levels[].events` теперь лежат только ссылки на события по `name`, `weight` и `guaranteed`.
+- Несколько событий могут иметь одинаковый `type`, но разные `name`, например `easy_battle` и `hard_battle`; карта сможет по-разному весить их на уровнях, а логика запуска все еще выбирается по `type`.
+- Runtime сохраняет в узле карты и `eventName`, и `eventType`, чтобы дальнейшая привязка разных payload-групп к именам событий не требовала нового переворота структуры.
+- Валидатор проверяет уникальность `events[].name`, корректность `type`/`icon`, ссылки `levels[].events[].name` на каталог и наличие payload-вариантов для типа события на нужном уровне.
+- Контекст версии: каталог событий описывает “что это за событие”, а уровень описывает “как часто оно появляется здесь”. Не стоит возвращать `type`/`icon` внутрь уровня, иначе появится дублирование и разные события одного типа будет трудно балансировать.
+- Затронутые файлы: `src/map-module.js`, `src/data-validation.js`, `data/maps/WildWest.jsonc`, `data/maps/123.jsonc`, `data/maps/WildWest — копия.jsonc`, `data/maps/forest-map.example.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/map-module.js`, `node --check src/data-validation.js`, парсинг JSON/JSONC, `validateGameData`, `node scripts/check-encoding.mjs`.
+
+### 2026-05-18 - Генерация карты стала настраиваемой по уровням
+
+- Формат карты изменен: `levels` теперь массив уровней, а не объект с `count` и `nodesPerLevel`.
+- У каждого `levels[]` появились собственные `nodes`, `paths` и `events`, поэтому количество точек, число путей и набор событий можно задавать отдельно для каждого уровня.
+- Для количества точек поддерживаются два режима: фиксированный `nodes.count` или случайный диапазон `nodes.min`/`nodes.max`.
+- Для событий уровня поддержаны два режима: случайный выбор по `weight` и гарантированные точки через `guaranteed: true` плюс необязательный `count`.
+- Генератор карты сначала размещает гарантированные события уровня, затем добирает оставшиеся точки случайными событиями этого же уровня и перемешивает порядок точек.
+- Валидатор теперь проверяет `levels[]`, последовательность уровней, лимиты точек, per-level события, гарантированные события и наличие payload-вариантов для каждого включенного события на конкретном уровне.
+- Активные карты переведены на новый формат без изменения текущего баланса: прежние общие веса и пути продублированы в каждый уровень.
+- Контекст версии: генерация карты стала управляемой по уровням, чтобы можно было делать, например, гарантированную награду на первом уровне, больше боев на середине или узкие развилки перед боссом без правки JS. Не стоит возвращать глобальные `levels.count`, `nodesPerLevel`, `event` и `paths`, иначе карта снова потеряет точный контроль над отдельными уровнями.
+- Затронутые файлы: `src/map-module.js`, `src/data-validation.js`, `data/maps/WildWest.jsonc`, `data/maps/123.jsonc`, `data/maps/WildWest — копия.jsonc`, `data/maps/forest-map.example.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/map-module.js`, `node --check src/data-validation.js`, парсинг JSON/JSONC, `validateGameData`, `node scripts/check-encoding.mjs`.
+
+### 2026-05-18 - События карты перешли с `eventWeights` на `event`
+
+- В конфиге карты вместо объекта `eventWeights` теперь используется массив `event`: каждая запись хранит `type`, `icon` и `weight`.
+- Генерация карты выбирает сначала запись события из `event`, затем берет payload из раздела карты с тем же `type`.
+- Иконка обычной точки карты теперь берется из `event[].icon`, а не собирается в коде по имени типа события.
+- Валидатор данных проверяет новый массив `event`, типы событий, веса и пути иконок в `data/Assets/icons/`.
+- Обновлены активные карты и пример карты под новый формат.
+- Контекст версии: событие карты теперь описывает не только шанс, но и визуальное представление точки. Это нужно, чтобы менять иконки событий из JSONC без правки JS. Не стоит возвращаться к `eventWeights` и автосборке пути `data/Assets/icons/<type>.png`, иначе контроль над визуалом снова уедет из данных в код.
+- Затронутые файлы: `src/map-module.js`, `src/data-validation.js`, `data/maps/WildWest.jsonc`, `data/maps/123.jsonc`, `data/maps/WildWest — копия.jsonc`, `data/maps/forest-map.example.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/map-module.js`, `node --check src/data-validation.js`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`.
+
+### 2026-05-17 - Коробки поверх клеток боя
+
+- В enemy JSON добавлен поддерживаемый параметр `box`: его можно указать на корне врага или внутри стадии. Значение больше `0` закрывает указанное количество случайных клеток боевого поля коробками.
+- `battle-engine` теперь хранит коробки отдельным списком клеток: такие клетки не участвуют в поиске совпадений, подсказках доступного хода, обычном swap, свободном swap и батарейных активациях.
+- Падение и добор учитывают коробки как фиксированные клетки: предмет под коробкой остается на месте, а элементы в колонке не проходят сквозь закрытую клетку.
+- `battle-view` рисует коробки отдельным слоем поверх иконок предметов, используя `icons.box` из `data/settings/battle-ui.jsonc`; при попытке выбрать закрытую клетку коробка трясется и показывается локализованный статус `battle.status.boxBlocked`.
+- Стены и коробки теперь инициализируются один раз при старте боя и не пересоздаются при смене стадии врага или перемешивании поля.
+- Если добор заполняет клетки ниже коробки, движение новых предметов начинается от позиции коробки, а не от верхнего края поля.
+- Контекст версии: коробка должна быть блокировкой клетки, а не новым предметом в матрице. Не стоит переносить ее в `items.jsonc` или заменять предмет под ней на другой `itemId`, иначе падение, награды за матчи и будущие эффекты начнут путать покрытие клетки с сущностью предмета.
+- Затронутые файлы: `src/battle/battle-engine.js`, `src/battle/battle-view.js`, `src/styles.css`, `src/data-validation.js`, `scripts/check-battle-engine.mjs`, `data/settings/battle-ui.jsonc`, `data/settings/battle-ui.example.jsonc`, `data/enemy/enemy.example.jsonc`, `data/locales/ru.json`, `data/locales/en.json`, `data/locales/new_ru.json`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS/MJS-файлов, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC.
+
+### 2026-05-17 - Визуальная доводка боевых стен
+
+- Стены на боевом поле теперь рендерятся размером с игровую клетку и центрируются на ребре между двумя соседними клетками.
+- Слой стен поднят выше всех предметных иконок, включая иконки во время swap, падения и исчезновения.
+- Горизонтальные стены используют ту же иконку, но поворачиваются на `90deg`.
+- При попытке обычного обмена через стену трясется выбранная иконка предмета и конкретная блокирующая стена.
+- Контекст версии: стена должна читаться как физический барьер между клетками, а не как маленький маркер поверх поля. Не стоит уменьшать ее до декоративной иконки или класть ниже предметов, иначе игрок не поймет, почему swap заблокирован.
+- Затронутые файлы: `src/battle/battle-view.js`, `src/styles.css`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-view.js`, `node scripts/check-battle-engine.mjs`, `node scripts/check-encoding.mjs`.
+
+### 2026-05-17 - Анимированный маркер стены в бою
+
+- Стены боя теперь используют двухкадровую анимацию: `icons.wall_1` и `icons.wall_2` в `data/settings/battle-ui.jsonc`, переключение кадров выполняется по таймеру `animations.wallToggleMs`.
+- Если для конкретного кадра ключ не задан, используется fallback из доступных иконок `icons.wall`, `icons.wall_1`, `icons.wall_2`.
+- Контекст версии: анимация стен делает барьер более заметным и понятным, при этом вся настройка остается в data-driven UI-конфиге без изменения логики матчинга/движения. Не стоит возвращаться к статической `icons.wall`, иначе визуально сложнее воспринимать состояние стен и блокировку проходов.
+- Затронутые файлы: `src/battle/battle-view.js`, `src/styles.css`, `src/data-validation.js`, `data/settings/battle-ui.jsonc`, `data/settings/battle-ui.example.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/battle/battle-view.js`, `node --check src/data-validation.js`, `node scripts/check-encoding.mjs`, парсинг JSON/JSONC.
+
+### 2026-05-17 - Стены между клетками в бою
+
+- В enemy JSON добавлен поддерживаемый параметр `wall`: его можно указать на корне врага или внутри стадии. Значение больше `0` создает указанное количество стен между соседними клетками поля.
+- `battle-engine` теперь умеет генерировать уникальные стены-ребра между клетками и проверять, заблокирован ли обмен между двумя соседними клетками.
+- Обычный swap и поиск доступного хода учитывают стены: ход через стену не выполняется и не предлагается как подсказка.
+- `battle-view` рисует стены отдельным слоем на поле, используя иконку `icons.wall` из `data/settings/battle-ui.jsonc`; сами предметы и логика каскадов остаются независимыми от стен.
+- Добавлен локализованный статус `battle.status.wallBlocked`, если игрок пытается сделать обычный обмен через стену.
+- Валидатор данных проверяет `wall` у врага/стадии и обязательную иконку стены в `battle-ui`.
+- Контекст версии: стены должны быть препятствием движения, а не новым типом клетки или предмета. Не стоит встраивать их в матрицу предметов, иначе они начнут ломать падение, добор и match-3 поиск; отдельные ребра проще расширять под будущие ульты врагов.
+- Затронутые файлы: `src/battle/battle-engine.js`, `src/battle/battle-view.js`, `src/styles.css`, `src/data-validation.js`, `scripts/check-battle-engine.mjs`, `data/settings/battle-ui.jsonc`, `data/settings/battle-ui.example.jsonc`, `data/enemy/enemy.example.jsonc`, `data/locales/ru.json`, `data/locales/en.json`, `data/locales/new_ru.json`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS/MJS-файлов, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`.
+
+### 2026-05-17 - Опыт уровня явно закреплен как накопительный
+
+- `addExperience()` теперь явно приводит текущий и добавляемый опыт к числам и увеличивает только `playerState.experience.total`.
+- Повышение уровня пересчитывает `experience.level` по таблице, но не вычитает достигнутый порог и не превращает опыт в остаток текущего уровня.
+- В документации уточнено, что HUD опыта показывает накопительный общий опыт до следующего накопительного порога: например, после порога `50` значение `55` остается `55/105`.
+- Контекст версии: шкала опыта не должна обнуляться после повышения уровня, потому что таблица опыта построена на общих накопительных порогах. Не стоит возвращать вычитание порога из `total` без отдельного решения, иначе награды уровня и отображение прогресса начнут жить в разных моделях.
+- Затронутые файлы: `src/map-module.js`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/map-module.js`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`.
+
+### 2026-05-17 - Сыворотка и стимулятор подключены к бою
+
+- В `data/settings/battle-ui.jsonc` и fallback боевого UI добавлены слоты `red` и `green`, чтобы сыворотка и стимулятор отображались рядом с предметами на руках.
+- Боевой движок теперь считает эффективный максимум здоровья через `max_hp_modif`, а размер восстановления от шкалы лечения через `heal_hp_modif`.
+- `red` увеличивает эффективный максимум HP на `max_hp_modif * quantity`, `green` увеличивает восстановление HP на `heal_hp_modif * quantity`.
+- Базовое состояние игрока в JSON не переписывается: модификаторы считаются в момент боя от текущего инвентаря и каталога предметов.
+- Валидатор предметов теперь проверяет, что `max_hp_modif` и `heal_hp_modif` являются числовыми неотрицательными значениями.
+- Контекст версии: сыворотка и стимулятор должны быть data-driven предметами прогресса, чтобы баланс можно было менять в `items.jsonc` без правок боевой логики. Не стоит переносить эти значения в JS или заранее мутировать `playerState`, иначе станет трудно понять, откуда берутся текущие боевые параметры.
+- Затронутые файлы: `src/battle/battle-engine.js`, `src/battle/battle-view.js`, `src/styles.css`, `src/map-module.js`, `scripts/check-battle-engine.mjs`, `data/settings/battle-ui.jsonc`, `data/settings/battle-ui.example.jsonc`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS/MJS-файлов, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`.
+
+### 2026-05-17 - Добавлены предметы сыворотки и стимулятора
+
+- В `data/settings/items.jsonc` добавлены предметы `red` и `green`.
+- `red` использует иконки `data/Assets/item/red.png` и `data/Assets/big_icon/red.png`, локализован как сыворотка для повышения максимального здоровья.
+- `green` использует иконки `data/Assets/item/green.png` и `data/Assets/big_icon/green.png`, локализован как стимулятор для увеличения размера лечения.
+- Добавлены ключи локалей `items.red.name`, `items.red.description`, `items.green.name`, `items.green.description` для `ru`, `en`, `new_ru`.
+- Контекст версии: эти предметы заведены как сущности каталога, чтобы их можно было выдавать наградами и показывать в инвентаре. Боевой или событийный эффект повышения HP/лечения должен подключаться отдельной правкой, чтобы не смешивать добавление данных с новой механикой применения.
+- Затронутые файлы: `data/settings/items.jsonc`, `data/locales/ru.json`, `data/locales/en.json`, `data/locales/new_ru.json`, `VERSIONS.md`.
+- Проверка: парсинг JSON/JSONC, `node scripts/check-encoding.mjs`.
+
+### 2026-05-17 - Инвентарь может трансформировать новые предметы поля
+
+- `battle-engine` теперь при генерации новых предметов учитывает поля предметов инвентаря `transform_chance`, `transform_from_itemId`, `transform_to_itemId`.
+- Шанс считается как процент за каждую штуку предмета в инвентаре: 3 `item_Shield_power` при `transform_chance: 1` дают 3% заменить новый `Shield` на `Shield_power`.
+- Трансформация применяется только к новым предметам при стартовой генерации, доборе и пополнении резервного поля. Уже лежащие на поле предметы не изменяются.
+- `battle-view` передает текущее `playerState` в генерацию поля и резервного поля, чтобы шанс отражал актуальный инвентарь игрока.
+- Валидатор предметов теперь проверяет, что `transform_chance` находится в диапазоне `0..100`, а `transform_from_itemId` и `transform_to_itemId` ссылаются на существующие предметы.
+- Контекст версии: трансформации должны быть data-driven механикой прогрессии, а не ручной подменой в UI. Не стоит применять их к уже существующим предметам на поле, иначе игрок будет видеть непредсказуемые превращения без момента генерации.
+- Затронутые файлы: `src/battle/battle-engine.js`, `src/battle/battle-view.js`, `src/map-module.js`, `scripts/check-battle-engine.mjs`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS/MJS-файлов, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`.
+
+### 2026-05-17 - Инвентарь усиливает матч-3 предметы через modificate
+
+- `battle-engine` теперь при активации клетки считает эффективные `damage`, `heal`, `aggression` и `calm` как базовые значения матч-3 предмета плюс бонусы из `modificate` предметов в инвентаре игрока.
+- Каждая запись `modificate` умножается на `quantity` соответствующего предмета в `playerState.inventory`. Например, 3 `item_Shield` дают `Shield` +3 к `calm`, а `Shield_power` +6 к `calm`, если в JSON указаны добавки `1` и `2`.
+- Батарейные активации тоже используют эти модификаторы, но все еще подавляют начисление `aggression`, как и было задумано для батареи.
+- Валидатор каталога предметов теперь проверяет `modificate`: массив, существующий целевой `itemId`, числовые `damage`, `heal`, `aggression`, `calm`.
+- Контекст версии: модификаторы должны жить в данных, чтобы баланс предметов на руках менялся через `items.jsonc`, а не через правку боевой логики. Не стоит переносить эти бонусы в код или заранее мутировать каталог предметов: расчет зависит от текущего количества предметов в инвентаре.
+- Затронутые файлы: `src/battle/battle-engine.js`, `src/map-module.js`, `scripts/check-battle-engine.mjs`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS/MJS-файлов, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`.
+
+### 2026-05-17 - Батарея получила боевое поведение
+
+- `battary` теперь помечена в каталоге предметов как `battleUse: "battery"`.
+- Батарея больше не участвует в обычных match-3 совпадениях, даже если на поле рядом стоят несколько батарей.
+- Если игрок объединяет батарею с соседним предметом, активируются все предметы этого `type` на видимом поле, а батарея исчезает вместе с ними. Эти активации применяют обычные эффекты, но не начисляют агрессию врагу.
+- Если объединить батарею с батареей, активируются все предметы на видимом поле без начисления агрессии.
+- Поиск доступных ходов теперь учитывает батарею как доступный ход и подсвечивает саму батарею, когда ее можно применить к приоритетному типу.
+- Контекст версии: батарея была заглушкой для результата 5+, теперь это управляемый спец-предмет поля. Не стоит возвращать ее к обычному `type`-матчу, иначе она начнет случайно собираться как ряд из батарей и потеряет смысл ручного мощного хода.
+- Затронутые файлы: `src/battle/battle-engine.js`, `src/battle/battle-view.js`, `scripts/check-battle-engine.mjs`, `src/map-module.js`, `data/settings/items.jsonc`, `data/locales/en.json`, `data/locales/ru.json`, `data/locales/new_ru.json`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS/MJS-файлов, `node scripts/check-battle-engine.mjs`, парсинг JSON/JSONC, `node scripts/check-encoding.mjs`.
+
+### 2026-05-17 - Выбор награды при повышении уровня
+
+- При получении опыта игра теперь отслеживает пересечение порогов `requiredExperience` из `data/player/experience-table.jsonc`.
+- После закрытия обычного окна награды открывается окно повышения уровня: показывается `eventImage`, текст `textKey` и несколько уникальных вариантов из `rewards`.
+- Игрок выбирает один вариант, после чего только выбранный предмет начисляется в инвентарь. Если вариантов меньше, чем `rewardCount`, показываются все доступные варианты.
+- Выбор вариантов идет по `weight` без повторов; при нескольких повышениях уровня окна показываются по очереди.
+- Валидатор таблицы опыта теперь явно разрешает базовый `level: 0`, требует целый `rewardCount` и не считает ошибкой `rewardCount` больше длины `rewards`.
+- Исправлен `itemId` в таблице опыта: `item_knife` заменен на существующий `item_Knife`.
+- Исправлена хвостовая запятая в `data/player/experience-table.jsonc`, из-за которой браузерный JSONC-загрузчик не мог распарсить таблицу опыта при старте игры.
+- Контекст версии: повышение уровня стало отдельным пользовательским сценарием, завязанным на таблицу опыта и общий reward overlay. Не стоит возвращаться к автоначислению всех наград уровня, иначе игрок потеряет выбор, а `rewardCount` перестанет быть управляемой настройкой.
+- Затронутые файлы: `src/map-module.js`, `src/styles.css`, `data/player/experience-table.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check src/map-module.js`, `node --check src/battle/battle-view.js`, `node scripts/check-encoding.mjs`, JSON/JSONC parse checks.
+
+### 2026-05-17 - Восстановлена кодировка русскоязычной документации
+
+- Восстановлены строки, которые были сохранены как mojibake после чтения UTF-8 текста в неправильной кодировке Windows-1251.
+- Затронуты Markdown-документы и example/HTML-файлы с русскими комментариями и текстами.
+- Добавлен `scripts/check-encoding.mjs`: no-dependency проверка, которая ищет характерные признаки сломанной кодировки в текстовых файлах проекта.
+- В `AGENTS.md` добавлено правило запускать проверку после правок русскоязычной документации или JSONC-комментариев.
+- Контекст версии: документация является рабочей памятью проекта, поэтому сломанную кодировку нужно ловить автоматически. Не стоит удалять проверку без равноценной замены, иначе проблема легко вернется при работе через PowerShell или редактор с неверной кодировкой.
+- Затронутые файлы: `AGENTS.md`, `DECISIONS.md`, `VERSIONS.md`, `data/README.md`, `data/settings/battle-ui.example.jsonc`, `data/enemy/enemy.example.jsonc`, `data/player/player-state.example.jsonc`, `index.html`, `src/battle/README.md`, `scripts/check-encoding.mjs`.
+- Проверка: `node scripts/check-encoding.mjs`.
+
+### 2026-05-17 - Invisible reserve board above the battle field
+
+- Added a second, invisible reserve board above the visible match-3 board.
+- The reserve board has the same size as the visible board, is stored in battle state as `reserveBoard`, and does not run match detection.
+- After matches or skull activation remove visible items, the battle engine now refills the visible board from the lower reserve items first, then refills the reserve board with new random `category: "match-3"` items.
+- The battle view uses the movement data from this reserve refill so icons visually fall from the upper pseudo-board instead of appearing as unrelated replacements inside empty cells.
+- New item spawn height now stacks by one full cell height plus `animations.newItemStackGapPx`, so upper spawned items no longer start almost at the same height as the lower item.
+- Gravity/refill movement now synchronizes the finish of every moving icon in one wave, so newly spawned icons do not settle before older falling icons are done.
+- Exposed `animations.newItemSpawnOffsetPx` in `data/settings/battle-ui.jsonc`: it controls how many pixels above the visible board the first new item starts. `animations.boardDropMs` remains the active fall-speed setting in milliseconds per board row.
+- Context: refill should feel like items are physically falling from above, while only the visible board remains playable. Do not remove the reserve layer unless replacing it with an equivalent explicit spawn model, otherwise cascade refill timing and readability will regress.
+- Touched files: `src/battle/battle-engine.js`, `src/battle/battle-view.js`, `scripts/check-battle-engine.mjs`, `data/README.md`, `VERSIONS.md`.
+- Checks: `node --check` and `node scripts/check-battle-engine.mjs`.
+
+
+### 2026-05-16 - Settings files moved to data/settings
+
+- Moved config files that define game startup parameters to `data/settings`:
+  - `items.jsonc`
+  - `campaign.jsonc`
+  - `campaign.example.jsonc`
+  - `battle-ui.jsonc`
+  - `battle-ui.example.jsonc`
+- Moved experience table config to `data/player/experience-table.jsonc`.
+- Updated runtime paths in `src/map-module.js` and `src/battle/battle-data.js` to use new locations.
+- Context: these are startup/data-contract files, so accidental relocation without aligned paths can break map loading or battle validation before the game starts.
+- Checks: `node --check src/map-module.js src/battle/battle-data.js` and JSON/JSONC parse checks for settings and player state files.
+### 2026-05-16 - Battle tooltip now overlays UI and comes from settings
+
+- В боевом окне подсказки больше не зависят от позиции карты: они рендерятся как фиксированное окно поверх всех слоёв.
+
+- Время показа берется из `data/settings/default-settings.json`/`current-settings.json` через `battleTooltipMs` (fallback: `battle-ui.feedback.battleTooltipMs`, затем 3000ms).
+
+- Затронутые файлы: `src/battle/battle-view.js`, `src/styles.css`, `data/settings/default-settings.json`, `data/settings/current-settings.json`, `data/settings/settings.example.jsonc`, `data/README.md`.
+### 2026-05-16 - Смена языка сразу обновляет боевой экран
+
+- Карта теперь хранит подписчиков смены языка и уведомляет их после `setLanguage()` и `resetSettings()`.
+- Battle-view подписывается через callback `onLanguageChange`, обновляет `request.locale` и перерисовывает боевые тексты: верхние кнопки, имя врага, подписи шкал, описание ульты, tooltip-предметы и заголовок окна лога.
+- При закрытии боя подписка снимается, чтобы старый battle-view не получал дальнейшие смены языка.
+- Контекст версии: бой получает локаль как снимок при старте, поэтому без отдельного уведомления настройки меняли язык только на карте. Не стоит возвращаться к чтению глобального состояния из battle-view: модуль боя должен оставаться отделенным от карты и получать изменения через явный callback.
+- Затронутые файлы: `src/map-module.js`, `src/battle/battle-view.js`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для `map-module.js` и `battle-view.js`.
+
+### 2026-05-16 - Fail-safe каскадов и предметы на руках из battle-ui
+
+- После достижения `MAX_CASCADE_STEPS` бой проверяет, остались ли на поле совпадения. Если остались, итог хода получает флаг `cascadeLimitReached`, а в статус и боевой лог добавляется локализованное сообщение `battle.status.cascadeLimitReached`.
+- Список предметов на руках справа от боевого поля перенесен из JS в `data/settings/battle-ui.jsonc` как `handItemIds`; `battle-view` оставляет только fallback-список для прямого запуска без конфига.
+- Валидатор перед START проверяет `handItemIds`: список должен быть непустым, а все `itemId` должны существовать в `data/items.jsonc`.
+- Контекст версии: длинные каскады должны завершаться явно и понятно, а боевые слоты должны управляться данными, чтобы добавление или перестановка предметов не требовали правки `battle-view.js`.
+- Затронутые файлы: `src/battle/battle-view.js`, `src/map-module.js`, `data/settings/battle-ui.jsonc`, `data/settings/battle-ui.example.jsonc`, `data/locales/ru.json`, `data/locales/en.json`, `data/locales/new_ru.json`, `data/README.md`, `VERSIONS.md`.
+- Проверка: JS syntax check, парсинг JSON/JSONC, проверка `battle-ui.textKeys`, `node scripts/check-battle-engine.mjs`.
+
+### 2026-05-16 - Локализация боевых статусов и явный контракт размера поля
+
+- Строки статуса и боевого лога в `battle-view` вынесены в `data/settings/battle-ui.jsonc` через `textKeys` и в локали `ru`, `en`, `new_ru`.
+- Устаревшее сообщение про тестовую победу заменено на нейтральный локализованный статус `battle.status.enemyDefeated`.
+- Размер поля из `battle-ui.jsonc` теперь не только runtime-fallback в view: перед START валидатор явно требует целые `board.width` и `board.height` в диапазоне 3..30. Clamp во view остается защитой на случай прямого вызова боевого модуля с битым конфигом.
+- Контекст версии: боевые сообщения должны быть частью локалей, иначе `en/new_ru` не контролируют текст, а старые подсказки могут пережить удаленные механики. Контракт размера поля должен падать понятной ошибкой на старте, а не молча менять значение.
+- Затронутые файлы: `src/battle/battle-view.js`, `data/settings/battle-ui.jsonc`, `data/settings/battle-ui.example.jsonc`, `data/locales/ru.json`, `data/locales/en.json`, `data/locales/new_ru.json`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `rg` больше не находит русские UI-строки в `src/battle/battle-view.js`; выполнены JS syntax check, парсинг JSON/JSONC и `node scripts/check-battle-engine.mjs`.
+
+### 2026-05-16 - Ранняя проверка данных боя и no-dependency тесты engine
+
+- Перед START валидатор теперь загружает активные `data/enemy/<enemyId>.jsonc` из карт кампании и проверяет минимальный контракт врага: стадии, здоровье, агрессию, ярость, ульту, награду и текстовые ключи.
+- Перед START также проверяется `data/settings/battle-ui.jsonc`: ключи локалей, пути к иконкам и фону окна боя, размер поля, настройки подсказки хода, feedback и основные тайминги анимаций.
+- Добавлен `scripts/check-battle-engine.mjs` без зависимостей и без `package.json`: он проверяет создание поля, отсутствие стартовых совпадений, drop pool, совпадения по `type`, 2x2, бонусы за 4/5+, порядок поиска хода и базовый цикл remove/drop/refill.
+- Контекст версии: бой уже зависит от нескольких JSON/JSONC-файлов, и поздняя ошибка при клике по battle-точке слишком болезненна. Раннюю проверку не стоит убирать без отдельной замены на равноценный валидатор, иначе битые enemy/battle-ui данные снова будут ломать игру только в момент входа в бой.
+- Затронутые файлы: `src/map-module.js`, `scripts/check-battle-engine.mjs`, `data/README.md`, `VERSIONS.md`.
+- Проверка: `node --check` для измененных JS-файлов и `node scripts/check-battle-engine.mjs`.
+
+### 2026-05-16 - Размер боевого поля из battle-ui
+
+- В `data/settings/battle-ui.jsonc` добавлен блок `board` с полями `width` и `height`; по умолчанию сохранено текущее поле 12x9.
+- `battle-view` передает эти размеры в `createBattleBoard()` при старте боя и при штрафном перемешивании без ходов.
+- CSS боевого поля больше не зашит на `repeat(12)` и `aspect-ratio: 12 / 9`: сетка получает `--battle-board-width` и `--battle-board-height` из конфига.
+- `data/settings/battle-ui.example.jsonc`, `data/README.md` и `src/battle/README.md` описывают настройку размера поля.
+- Контекст версии: размер поля стал частью оформления боя, чтобы можно было экспериментировать с плотностью и масштабом match-3 без правки JS/CSS. Не стоит возвращать жесткие 12x9 в стили или view, иначе настройка снова потеряет смысл.
+- Проверка: выполнены `node --check` для `battle-view.js` и `battle-engine.js`, парсинг `battle-ui.jsonc` и `battle-ui.example.jsonc`, Node-тест `createBattleBoard()` для 8x5, browser smoke боевого UI с конфигом 10x6.
+
+### 2026-05-16 - Пример battle-ui с комментариями
+
+- Добавлен `data/settings/battle-ui.example.jsonc` с пояснениями к каждому полю оформления боя: локализационные ключи, иконки, фон окна, цвета шкал, feedback, приоритет поиска доступного хода и тайминги анимаций.
+- `data/README.md` и `src/battle/README.md` теперь указывают на example-файл как на справочник по настройкам battle UI.
+- Контекст версии: рабочий `battle-ui.jsonc` должен оставаться компактным, а подробные комментарии лучше держать в example-файле. Не стоит переносить все пояснения в рабочий config без причины, иначе его станет труднее быстро читать и менять.
+- Проверка: выполнен парсинг `data/settings/battle-ui.jsonc` и `data/settings/battle-ui.example.jsonc` как JSONC.
+
+### 2026-05-16 - Настраиваемый приоритет поиска доступного хода
+
+- В `data/settings/battle-ui.jsonc` добавлен блок `availableMoveSearch.typeGroups`: каждый вложенный список задает типы match-3 предметов, которые ищутся одновременно, а следующие группы проверяются только если в предыдущей доступного хода нет.
+- По умолчанию idle-подсказка сначала ищет ходы для атакующих типов `granate`, `Knife`, `bullet`, потом для `Bandage`, `Shield`, потом для любых остальных типов через `"*"`.
+- `findBattleAvailableMove()` принимает настройки поиска и возвращает ход только если `hintCell` относится к типу текущей приоритетной группы; `battle-view` передает эти настройки из оформления битвы.
+- Контекст версии: порядок подсказки вынесен в оформление боя, чтобы можно было менять UX-приоритеты без правки логики. Не стоит хардкодить порядок типов в `battle-engine.js`, потому что баланс и желаемая подсказка будут меняться.
+- Проверка: выполнены `node --check` для `battle-engine.js` и `battle-view.js`, парсинг `battle-ui.jsonc`, а также Node-тест приоритета, где нижний доступный ход с типом `junk_1` пропущен ради хода с `bullet` из первой группы.
+
+### 2026-05-16 - Idle-подсказка трясет нужный предмет
+
+- `findBattleAvailableMove()` теперь возвращает `hintCell`: исходную клетку предмета, который после обмена входит в найденную комбинацию.
+- `battle-view` использует `hintCell` для idle-подсказки, поэтому если комбинацию собирает пуля, трясется именно пуля, которую нужно подвинуть, а не соседняя клетка обмена.
+- Контекст версии: подсказка должна учить игрока конкретному действию, а не просто показывать пару клеток. Не стоит возвращаться к тряске `from` без проверки предмета, потому что при некоторых обменах нужный предмет находится во второй клетке.
+- Проверка: выполнены `node --check` для `battle-engine.js` и `battle-view.js`, а также точечный Node-тест, где доступный ход найден через левый обмен, но `hintCell` указывает на правый предмет, который собирает вертикальную комбинацию.
+
+### 2026-05-16 - Подсказка доступного хода снизу вверх
+
+- `findBattleAvailableMove()` снова обходит match-3 поле от нижней строки к верхней, поэтому idle-подсказка выбирает нижний доступный ход раньше верхних.
+- Документация боевого модуля и общий README уточняют этот порядок, чтобы при восстановлении из бекапов или новых правках он не потерялся снова.
+- Контекст версии: нижняя часть поля ближе к зоне внимания игрока в текущем боевом layout, поэтому автоматическая подсказка должна сначала искать ходы там. Не стоит возвращать обход сверху вниз без отдельного UX-решения.
+- Проверка: выполнены `node --check` для `src/battle/battle-engine.js` и точечный Node-тест `findBattleAvailableMove()` на поле с двумя возможными ходами, где выбран нижний ход.
+
+### 2026-05-16 - Grid-слой иконок над боевыми квадратами
+
+- Иконки предметов отвязаны от квадратов: `.battle-scaffold-cell` остается статичным кликабельным квадратом, а `.battle-cell-icon` становится отдельным прямым элементом того же grid-поля.
+- Квадрат и его иконка получают одинаковые `grid-row` и `grid-column`, но разные слои: квадрат остается на `z-index: 0`, обычная иконка на `z-index: 100`, а анимируемая иконка на `z-index: 200`.
+- Квадраты поля переведены с native `<button>` на обычные `<div role="gridcell">`, чтобы браузерный слой отрисовки кнопки не перекрывал и не размывал отдельные иконки.
+- Визуал квадрата перенесен в `.battle-scaffold-cell::before`; сама клетка остается прозрачной и без `backdrop-filter`, чтобы статичная иконка не выглядела лежащей под квадратом.
+- `getBattleCellElement()` теперь явно ищет `.battle-scaffold-cell[data-row][data-col]`, а `getBattleCellIconElement()` - `.battle-cell-icon[data-row][data-col]`.
+- Контекст версии: этот способ выбран вместо абсолютного overlay и вместо двух самостоятельных grid-слоев, потому что оба подхода могут уехать относительно реальных квадратов. Не стоит снова вкладывать иконки внутрь квадратов: тогда фон квадрата может перекрывать предмет во время swap.
+- Проверка: выполнены JS syntax check, парсинг ключевых JSON/JSONC и browser smoke 12x9: 108 квадратов, 108 иконок, клетки являются `DIV`, иконки не внутри квадратов, координаты иконок совпадают с квадратами, обычные и анимируемые иконки находятся выше квадратов, у клетки и ее `::before` нет blur/backdrop-filter.
+
+### 2026-05-16 - Череп, перчатка и правки каскадов боя
+
+- Исправлено наложение при обмене: анимируемые иконки получают верхний слой над подложками клеток, поэтому предмет не должен визуально уходить под квадрат.
+- `refillBattleBoard()` теперь заполняет пустые клетки снизу вверх, чтобы добор новых предметов читался в нужном направлении.
+- Эффекты боя теперь сначала применяют урон по врагу, а уже потом агрессию. Если враг погиб от этого хода, агрессия дальше не копится; таймер ярости и раньше останавливался на `isDefeated`, это поведение сохранено явно.
+- Добавлена активная механика `item_skull`: клик по черепу тратит предмет и показывает маленькую иконку у курсора; повторный клик по черепу отменяет режим и возвращает предмет; клик по полю активирует выбранную клетку и 3x3 вокруг нее без начисления агрессии от этих клеток.
+- Добавлена активная механика `item_swap`: клик по перчатке тратит предмет и показывает маленькую иконку у курсора; повторный клик отменяет режим и возвращает предмет; два клика по полю меняют любые две клетки местами, даже если комбинации нет.
+- Пока активен череп или перчатка, другие спец-кнопки (`item_skull`, `item_swap`, `item_time`) не активируются и показывают сообщение недоступности.
+- Контекст версии: эти способности расходуют предмет в момент входа в режим, а не в момент применения, потому что отмена уже явно возвращает предмет. Не стоит переносить списание на клик по полю без пересмотра UX: иначе игрок не будет видеть цену активного режима сразу.
+- Проверка: выполнены JS syntax check всех файлов `src`, парсинг ключевых JSON/JSONC и browser smoke спец-предметов: череп активируется/отменяется/снимает 3x3 без агрессии, перчатка меняет любые две клетки и очищает активный режим.
+
+### 2026-05-16 - Визуальный каскад боя
+
+- Усиленный предмет или генератор за сбор 4/5 теперь пытается создаться на клетке, куда игрок передвинул предмет, если эта клетка входит в совпадение.
+- Подложки клеток на боевом поле остаются неподвижными; swap, shake, death, gravity и shuffle применяются только к иконкам предметов.
+- Падение и добор после исчезновения предметов анимируются по расстоянию: `animations.boardMoveStepMs` в `data/settings/battle-ui.jsonc` задает миллисекунды на одну клетку, по умолчанию `250`.
+- Контекст версии: это косметический шаг для читаемости каскадов. Не стоит возвращать мгновенное падение или движение всей клетки без отдельной причины, потому что поле становится труднее читать во время длинных каскадов.
+- Проверка: выполнены JS syntax check всех файлов `src`, парсинг ключевых JSON/JSONC (`battle-ui`, `items`, `enemy`, `locales`, player state) и browser smoke боевого поля: бонус за 4 появился в клетке второго клика, при падении двигались только `.battle-cell-icon`, а `.battle-scaffold-cell` оставались неподвижными.
+
+### 2026-05-16 - Подключены реальные исходы боя
+
+- Из окна боя убраны кнопки `Тестовая победа` и `Отмена`; освободившееся место осталось под описание ярости врага.
+- В верхней части battle overlay добавлены кнопки `Сдаться`, `Настройки`, `Лог`. `Настройки` открывают общий overlay настроек карты и ставят боевые таймеры на паузу, пока настройки открыты.
+- Победа теперь определяется состоянием врага: когда `enemyState.isDefeated` становится `true`, показывается полупрозрачная полоса с локализованной надписью `battle.outcome.victory`.
+- Длительность победной полосы вынесена в `data/settings/battle-ui.jsonc` как `animations.outcomeBannerMs`; после показа бой возвращает карте `victory`, как раньше делала тестовая кнопка.
+- Поражение определяется по HP игрока `<= 0`: показывается полоса `battle.outcome.defeat` и две кнопки - `ui.surrender` и `battle.outcome.restart`. Кнопка повторного старта пока является заглушкой до следующего шага проектирования.
+- В `map-module.js` сдача получила callbacks, чтобы battle-модуль мог открыть тот же диалог сдачи и корректно остановить/продолжить бой при подтверждении или отмене.
+- Контекст версии: это перевод боя с ручной тестовой победы на реальные состояния победы/поражения. Не стоит возвращать тестовые кнопки внутрь боевого окна: они скрывали настоящий переход результата боя и занимали место, нужное под описание ярости.
+- Проверка: выполнены JS syntax check, парсинг battle-ui и локалей, браузерный smoke победы по HP врага с победной полосой, проверка паузы таймеров на настройках, проверка поражения по HP игрока с двумя кнопками.
+
+### 2026-05-16 - Перенесен лог боя и подключены награды врага после победы
+
+- В `battle-view.js` короткий лог/статус больше не отображается внутри окна характеристик врага.
+- В боевом overlay добавлена отдельная кнопка `Лог` на позиции кнопки лога карты; по нажатию открывается список сообщений боя.
+- `BattleResult` теперь может возвращать `reward` - payload награды из enemy JSON.
+- При победе карта больше не завершает battle-точку мгновенно, если у врага есть награда: сначала показывается общее reward-окно, затем после кнопки `ui.claimReward` награда начисляется, точка боя помечается пройденной и открываются следующие точки.
+- Награды типа `health` теперь поддерживаются общей reward-механикой карты вместе с `gold`, `experience` и `item`.
+- В `data/enemy/test.jsonc`, `data/enemy/Boss_1.jsonc` и `data/enemy/enemy.example.jsonc` у `reward` добавлены `eventImage` и `dialogTextKey`; локали получили тексты `battle.reward.*`.
+- Контекст версии: награда после боя должна оставаться картовой механикой, а не логикой battle-view. Бой возвращает результат и payload, карта владеет прогрессом маршрута, начислением награды, глобальным логом и открытием следующих точек.
+- Проверка: выполнены JS syntax check всех файлов `src`, парсинг enemy/locales/items/battle-ui JSONC/JSON, direct browser smoke для battle log/result reward и browser-проверка полного flow карты: battle -> тестовая победа -> reward overlay -> `Забрать` -> завершение battle-точки.
+
+### 2026-05-16 - Добавлен поиск доступных ходов в бою
+
+- `battle-engine.js` получил чистую функцию `findBattleAvailableMove()`: она проверяет соседние обмены вправо/вниз и возвращает первый ход, который создаст совпадение, либо `null`.
+- `battle-view.js` запускает idle-таймер: если игрок 5 секунд ничего не делает, поле ищет доступный ход и слегка трясет предмет, который нужно передвинуть.
+- Если доступных ходов нет, поле блокируется, показывает локализованное сообщение, игрок получает урон в размере атаки врага, а доска перемешивается в течение `noMovesShuffleMs`.
+- В `data/settings/battle-ui.jsonc` добавлены ключи `noMovesTitle`, `noMovesBody` и тайминги `idleHintDelayMs`, `idleHintShakeMs`, `noMovesShuffleMs`.
+- В `data/locales/ru.json`, `data/locales/en.json` и `data/locales/new_ru.json` добавлены тексты предупреждения о невозможности хода.
+- Контекст версии: это страховка от тупикового поля и первый мягкий hint-сценарий. Не стоит смешивать эту механику с будущей проверкой “есть ли ход после каждого каскада”: сейчас подсказка работает только после бездействия, а штрафное перемешивание остается простым MVP-поведением.
+- Проверка: выполнены JS syntax check всех файлов `src`, парсинг измененных JSON/JSONC и локалей, engine-тест доступного/недоступного хода и урона игроку, браузерный smoke-тест idle-подсказки на боевом экране и отдельный браузерный тест no-move сообщения со штрафным уроном.
+
+### 2026-05-16 - Добавлен первый слой анимаций match-3 боя
+
+- Курсор `up_down.png` больше не назначается на основные прокручиваемые панели; вместо него используется обычный курсор.
+- Доступные точки карты теперь используют курсор `hand-finger.png`, а боевые кликабельные элементы остаются на активном зеленом курсоре `cursor_activ.png`.
+- В `data/settings/battle-ui.jsonc` добавлен блок `animations`: `swapMs`, `invalidShakeMs`, `matchShakeMs`, `boardMoveMs`, `deathFlightPx`.
+- Ход в battle-view стал асинхронным: поле блокируется на время swap/match/death/drop/refill/cascade-цепочки.
+- При выборе двух соседних предметов они визуально меняются местами за `swapMs`.
+- Если ход не дал совпадения, две клетки шатаются `invalidShakeMs` и возвращаются без изменения поля.
+- Если совпадение найдено, активированные клетки шатаются `matchShakeMs`, затем предметы исчезают по своему `death_time`, увеличиваясь до x2 и улетая в сторону `Leave_side`.
+- После удаления поле перерисовывается и получает короткое движение `boardMoveMs`; каскады повторяются до успокоения поля.
+- Всем текущим match-3 и rare_match-3 предметам добавлены `Leave_side: 0` и `death_time: 0.5`; валидатор теперь требует эти поля.
+- Контекст версии: это первый визуальный слой поверх существующего engine. Не стоит переносить анимации в чистую логику боя: engine должен оставаться проверяемым без DOM, а view отвечает за последовательность показа.
+- Проверка: нужно прогнать JS/JSON/локали, валидатор предметов и браузерный smoke-тест боя.
+
+### 2026-05-15 - Улучшено визуальное оформление окна боя
+
+- В `data/settings/battle-ui.jsonc` добавлен фон окна боя `backgrounds.battleWindow` со ссылкой на `data/Assets/backgrounds/battle.png`.
+- `battle-view.js` теперь берет фон окна боя из UI-конфига, а не из CSS-хардкода.
+- Боевые клетки, слоты предметов, кнопки, статус и описание ульты переведены на полупрозрачные скругленные прямоугольники с легкой границей и blur-слоем.
+- Сетка match-3 больше не выглядит как плоские сплошные квадраты: иконки предметов лежат поверх полупрозрачных округлых ячеек.
+- Контекст версии: отдельная текстура для ячеек пока не нужна, потому что прозрачность, скругление и состояние hover проще и надежнее держать в CSS. Текстуру стоит добавлять позже только если понадобится художественная рамка или материал.
+- Проверка: нужно прогнать JSON/JS проверки и браузерный smoke-тест окна боя.
+
+### 2026-05-15 - Подключены игровые курсоры в интерфейсе
+
+- Готовый набор из `data/Assets/cursor/ready` подключен через CSS-переменные в `src/styles.css`.
+- Обычное состояние использует `cursor.png`, кнопки и кликабельные элементы - `cursor_activ.png`, подсказки по предметам - `cursor_q.png`.
+- Карта в режиме перетаскивания использует `hand.png`, активное перетаскивание - `hand_take.png`, вертикально прокручиваемые панели - `up_down.png`.
+- Контекст версии: курсоры подключены к готовым 32x32 PNG, а не к крупным исходникам. Это важно сохранить, чтобы браузер не показывал слишком большие курсоры и чтобы все состояния можно было менять централизованно через CSS-переменные.
+- Проверка: нужно открыть игру в браузере и убедиться, что computed cursor для body, кнопок, карты, HUD-предметов и drag-состояния содержит нужные PNG.
+
+### 2026-05-15 - Подготовлен набор игровых курсоров 32x32
+
+- Из крупных исходников в `data/Assets/cursor` создан отдельный готовый набор курсоров в `data/Assets/cursor/ready`.
+- Все PNG приведены к размеру 32x32 с сохранением прозрачности и без перезаписи исходных файлов.
+- Контекст версии: исходники остаются крупными рабочими файлами, а `ready` нужен как безопасный web-набор для CSS cursor. Не стоит подключать большие исходники напрямую в CSS, иначе курсоры будут слишком крупными и менее предсказуемыми в браузере.
+- Проверка: все созданные PNG открываются как 32x32.
+
+### 2026-05-15 - Улучшено состояние часов в бою
+
+- Слот часов теперь блокируется и затемняется на время действия остановки ярости.
+- Поверх иконки часов показывается обратный отсчет оставшихся секунд заморозки времени.
+- Повторный клик по активным часам больше не тратит предмет и показывает локализованное `battle.clock.unavailable`.
+- Сообщение недоступности заменено на короткое `Недоступно`/`Unavailable`, выводится в одну строку и без подложки.
+- Контекст версии: часы становятся боевым cooldown-инструментом, а не расходником, который можно прожимать несколько раз подряд. Это важно сохранить, чтобы игрок не мог случайно потратить часы во время уже активной остановки времени.
+- Проверка: после изменения нужно прогнать JS/JSON/локали и браузерный smoke-тест часов.
+
+### 2026-05-15 - Добавлены порог агрессии, таймер ярости и боевое применение часов
+
+- `battle-engine.js` теперь сбрасывает агрессию врага при достижении порога и наносит игроку урон из `aggression.damage`; переполнение намеренно не переносится дальше, чтобы порог читался как отдельная атака.
+- Добавлен чистый тик таймера ярости: таймер уменьшается по секундам, при нуле выдает событие-заглушку и перезапускается от значения стадии врага.
+- Предмет `item_time` получил `battleTimeStopSeconds: 30`; в боевом UI клик по часам тратит один предмет и ставит таймер ярости на паузу на это время.
+- Если часы недоступны, из иконки вылетает локализованное сообщение `battle.clock.unavailable`; длительность сообщения вынесена в `data/settings/battle-ui.jsonc` как `feedback.floatMessageMs`.
+- В валидатор предметов добавлена проверка `battleTimeStopSeconds`, а локали `en`, `ru`, `new_ru` получили ключи для часов и события ярости.
+- Обновлены `data/README.md` и `src/battle/README.md`, чтобы новые правила боя были зафиксированы рядом с данными и модулем.
+- Контекст версии: это первый маленький шаг к поведению врага без полноценного AI. Важно не менять это обратно на простой clamp агрессии: игрок должен понимать, что шкала агрессии является порогом атаки, а не обычным индикатором.
+- Проверка: после изменения нужно прогнать JS/JSON/локали/asset checks, engine-проверки агрессии/ярости и браузерный smoke-тест боя.
+
+### 2026-05-13 - Добавлен журнал версий
+
+- Создан `VERSIONS.md` для фиксации всех будущих изменений и дополнений.
+- В `data/README.md` добавлено правило: при изменении кода, данных, ассетов или функций обновлять журнал версий, а README держать актуальным.
+- Контекст версии: журнал нужен, чтобы будущие изменения не теряли причину и проверку. Это правило не стоит убирать без отдельного решения, иначе проект снова начнет расходиться между кодом, данными и документацией.
+- Поведение игры не менялось.
+- Проверка: документационные файлы прочитаны после изменения.
+
+### 2026-05-13 - Добавлены правила работы с проектом
+
+- Создан `AGENTS.md` с правилами поведения помощника, стилем работы, ограничениями по коду, данным, тестированию и документации.
+- Создан `DECISIONS.md` для фиксации архитектурных решений.
+- Обновлен формат `VERSIONS.md`: теперь каждая версия должна содержать контекст версии.
+- Обновлен `data/README.md`, чтобы он ссылался на `AGENTS.md`, `VERSIONS.md` и `DECISIONS.md`.
+- Контекст версии: правила нужны, чтобы новые изменения делались аккуратно, маленькими проверяемыми шагами и не ломали проектные договоренности. Их не стоит менять ситуативно ради одной задачи; если правило мешает, нужно зафиксировать причину и новое решение в `DECISIONS.md`.
+- Поведение игры не менялось.
+- Проверка: документационные файлы прочитаны после изменения.
+
+### 2026-05-13 - Добавлены проверка данных, глобальный лог и полная локаль new_ru
+
+- В `src/map-module.js` добавлен валидатор перед стартом забега: он проверяет кампанию, карты кампании, стартовое состояние игрока и все активные локали из `settings.languages`.
+- START больше не скрывает главное меню до успешной проверки данных. При ошибках игра показывает список проблем в диалоге.
+- Глобальный лог сохранен как намеренное поведение: новый забег не очищает старые записи, а добавляет выделенный заголовок забега и подробные строки событий.
+- Лог стал подробнее: фиксирует проверку данных, генерацию карты, выбор точек, открытие магазина/лекаря, покупки, лечение, победу и переходы между картами.
+- `new_ru.json` дописан до полного набора ключей и переведен в псевдо-старорусском стиле.
+- В `data/maps/WildWest.jsonc` расширено покрытие `skip` до 10 уровня, чтобы положительный вес `skip` не создавал пустой payload на поздних уровнях.
+- В `src/styles.css` добавлено оформление разделителей глобального лога и перенос строк в диалоге ошибок.
+- В `data/README.md` описаны проверка перед стартом, глобальный лог и правило покрытия событий с положительным весом.
+- В `DECISIONS.md` добавлено решение про раннюю проверку данных и сохранение глобального лога.
+- Контекст версии: изменения нужны, чтобы ошибки JSON/локалей становились понятными до старта забега, а история нескольких попыток читалась как единая летопись с разделителями. Не стоит убирать раннюю проверку или очищать лог при новом START без отдельного решения: иначе проект снова начнет молча пропускать ошибки данных и терять контекст между забегами.
+- Поведение игры изменилось: старт блокируется при ошибках данных, `new_ru` больше не показывает технические ключи, а лог стал глобальным явно оформленным журналом с подробными событиями.
+- Проверка: выполнены `node --check src\\map-module.js`, парсинг измененных JSON/JSONC и проверка покрытия локалей/данных скриптом.
+
+### 2026-05-13 - Улучшены прокрутка карты и вертикальный HUD-инвентарь
+
+- После выбора точки карта плавно прокручивается к новым доступным точкам и старается разместить их в нижней трети экрана.
+- Кнопки точек получают `data-node-id`, чтобы автопрокрутка могла найти новые доступные узлы после перерендера.
+- HUD слева сверху стал вертикальным списком: здоровье, золото, черепа, часы и перчатка/обмен показываются всегда, остальные предметы появляются только при `quantity > 0`.
+- В активные локали добавлен ключ `hud.health` для подписи здоровья в подсказке HUD.
+- В `data/README.md` описаны автопрокрутка после выбора точки и новые правила отображения HUD.
+- В `DECISIONS.md` добавлено решение про удержание доступных точек в зоне действия и вертикальный HUD.
+- Контекст версии: изменение снижает ручной скролл между событиями и делает инвентарь слева читаемым при росте количества предметов. Не стоит возвращать горизонтальный HUD или убирать автопрокрутку без отдельного решения, потому что эти элементы поддерживают основной темп map-run геймплея.
+- Поведение игры изменилось: после выбора точки viewport сам двигается к следующим доступным точкам, а HUD строится динамически из runtime-инвентаря.
+- Проверка: выполнены `node --check src\\map-module.js`, парсинг всех JSON/JSONC и проверка покрытия локалей.
+
+### 2026-05-13 - Исправлены автопрокрутка карты и ширина HUD
+
+- Исправлен расчет позиции новых доступных точек для автопрокрутки: координата узла теперь берется внутри карты без повторного добавления `scrollTop`.
+- Добавлен fallback на прямое присваивание `scrollTop`, если контейнер не поддерживает объектный `scrollTo`.
+- HUD расширен: значения рассчитаны минимум на 8 символов и выровнены по левому краю.
+- В `data/README.md` уточнено правило ширины и выравнивания значений HUD.
+- Контекст версии: исправление нужно, потому что прежняя формула прокрутки могла уводить viewport не к новым точкам, а HUD был слишком узким для `100/100`. Не стоит снова сужать HUD ниже 8 символов без отдельной проверки всех базовых показателей.
+- Поведение игры изменилось: автопрокрутка должна попадать к новым доступным точкам стабильнее, а значения HUD больше не должны обрезаться.
+- Проверка: выполнены `node --check src\\map-module.js` и парсинг всех JSON/JSONC.
+
+### 2026-05-13 - Смягчена автопрокрутка к новым точкам
+
+- Автопрокрутка после открытия новых доступных точек переведена с браузерного `scrollTo({ behavior: "smooth" })` на собственную анимацию через `requestAnimationFrame`.
+- Длительность прокрутки установлена в 1 секунду.
+- Если игрок быстро выбирает новую точку или запускается новая прокрутка, предыдущая анимация отменяется.
+- В `data/README.md` уточнена длительность автопрокрутки.
+- Контекст версии: браузерная плавная прокрутка оказалась слишком резкой и не давала управлять длительностью. Не стоит возвращаться к нативному `behavior: "smooth"`, если нужно стабильное ощущение движения карты.
+- Поведение игры изменилось: камера к новым точкам движется мягче и заметнее.
+- Проверка: выполнены `node --check src\\map-module.js` и парсинг всех JSON/JSONC.
+
+### 2026-05-13 - Перенесена автопрокрутка на завершение события
+
+- Автопрокрутка больше не запускается сразу после выбора точки.
+- Для `skip` камера двигается после закрытия диалога.
+- Для `shop` камера двигается после ухода из магазина или успешной покупки.
+- Для `heal` камера двигается после ухода от лекаря или успешного лечения.
+- В `data/README.md` и `DECISIONS.md` уточнено, что новые точки подтягиваются после завершения события.
+- Контекст версии: игрок должен сначала увидеть и завершить событие, а уже потом карта должна подвести его к следующему выбору. Не стоит возвращать прокрутку на момент клика по точке, потому что это двигает карту под оверлеем или диалогом и делает переход менее понятным.
+- Поведение игры изменилось: камера ждет завершения события перед движением к новым точкам.
+- Проверка: выполнены `node --check src\\map-module.js` и парсинг всех JSON/JSONC.
+
+### 2026-05-13 - Зафиксирован путь к будущей exe/Steam-версии
+
+- В `DECISIONS.md` добавлено важное архитектурное уточнение: проект остается web-прототипом, но должен сохранять возможность будущей упаковки в `.exe` и публикации в Steam.
+- В `data/README.md` добавлена заметка о будущем desktop/Steam-направлении.
+- Контекст версии: это нужно зафиксировать до появления новых систем, чтобы не принять удобные для прототипа решения, которые потом помешают packaged-билду. Не стоит убирать это уточнение без отдельного решения, потому что оно влияет на выбор путей к ассетам, сохранений, зависимостей и платформенных API.
+- Поведение игры не менялось.
+- Проверка: документационные файлы обновлены и прочитаны.
+
+### 2026-05-13 - Увеличены точки карты и добавлен живой разброс раскладки
+
+- Кнопки-точки на карте стали крупнее, вместе с иконками внутри них.
+- Босс-точка тоже увеличена пропорционально.
+- В `src/map-module.js` добавлен стабильный визуальный jitter для обычных точек карты по X/Y.
+- Разброс вычисляется от id карты и id точки, поэтому не меняется при каждом `render()`.
+- В `data/README.md` описано, что точки больше и что раскладка специально не строится строгими колонками.
+- В `DECISIONS.md` добавлено решение про живую, но стабильную раскладку карты.
+- Контекст версии: крупные точки удобнее читать и нажимать, а легкий разброс делает карту живее, когда соседние уровни имеют одинаковое количество точек. Не стоит делать разброс случайным на каждом render(), потому что карта начнет визуально прыгать.
+- Поведение игры изменилось визуально: точки стали крупнее, а уровни больше не выглядят как идеально ровная сетка.
+- Проверка: выполнены `node --check src\\map-module.js` и парсинг всех JSON/JSONC.
+
+### 2026-05-13 - Усилен горизонтальный разброс точек карты
+
+- Горизонтальный jitter обычных точек увеличен, вертикальный разброс оставлен прежним.
+- В `data/README.md` уточнено, что горизонтальный разброс специально заметнее вертикального.
+- Контекст версии: вертикальное движение уже выглядело хорошо, а горизонтальный разброс был слишком слабым и оставлял ощущение колонок. Не стоит усиливать вертикаль вместе с горизонталью без проверки читаемости уровней.
+- Поведение игры изменилось визуально: точки сильнее расходятся влево-вправо.
+- Проверка: выполнены `node --check src\\map-module.js` и парсинг всех JSON/JSONC.
+
+### 2026-05-14 - Добавлен единый каталог предметов
+
+- Создан `data/items.jsonc` со всеми текущими предметами, их ключами названия и описания, обычными и крупными иконками, категориями и настройками HUD.
+- `src/map-module.js` теперь загружает каталог перед START, проверяет его валидатором и берет имена, описания, иконки HUD, магазина и инвентаря из каталога.
+- Статические ссылки на item-иконки убраны из HTML: HUD полностью строится из runtime-состояния и `data/items.jsonc`.
+- В активные локали добавлены описания предметов, включая псевдо-старорусские описания для `new_ru`.
+- В `data/README.md` описаны формат каталога, новые проверки и связь каталога с HUD.
+- В `DECISIONS.md` добавлено решение о центральном каталоге предметов.
+- Контекст версии: каталог нужен, чтобы предметы можно было менять, переименовывать и перевешивать на другие иконки без правки JS. Не стоит возвращать сборку путей к иконкам из `itemId` в коде без отдельного решения, иначе контроль над сущностями снова расползется между файлами.
+- Поведение игры изменилось технически: START теперь дополнительно проверяет каталог предметов и ключи описаний; визуально HUD, магазин и инвентарь должны выглядеть так же, но их данные идут из каталога.
+- Проверка: выполнены `node --check src\\map-module.js`, парсинг всех JSON/JSONC и проверка ссылок каталога на локальные ассеты.
+
+### 2026-05-14 - Переименовано event-изображение и оживлено событие reward
+
+- Поле карты `characterImage` заменено на более общее `eventImage` для `shop`, `heal` и `reward`.
+- В reward-варианты добавлены `dialogTextKey` и `eventImage` с картинками из `data/Assets/events`.
+- `reward` теперь применяет награду: выбирает `itemCount` записей из массива `rewards`, начисляет золото или предметы, показывает диалог с event-изображением и пишет результат в лог.
+- Простой `eventDialog` получил необязательное изображение для событий вроде `reward`; `skip` и victory остаются текстовыми.
+- В активные локали добавлены тексты наград и строка лога `log.rewardResolved`.
+- В `data/README.md` описан новый формат reward и смысл `itemCount`.
+- В `DECISIONS.md` добавлено решение про единое поле `eventImage` и семантику `itemCount`.
+- Контекст версии: `characterImage` был слишком узким названием, потому что событие может показывать предмет, тайник или сцену, а не только персонажа. `itemCount` теперь имеет явный смысл как размер случайной выборки из пула `rewards`; не стоит снова оставлять его как неиспользуемое поле без отдельного решения.
+- Поведение игры изменилось: если reward получит положительный вес, он будет выдавать награды и показывать диалог события.
+- Проверка: выполнены `node --check src\\map-module.js`, парсинг всех JSON/JSONC и проверка eventImage-файлов.
+
+### 2026-05-14 - Добавлен экран получения reward
+
+- Для события `reward` добавлен отдельный fullscreen overlay: `eventImage` используется как замыленный фон, а полученные предметы показываются крупными `bigIcon`-иконками с названием и количеством.
+- Иконки наград появляются с zoom-анимацией из маленького размера в нормальный.
+- Внизу экрана награды выводится текст из `dialogTextKey` и кнопка получения награды.
+- В рабочей `WildWest.jsonc` событие `reward` включено в генерацию карты с положительным весом.
+- В активные локали добавлен новый ключ `ui.claimReward`.
+- В `data/README.md` уточнено визуальное поведение reward.
+- Контекст версии: reward должен ощущаться как отдельный момент получения добычи, а не как обычный текстовый диалог. Не стоит возвращать reward в простой `showDialog`, если только весь UX наград не будет пересмотрен.
+- Поведение игры изменилось: reward теперь закрывается отдельной кнопкой получения, после чего камера прокручивается к следующим доступным точкам.
+- Проверка: выполнены `node --check src\\map-module.js`, парсинг всех JSON/JSONC и проверка ключа `ui.claimReward` во всех активных локалях.
+
+### 2026-05-14 - Включен reward-only режим для проверки карты
+
+- В `data/maps/WildWest.jsonc` веса событий выставлены так, чтобы обычные точки генерировались только как `reward`: `reward: 1000`, остальные типы `0`.
+- Контекст версии: это нужно для проверки нового reward-экрана и для подтверждения, что генерация действительно берется из активного конфига карты. Не стоит оставлять этот режим как боевой баланс без отдельного решения, потому что он отключает shop/heal/skip.
+- Поведение игры изменилось: обычные точки карты должны быть только `reward`; финальный `boss` остается отдельной обязательной точкой.
+- Проверка: выполнена проверка весов активной карты и симуляция генерации событий.
+
+### 2026-05-14 - Улучшена анимация окна reward
+
+- Reward больше не открывается полноэкранной сценой: теперь это центральное окно поверх затемненной карты.
+- `eventImage` в окне сначала показывается четко 1 секунду, затем за 2 секунды становится размытым фоном.
+- Карточки полученных предметов появляются маленькими в центре и за 4 секунды увеличиваются до крупного размера.
+- Добавлены свет, тень, мягкая рамка окна и поддержка `prefers-reduced-motion`.
+- В `data/README.md` уточнено новое визуальное поведение reward.
+- Контекст версии: награда должна быть красивым отдельным моментом, но не полностью вырывать игрока из карты. Не стоит возвращать fullscreen reward без отдельного UX-решения.
+- Поведение игры изменилось визуально: reward стал оконным и более медленным, церемониальным.
+- Проверка: выполнены `node --check src\\map-module.js`, парсинг JSON/JSONC и проверка локального ответа `index.html`.
+
+### 2026-05-14 - Вынесены времена reward-анимации в настройки
+
+- В `data/settings/default-settings.json`, `data/settings/current-settings.json` и `data/settings/settings.example.jsonc` добавлен блок `rewardAnimationMs`.
+- Настраиваются `clearMs`, `blurMs`, `iconDelayMs`, `iconZoomMs` и `iconStaggerMs`.
+- `src/map-module.js` применяет эти значения как CSS-переменные при открытии reward-окна.
+- В `data/README.md` добавлено описание новых полей настроек.
+- Контекст версии: скорость reward-анимации нужно менять из данных, а не через поиск в CSS. Не стоит снова зашивать эти времена только в стилях, потому что визуальный темп наград будет активно подбираться.
+- Поведение игры изменилось технически: длительности reward-анимации теперь управляются JSON-настройками в миллисекундах.
+- Проверка: выполнены `node --check src\\map-module.js`, парсинг JSON/JSONC и проверка локального ответа `index.html`.
+
+### 2026-05-14 - Исправлено мгновенное проигрывание reward-анимации
+
+- Убран CSS-блок `prefers-reduced-motion`, который сжимал reward-анимации до `1ms` при системной настройке уменьшения движения.
+- `rewardAnimationMs` теперь всегда берется из файлов настроек, а не из старого `localStorage`.
+- В `data/README.md` уточнено, что после изменения `rewardAnimationMs` нужно перезагрузить страницу.
+- Контекст версии: reward-анимация является частью игрового события и должна подчиняться JSON-временам. Не стоит снова принудительно сокращать ее через общий CSS без отдельной настройки внутри игры.
+- Поведение игры изменилось: увеличение значений `rewardAnimationMs` должно реально замедлять размытие и появление иконок.
+- Проверка: выполнены `node --check src\\map-module.js`, парсинг JSON/JSONC и проверка отсутствия `prefers-reduced-motion` для reward.
+
+### 2026-05-14 - Разделены зум и подпись reward-предмета
+
+- В reward-анимации теперь увеличивается только иконка предмета, а не вся карточка с подложкой.
+- Подложка, название и количество появляются после окончания зума иконки.
+- Убраны промежуточные масштабные ступени, которые могли создавать визуальный рывок в конце анимации.
+- В `data/README.md` уточнено, что подпись reward-предмета появляется после зума.
+- Контекст версии: игрок должен сначала увидеть предмет как визуальный приз, а потом получить текстовую подпись. Не стоит снова зумить всю карточку целиком, потому что фон, тени и текст делают финал движения дерганым.
+- Поведение игры изменилось визуально: reward-предмет должен увеличиваться ровнее, а подпись появляется отдельным поздним слоем.
+- Проверка: выполнены `node --check src\\map-module.js`, парсинг JSON/JSONC и проверка локального ответа `index.html`.
+
+### 2026-05-14 - Добавлен формат JSONC для врагов
+
+- Создан `data/enemy/Boss_1.jsonc` с примером врага на 3 стадии: внешний вид, здоровье стадии, агрессия, урон, ярость, ульта и награда.
+- Создан `data/enemy/enemy.example.jsonc` как документированный шаблон для будущих врагов.
+- Ульты описаны через массив `effects`, чтобы поддерживать расширяемые эффекты: конвертацию элементов, урон по количеству элементов, лечение по количеству элементов и заморозку случайных элементов.
+- В активные локали добавлены ключи описания Boss_1, стадий и ульт.
+- В `data/README.md` описан формат врага, стадии, агрессии, ярости, ульт, селекторов предметов и награды `health`/`experience`.
+- В `DECISIONS.md` добавлено решение хранить врагов отдельными JSONC-файлами.
+- Контекст версии: враги будущего матч-3 боя должны быть переиспользуемыми сущностями, а не набором параметров внутри карты. Не стоит переносить стадии и ульты обратно в карту без отдельного архитектурного решения.
+- Поведение игры не менялось: код боя пока не читает эти файлы.
+- Проверка: выполнен парсинг JSON/JSONC и проверка существования enemy appearance-ассетов.
+
+### 2026-05-14 - Уточнены ярость и награды врага
+
+- В `data/enemy/Boss_1.jsonc` и `data/enemy/enemy.example.jsonc` поле ярости заменено с `turnsToUltimate` на `secondsToUltimate`.
+- Награда врага теперь повторяет общий формат reward-пула: `itemCount` и массив `rewards`.
+- В награду врага заложены типы `health` и `experience`; опыт пока остается только данными на будущее.
+- В `data/README.md` и `DECISIONS.md` зафиксировано, что ярость измеряется секундами, а не ходами/тиками.
+- Контекст версии: название поля должно защищать будущий код боя от неверной трактовки ярости как ходового счетчика. Награда врага должна пользоваться тем же паттерном, что и награды карты, чтобы не плодить похожие, но несовместимые схемы.
+- Поведение игры не менялось из-за enemy JSONC: код боя пока не читает эти файлы.
+
+### 2026-05-14 - Награда reward начисляется после закрытия окна
+
+- `src/map-module.js` теперь выбирает и показывает награду при открытии reward-окна, но держит ее в `pendingReward`.
+- Инвентарь, золото и лог `log.rewardResolved` обновляются только после нажатия кнопки `ui.claimReward`.
+- Контекст версии: игрок должен сначала увидеть церемонию награды, а само начисление должно быть осознанным финалом события. Не стоит снова начислять reward при открытии окна, иначе кнопка становится визуальной формальностью.
+- Поведение игры изменилось: награда появляется в инвентаре только после клика по кнопке reward-окна.
+
+### 2026-05-14 - Добавлен опыт игрока и таблица уровней
+
+- В `data/items.jsonc` добавлен предмет `exp` с иконками `data/Assets/item/exp.png` и `data/Assets/big_icon/exp.png`.
+- В `data/player/default-player-state.json`, `current-player-state.json` и `player-state.example.jsonc` добавлен блок `experience` с `level` и `total`.
+- Создана `data/experience-table.jsonc`: уровни задают `requiredExperience`, `eventImage`, `textKey`, `rewardCount` и список возможных предметов с `itemId`, `weight`, `amount`.
+- `src/map-module.js` загружает и валидирует таблицу опыта перед START, умеет показывать опыт в HUD сразу под здоровьем и поддерживает тип reward `experience`.
+- В активные локали добавлены тексты уровней, `ui.maxLevel`, а недостающие ключи предмета опыта добавлены в `en` и `new_ru`.
+- В `data/README.md` и `DECISIONS.md` описан формат опыта и причина отдельной таблицы.
+- Контекст версии: опыт должен быть базовым показателем, но его пороги и награды должны редактироваться в данных без правки JS. Не стоит переносить таблицу опыта в код или хранить опыт как обычный инвентарный предмет.
+- Поведение игры изменилось: HUD теперь всегда показывает опыт после здоровья; на максимальном уровне вместо чисел выводится локализованная запись максимума.
+
+### 2026-05-14 - Перенесены свойства матч-3 предметов в каталог
+
+- В `data/items.jsonc` предметы `category: "match-3"` используют `type`, `damage`, `heal`, `aggression` и `calm`.
+- В `data/player/default-player-state.json`, `current-player-state.json` и `player-state.example.jsonc` закреплен раздел `heal` со шкалой накопительного лечения: `health`, `current`, `max`.
+- Из `player-state.example.jsonc` убран старый пример `match3.items`; комментарии теперь описывают только состояние игрока, а не свойства предметов.
+- `src/map-module.js` валидирует матч-3 поля в каталоге предметов и валидирует `player.heal`.
+- `data/enemy/Boss_1.jsonc` и `data/enemy/enemy.example.jsonc` переведены с `itemCategories` на `itemTypes` для селекторов будущего боя.
+- `data/README.md` и `DECISIONS.md` обновлены под новый источник правды.
+- Контекст версии: матч-3 свойства принадлежат предметам, поэтому должны редактироваться в каталоге предметов. Не стоит возвращать эти параметры в состояние игрока, иначе появятся два источника правды.
+- Поведение игры сейчас почти не меняется: матч-3 бой еще не реализован, но проверка данных стала строже.
+ 
+ 
+
+### 2026-05-15 - Подготовлены данные к MVP боя
+
+- В battle-вариантах карты поле задника унифицировано до `background`; общий `battleBackgrounds` больше не используется как стандартный источник фона.
+- В `data/items.jsonc` у матч-3 предметов добавлены явные связи `createsOnFour` для усиленных предметов и `createsOnFive` для генераторов.
+- Добавлены предметы-заглушки генераторов с `category: "generator"`: они нужны как сущности для результата 5+, но их поведение будет описано позднее.
+- `src/map-module.js` мягко проверяет, что ссылки `createsOnFour` и `createsOnFive` указывают на существующие `itemId`, и проверяет путь `background`, если он указан в battle-варианте.
+- В `data/README.md` и `DECISIONS.md` зафиксирован порядок будущей обработки match-3: найти все совпадения, объединить клетки, применить эффекты, определить бонусы, удалить, поставить бонусы, выполнить падение, добор и каскады.
+- Контекст версии: это подготовка первого MVP боя без реализации боевого экрана. Важно не зашивать связи бонусов в JS по имени предмета, потому что каталог предметов должен оставаться управляемым из JSON.
+- Не стоит менять без отдельного решения: не возвращать `battleBackgrounds` как основной формат и не делать генераторы случайно выпадающими предметами поля.
+### 2026-05-15 - Зафиксирован контракт будущего модуля боя
+
+- Добавлен `src/battle/battle-contract.js` с версией контракта, допустимыми исходами боя и JSDoc-описанием `BattleRequest`, `BattleReward`, `BattleResult`.
+- Добавлены файлы каркаса модуля: `battle-module.js`, `battle-engine.js`, `battle-view.js`, `battle-data.js`.
+- В `battle-engine.js` добавлен первый чистый слой match-3 логики без UI: создание поля 12x7, проверка стартовых совпадений, swap, поиск совпадений, удаление, падение и добор.
+- Добавлен `src/battle/README.md` с описанием ролей файлов и текущих функций engine-слоя.
+- `battle-module.js` экспортирует публичный `startBattle(request, options)`; `src/map-module.js` теперь умеет собирать `BattleRequest` и вызывать этот вход для `battle`-точек.
+- `activateNode(node)` стал асинхронным, чтобы карта могла дождаться загрузки данных боя и результата `startBattle()`.
+- `battle-engine.js` хранит первые константы поля 12x7 и создание начального состояния боя без DOM.
+- `battle-view.js` начинался как безопасная заглушка; теперь он заменен временным тестовым экраном, описанным ниже.
+- `battle-data.js` умеет строить путь к `data/enemy/<enemyId>.jsonc` и принимает loader извне.
+- В `data/README.md` описана граница `map -> battle -> map`: что карта передает в бой, что бой возвращает и чем каждый модуль владеет.
+- В `DECISIONS.md` зафиксировано архитектурное решение делать бой отдельным модулем, а не встраивать его напрямую в `src/map-module.js`.
+- Контекст версии: это подготовительный шаг после отката нестабильной большой реализации. Он почти не меняет видимое поведение игры и нужен, чтобы следующий этап можно было делать маленькими проверяемыми задачами внутри изолированного battle-модуля. Match-3 логика должна сначала проверяться на массивах без экрана, а уже потом подключаться к DOM.
+- Текущий риск: `battle-view.js` пока является временным экраном без match-3 поля; полноценный UI боя нужно подключать отдельным шагом.
+- Не стоит менять без отдельного решения: не позволять бою напрямую менять `generatedMap`, открывать точки карты, завершать кампанию или писать в DOM карты.
+
+### 2026-05-15 - Добавлен тестовый вход из карты в модуль боя
+
+- `battle`-точка больше не отмечается пройденной сразу при клике: карта сначала вызывает `startBattle()` и ждет результат.
+- В `battle-view.js` добавлен временный modal-экран боя с кнопками `Тестовая победа` и `Отмена`.
+- При `result.outcome === "victory"` карта обновляет `playerState`, отмечает battle-точку пройденной, открывает следующие точки и прокручивает карту к зоне действия.
+- При `cancelled` карта не продвигает маршрут и не открывает следующие точки.
+- В `src/styles.css` добавлены стили временного `battle-scaffold`.
+- Контекст версии: это проверка связки `карта -> battle-module -> карта`, а не реализация боевого UI. Она нужна, чтобы включение `eventWeights.battle` можно было тестировать без риска снова смешать карту и боевую механику.
+- Не стоит менять без отдельного решения: не возвращать старое поведение, где battle-точка завершается до результата боя.
+### 2026-05-15 - Добавлена первая интерактивная match-3 доска в тестовый экран боя
+
+- `battle-view.js` теперь создает поле 12x7 из предметов `category: "match-3"` и показывает его прямо в модальном экране боя.
+- Добавлены выбор клетки кликом, обмен только соседних клеток, отмена обмена без совпадений, удаление найденных совпадений, падение предметов, добор пустых клеток и автоматические каскады.
+- Кнопка `Тестовая победа` осталась на экране match-3 и по-прежнему возвращает `victory` в карту; это важно для проверки перехода `battle -> map` до полноценной победы по HP врага.
+- `src/styles.css` расширен стилями временной доски боя: фиксированная сетка, подсветка выбранной клетки, адаптация под узкий экран.
+- `src/battle/README.md` обновлен: теперь явно описано, что view уже подключает первую интерактивную доску, но еще не применяет боевые эффекты, бонусы, генераторы, анимации и победу по здоровью врага.
+- Контекст версии: это первый UI-слой поверх уже отделенной чистой логики. Его не стоит раздувать до полноценного боя за один шаг: пока он нужен, чтобы проверить механику swap/match/drop/refill/cascade в реальном браузерном экране и сохранить безопасную кнопку тестовой победы.
+- Текущий риск: каскады уже пересобирают поле, но награды за 4/5+, урон, лечение, агрессия и состояние врага пока намеренно не применяются. Эти части нужно добавлять отдельными проверяемыми итерациями.
+
+### 2026-05-15 - Подключены базовые эффекты и бонусы match-3 в тестовом бою
+
+- `battle-engine.js` получил первое состояние врага: текущая стадия, здоровье стадии, агрессия, таймер ярости и флаг поражения.
+- При обработке совпадений теперь суммируются свойства предметов из `data/items.jsonc`: `damage`, `heal`, `aggression`, `calm`.
+- `damage` уменьшает здоровье текущей стадии врага; при обнулении стадия переключается на следующую. Автоматическое закрытие боя по победе пока не включено: для выхода по-прежнему нужна кнопка `Тестовая победа`.
+- `heal` наполняет шкалу лечения игрока. Когда шкала достигает максимума, игрок получает `player.heal.health`, а остаток лечения сохраняется в шкале.
+- `aggression` и `calm` меняют шкалу агрессии врага в пределах `0..max`; урон от переполнения агрессии пока не запускается, чтобы не смешивать MVP match-3 с поведением врага.
+- Добавлено создание бонусов: при 4 активированных клетках одного типа ставится `createsOnFour`, при 5+ ставится `createsOnFive`. Генератор сейчас является заглушкой-предметом на поле, его эффект будет отдельной задачей.
+- `battle-view.js` показывает базовые показатели врага и игрока и обновляет их после обработанного хода.
+- `src/battle/README.md` обновлен под новое состояние тестового battle-view.
+- Контекст версии: это шаги 7-9 MVP после появления доски. Важно сохранить порядок обработки `эффекты -> бонусы -> удаление -> установка бонусов -> падение -> добор -> каскады`, потому что от него зависит предсказуемость будущих усиленных предметов и генераторов.
+- Текущий риск: бонус ставится в первую найденную активированную клетку группы, без выбора игроком и без анимации. Это приемлемо для MVP, но перед финальным UX боя точку появления бонуса нужно будет продумать отдельно.
+
+### 2026-05-15 - Исправлен регресс запуска после подключения battle-view
+
+- Убрана хрупкая зависимость главного запуска от новых именованных экспортов `battle-engine.js` внутри `battle-view.js`; тонкий слой отображения эффектов временно держит локальные helper-функции, чтобы старый кэш ES-модулей не валил главный экран.
+- `src/map-module.js` теперь загружает `battle-module.js` динамически при входе в бой, а `battle-module.js` динамически загружает `battle-view.js`. Это сохраняет уже существующий dev-подход с cache-buster и не дает браузеру держать старый battle-view после правок.
+- Контекст версии: ошибка проявлялась до клика START, потому что статический импорт battle-модуля мог остановить загрузку всего `map-module.js`; из-за этого не назначался фон главного меню `main_menu.png`. Для прототипа боя важно, чтобы незавершенный battle UI не мог ломать главный экран карты.
+- Проверка: главный экран снова получает `background-image: ./data/Assets/backgrounds/main_menu.png`, START доступен, после START карта открывается.
+
+### 2026-05-15 - Исправлен регресс открытия окна боя после кэша battle-engine
+
+- `battle-module.js` теперь динамически загружает не только `battle-view.js`, но и `battle-engine.js`; это убирает ситуацию, когда окно боя получает старую версию `createInitialBattleState()` без `enemyState`.
+- `battle-view.js` получил защитную инициализацию формы состояния боя: если `enemyState`, `playerState.health` или `playerState.heal` отсутствуют, экран создает безопасные значения из enemy/player данных.
+- Контекст версии: battle-модуль пока быстро меняется, поэтому вход в бой должен быть устойчив к старому кэшу ES-модулей и к неполному тестовому состоянию. Это не финальная архитектура загрузки, а защита прототипа от падения всего окна боя во время разработки MVP.
+- Проверка: доступная battle-точка открывает `.battle-scaffold-overlay`, на экране создаются 84 клетки поля 12x7.
+
+### 2026-05-15 - Проведена стабилизация запуска карты и тестового боя
+
+- `battle-view.js` больше не импортирует `battle-engine.js` статически: свежий engine передается из `battle-module.js` в `createBattleView()`. Это убирает рассинхрон между свежим view и старым engine из браузерного кэша.
+- Логика эффектов, бонусов, генераторов, состояния врага и поиска предметов снова централизована в `battle-engine.js`, а `battle-view.js` только вызывает методы engine и отвечает за DOM тестового боя.
+- В `battle-view.js` добавлена явная проверка обязательных методов engine, чтобы следующий сломанный контракт падал понятной ошибкой, а не `Cannot read properties of undefined`.
+- В `data/locales/en.json` и `data/locales/new_ru.json` добавлен недостающий ключ `hud.exp`, чтобы все активные локали имели одинаковый набор HUD-ключей.
+- В `data/campaign.example.jsonc` убрана ссылка на отсутствующий пример swamp-map; файл теперь ссылается только на существующие map-конфиги.
+- В `data/enemy/test.jsonc` тип награды `Gold` приведен к общему формату `gold`.
+- Контекст версии: этот шаг нужен не как новая механика, а как фиксация устойчивой базы после регрессий боевого модуля. Важно сохранить разделение: map запускает battle-модуль, battle-view не должен тащить собственные копии бизнес-логики, а battle-engine остается единственным местом для правил match-3 и эффектов.
+- Не стоит менять без отдельного решения: не возвращать статический импорт `battle-engine.js` в `battle-view.js` во время активной разработки MVP и не дублировать эффект/bonus-логику во view, иначе снова появятся разные версии правил боя в разных файлах.
+- Проверка: выполнены JS syntax check всех файлов `src`, парсинг всех JSON/JSONC из `data`, проверка всех активных локалей, проверка 200 ссылок на ассеты, тесты battle-engine на поле 12x7/3-match/4-bonus/5-generator и браузерный smoke-тест через Playwright: главное меню получает `main_menu.png`, battle-точка открывает 84 клетки, тестовая победа закрывает overlay.
+
+### 2026-05-15 - Разделены случайный спавн и совпадения match-3 предметов
+
+- `battle-engine.js` теперь использует `category: "match-3"` только для случайного добора предметов сверху.
+- Совпадения ищутся по `type` для предметов категорий `match-3` и `rare_match-3`, поэтому обычная пуля и усиленная пуля с одинаковым `type` снова могут собираться вместе.
+- `src/map-module.js` валидирует боевые свойства `type`, `damage`, `heal`, `aggression`, `calm` и для `match-3`, и для `rare_match-3`.
+- `data/README.md` и `src/battle/README.md` уточняют правило: категория решает, может ли предмет случайно падать на поле, а `type` решает, с чем предмет собирается в ряд.
+- Контекст версии: усиленные предметы должны появляться от бонусов, а не из случайного добора, но после появления на поле они остаются частью match-3 механики. Не стоит снова привязывать совпадение только к `category: "match-3"`, иначе усиленные предметы перестанут собираться с обычными предметами того же типа.
+- Проверка: выполнены JS syntax check всех файлов `src`, парсинг всех JSON/JSONC из `data`, отдельный тест `bullet + bullet_power + bullet`, проверка что `bullet_power` не входит в drop-pool и не появляется при генерации стартового поля.
+
+### 2026-05-15 - Переложен тестовый экран боя под новый макет 12x9
+
+- Поле боя увеличено с 12x7 до 12x9: `BATTLE_BOARD_HEIGHT` теперь равен 9, а тестовый экран создает 108 клеток.
+- `battle-view.js` перестроен в две основные зоны: слева поле и блок игрока, справа визуал врага на фоне боя и панель характеристик врага.
+- В блок игрока вынесены три спецпредмета, горизонтальные шкалы здоровья/лечения и сетка предметов на руках 2x5. Сейчас это layout-слой поверх текущих данных, без новой логики применения предметов.
+- Визуал врага использует `background` из события карты и `appearance` текущей стадии врага из enemy JSON.
+- Overlay боя теперь не только затемняет карту, но и блюрит ее через `backdrop-filter`, чтобы карта оставалась фоном, а не конкурировала с боевым экраном.
+- `src/styles.css` получил responsive-правила для нового layout, чтобы экран не выходил за ширину мобильного viewport.
+- `src/battle/README.md` обновлен под размер поля 12x9.
+- Контекст версии: это подготовительный визуальный шаг. Он нужен, чтобы дальше наращивать полноценный бой внутри уже правильной компоновки, не смешивая layout, логику врага, награды и анимации в одну большую рискованную задачу. Не стоит возвращать поле к 12x7 без отдельного решения по балансу и новому референсу.
+- Проверка: выполнены JS syntax check всех файлов `src`, тест создания поля 12x9 без стартовых совпадений, браузерный smoke-тест 1280x900 с 108 клетками, правой колонкой врага, 10 предметами на руках, 3 спецпредметами и активным blur overlay; дополнительно проверен мобильный viewport 390x844.
+
+### 2026-05-15 - Вынесено оформление боевого UI в JSONC
+
+- Создан `data/settings/battle-ui.jsonc`: в нем хранятся ключи подписей боевого UI, пути к иконкам и цвета прогресс-баров.
+- `battle-data.js` теперь загружает `battle-ui.jsonc` вместе с enemy JSON и каталогом предметов.
+- Полосы здоровья и лечения игрока используют иконки из battle UI config: по умолчанию `hearts.png` и `bandage.png`.
+- Нижняя панель врага пересобрана по референсу: имя врага из enemy JSON, строка стадии через локализуемый ключ, здоровье и агрессия как прогресс-бары с иконками, урон и ярость как отдельные значения с иконками, ниже описание ульты из enemy JSON.
+- Добавлены локализационные ключи `battle.enemy.*` и `battle.player.*` во все активные локали.
+- Между полосами игрока увеличен отступ, чтобы здоровье и лечение читались как отдельные показатели.
+- `data/README.md` и `src/battle/README.md` обновлены: оформление боя теперь считается отдельным data-файлом, а не набором зашитых путей в JS.
+- Контекст версии: оформление боя должно редактироваться из данных, потому что иконки, подписи и визуальные акценты будут часто меняться во время сборки боевого экрана. Не стоит возвращать пути к UI-иконкам и подписи прогресс-баров прямо в `battle-view.js`, иначе баланс данных и внешний вид снова окажутся смешаны.
+- Проверка: выполнены JS syntax check всех файлов `src`, парсинг всех JSON/JSONC из `data`, проверка покрытия локалей, проверка ссылок на ассеты и браузерный smoke-тест: 108 клеток, 4 прогресс-бара, 2 enemy value-ячейки, иконки сердца/бинта/урона/ярости загружаются из config.
+
+
+### 2026-05-17 - Battle music switch by enemy config
+
+- Added enemy-side `battle_music` path support for battle entrypoints.
+- Added callbacks in battle module lifecycle to start battle track on battle start and restore map music on battle end.
+- Added audio state tracking so map music pauses during combat and resumes from the previous playback state after combat.
+
+### 2026-05-17 - Battle music channel isolation
+
+- Improved battle music playback so combat music uses a separate audio channel and does not overwrite map music playback state.
+- Resume flow now explicitly stops the battle audio channel and unpauses map music from its existing timeline when returning from combat.
+
+### 2026-05-17 - Smooth map-to-battle music transition
+
+- Fixed battle music transition to avoid abrupt cuts: map music now fades down and battle music fades up through crossfade when entering battle, and reverses on exit.
+- Added `battleMusicCrossfadeMs` in `data/settings/default-settings.json`, `data/settings/current-settings.json`, and `data/settings/settings.example.jsonc` (default: 2000 ms).
+- Context: this soft transition strongly affects UX; keep this setting explicit to avoid regressions.
+
+### 2026-05-17 - Audio settings ownership and red HP modifier fix
+
+- `loadSettings()` now keeps `audio` paths owned by JSON settings files: `default-settings.json` provides fallback values, and `current-settings.json` can override track paths without clearing browser `localStorage`.
+- `getBattlePlayerMaxHealth()` now applies inventory `max_hp_modif` items such as `red`. When `health.baseMax` exists, it is used as the unmodified base so map-side health normalization and battle-side calculation do not double-count the same inventory bonus.
+- Context: audio file paths are content/configuration data, not user runtime preferences. Red/green battle stat modifiers are covered by `scripts/check-battle-engine.mjs`; keep that test because this mechanic is easy to regress when player-state normalization changes.
+
+### 2026-05-17 - Extracted audio controller from map module
+
+- Added `src/audio-module.js` as the single owner of browser `Audio` objects, music track identity, battle music state, and map/battle crossfade logic.
+- `src/map-module.js` now keeps only thin audio entrypoints (`setupAudio`, `applyAudioSettings`, `playMusic`, battle music start/resume) and no longer stores audio internals in global map `state`.
+- Added `src/data-loader.js` for shared JSON/JSONC loading, no-store fetches, and cache-busting.
+- Context: this is the first safe slice of reducing `map-module.js` responsibility. Audio and data loading caused recent regressions and are naturally separate from map generation, rewards, shop, and battle entry flow. Do not move unrelated map logic in the same step; keep future refactors similarly narrow and testable.
+
+### 2026-05-17 - Extracted data validation from map module
+
+- Added `src/data-validation.js` as the owner of pre-start data checks for campaign maps, item catalog, enemy configs, battle UI config, experience table, default player state, required item ids, and required locale keys.
+- `src/map-module.js` now imports `validateGameData()` and only passes active language ids into validation; map startup still receives the same `mapConfigCache` and `itemCatalogById` result.
+- Context: validation is a data contract layer, not map rendering or route generation. Keeping it separate makes `map-module.js` easier to read and lowers the chance that future battle/item schema checks get mixed into map UI logic. Do not move these checks back into `map-module.js` without a specific reason.
+
+### 2026-05-17 - Restored data README encoding
+
+- Restored `data/README.md` from mojibake back to readable UTF-8 Russian text.
+- Verified the restored documentation with `scripts/check-encoding.mjs`.
+- Context: `data/README.md` is the main project data map and must stay readable before changing JSON/JSONC formats. If a console shows `Р...` text again, first re-read the file explicitly as UTF-8 before editing, so the file is not damaged by a wrong terminal encoding.
+
+### 2026-05-17 - Added battle view lifecycle guard
+
+- Added a single lifecycle token for each `battle-view.js` overlay.
+- Runtime timers, idle hints, language refreshes, settings resume, surrender, victory, defeat, click handlers, and cascade animation continuations now check that the active battle token still matches before touching battle DOM or state after async animation waits.
+- Context: battle view still owns DOM, timers, temporary state, and animations in one file, so this guard is a small safety layer before larger extraction. Do not remove it while animations and battle close flows can overlap; it prevents stale async work from updating a closed or replaced battle screen.
+
+### 2026-05-17 - Guarded battle board generation type diversity
+
+- `data-validation.js` now requires at least 3 different `type` values among regular `category: "match-3"` items before START.
+- `battle-engine.js` now checks the effective generated match-3 type count before creating the starting board, including inventory `transform_chance` effects that can collapse several base items into the same generated type.
+- Added no-dependency battle-engine tests for too-small base type pools and transform-collapsed type pools.
+- Context: the board generator should not spend 50 attempts on an impossible or nearly impossible field and then fail with a vague startup error. Keep this guard close to generation because future inventory transforms can change the effective drop pool per battle.
+
+### 2026-05-17 - Visible no-moves battle shuffle
+
+- No-moves penalty in battle now shuffles the current visible board instead of silently replacing it with a freshly generated board.
+- Added `shuffleBattleBoardWithMovement()` so the view receives both the new board and exact source-to-target cell movement for animation.
+- Box-covered cells stay fixed during no-moves shuffle, and the shuffle tries to avoid immediate starting matches while preferring a board with an available move.
+- Context: the no-moves penalty must feel fair and readable. Damage without a clearly visible board shuffle looks broken even if the data changed, so keep the visual movement tied to the actual board state change.
+
+### 2026-05-17 - Manual battle board shuffle button
+
+- Added a localized `Перемешать` / `Shuffle` button under the enemy ultimate/rage description in the battle panel.
+- Manual shuffle reuses the visible current-board shuffle path.
+- Added `battle.shuffle.button` and `battle.status.shuffleBoardDone` locale keys, plus `battle-ui.textKeys.shuffleBoard` and `battle-ui.textKeys.shuffleBoardDone`.
+- Context: manual shuffle is now an explicit player action and a debugging/design tool while the battle board is still being tuned. Keep it wired to the same shuffle path as the no-moves fallback so both behaviors stay consistent.
+
+### 2026-05-17 - No-moves warning without automatic shuffle
+
+- No-moves idle fallback now only shows the localized warning window for `animations.noMovesMessageMs`.
+- Automatic no-moves damage and automatic no-moves shuffle were removed; the player must press the manual shuffle button instead.
+- Manual shuffle now deals player damage equal to the enemy attack before shuffling the board.
+- Context: this makes the penalty explicit and player-driven. Do not reintroduce hidden automatic shuffle/damage in the idle warning path unless the design changes again, because it made the board state hard to read and debug.
+
+### 2026-05-17 - No-moves warning keeps manual shuffle available
+
+- The no-moves warning no longer sets `battleState.isResolving`; it only tracks its own `noMovesMessageVisible` flag.
+- The manual shuffle button stays active while the warning is visible and after it disappears.
+- Pressing manual shuffle while the warning is visible clears the warning before applying damage and shuffling the board.
+- Context: the warning is informational UI, not a move-resolution phase. Keep it separate from `isResolving`, otherwise the player cannot use the explicit recovery action at the exact moment the game asks for it.
+
+### 2026-05-17 - Battle defeat restart restores entry player state
+
+- Battle start now stores a runtime JSON snapshot of the entering player state in `battleState.initialPlayerState`.
+- The defeat screen `Начать сначала` button now restarts the same battle instead of writing a placeholder log message.
+- Restart restores `playerState` from the entry snapshot, recreates enemy state, board, reserve board, walls, boxes, timers, and special-item state inside the same battle overlay.
+- Context: defeat retry should not keep inventory spent during the failed attempt. Keep this as a runtime battle snapshot rather than a physical data file, because the browser build cannot write back into `data/player` during play.
+
+### 2026-05-18 - Battle health change feedback
+
+- Player HP and enemy HP meters now animate when current health changes after the first stat render.
+- The health icon shakes and scales during the feedback animation, while a green `+N` or red `-N` floats out of the icon.
+- Added `animations.healthChangeMs` and `animations.healthChangeScale` to `data/settings/battle-ui.jsonc`; the example config documents both fields and validation checks the values.
+- Context: HP changes are important combat feedback and should remain configurable in `battle-ui` instead of being hardcoded in CSS/JS. Do not remove the previous-health tracking unless another UI feedback system replaces it.
+- Changed files: `src/battle/battle-view.js`, `src/styles.css`, `src/data-validation.js`, `data/settings/battle-ui.jsonc`, `data/settings/battle-ui.example.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Check: `node --check src/battle/battle-view.js`, `node --check src/data-validation.js`, JSONC parse for `data/settings/battle-ui.jsonc` and `data/settings/battle-ui.example.jsonc`.
+
+### 2026-05-19 - Map bird animation visibility fix
+
+- Map ambient animation now spawns the first configured bird immediately after the map renders instead of waiting for the first random spawn interval.
+- Removed the hard stop tied to `prefers-reduced-motion`; the active `map-ui.animation.enabled` flag is now the source of truth for this prototype animation.
+- Bird spawn coordinates now account for flight direction, so a right-edge bird flying down-left starts higher and has a much better chance to cross the visible screen instead of leaving below it.
+- Raised the map effects layer above the map board while keeping it below HUD/top buttons and with `pointer-events: none`.
+- Context: the map animation existed in config but could be invisible in practice because startup delay, motion preference or unlucky spawn position made the bird hard to see. Keep first-spawn-immediate behavior until there is a separate ambient-animation scheduler/debug view.
+- Changed files: `src/map-module.js`, `src/styles.css`, `data/README.md`, `VERSIONS.md`.
+- Check: `node --check src/map-module.js`, `node --check src/data-validation.js`, JSONC parse for `data/settings/map-ui.jsonc`, `validateGameData`, HTTP asset check for `bird_1.png`.
+
+### 2026-05-19 - Map bird sprite rotation separated from flight heading
+
+- Bird movement direction still uses `headingDegrees`, but the sprite is no longer automatically rotated by that heading.
+- Added `rotateWithHeading` to map bird animation config. The current `griff` animation sets it to `false`, so `bird_1`-`bird_8` keep their authored orientation.
+- `spriteAngleOffsetDegrees` remains available as a fixed visual correction for future assets.
+- Context: movement direction and sprite orientation are different controls. The previous implementation treated every sprite as if it had to be turned toward the trajectory, which made the current bird frames look incorrectly rotated. Keep `rotateWithHeading` explicit so future flying assets can choose their behavior without changing JS.
+- Changed files: `src/map-module.js`, `src/data-validation.js`, `data/settings/map-ui.jsonc`, `data/settings/map-ui.example.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Check: `node --check src/map-module.js`, `node --check src/data-validation.js`, JSONC parse for `data/settings/map-ui.jsonc`, `validateGameData`.
+
+### 2026-05-19 - Battle top button icon size in battle-ui
+
+- Added `iconSizePx` to `topButtons.surrender`, `topButtons.settings`, and `topButtons.log` in `data/settings/battle-ui.jsonc`.
+- `battle-view` now applies `iconSizePx` through a CSS variable on each battle top button, matching the same control style already used by `map-ui`.
+- The data validator now checks `battle-ui.topButtons.*.iconSizePx` when present.
+- Context: button icon scale should be tuned from data, not hardcoded in CSS/JS, so map and battle UI stay consistent. Do not remove this setting unless top-button visuals move into a single shared UI config.
+- Changed files: `src/battle/battle-view.js`, `src/styles.css`, `src/data-validation.js`, `data/settings/battle-ui.jsonc`, `data/settings/battle-ui.example.jsonc`, `data/README.md`, `src/battle/README.md`, `VERSIONS.md`.
+- Check: `node --check src/battle/battle-view.js`, `node --check src/data-validation.js`, JSONC parse for `data/settings/battle-ui.jsonc` and `data/settings/battle-ui.example.jsonc`.
+
+### 2026-05-19 - Map UI config and bird ambient animation
+
+- Added `data/settings/map-ui.jsonc` and `data/settings/map-ui.example.jsonc`.
+- Map top action button icon paths and icon sizes can now be configured through `map-ui.jsonc`.
+- Added a decorative map animation layer `#mapEffects` over the visible map screen.
+- Added the first map animation type: `bird`. It supports named variants, frame lists, glide frame, heading range, flap frame interval, random glide duration, spawn edge, movement speed and max active count.
+- Added pre-start validation for `map-ui.jsonc`: button text keys/icons, animation counts, bird frames, heading range, spawn edges and timing ranges.
+- Context: map visuals and ambient animation should be data-driven, like battle UI. This lets the map get richer without hardcoding every decorative effect in `src/map-module.js`. Do not move bird timing or frame paths back into JS without a separate reason, otherwise tuning map atmosphere will again require code edits.
+- Touched files: `index.html`, `src/map-module.js`, `src/data-validation.js`, `src/styles.css`, `data/settings/map-ui.jsonc`, `data/settings/map-ui.example.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Checked: `node --check src/map-module.js`, `node --check src/data-validation.js`, `node scripts/check-battle-engine.mjs`, JSON/JSONC parse with BOM stripping, `validateGameData`, HTTP smoke for `index.html`, `map-ui.jsonc` and `bird_1.png`.
+
+### 2026-05-18 - Battle meter fill feedback per-bar + configurable float timing
+
+- Heal and enemy aggression meters now use the same "change" feedback pipeline as HP (icon tremble/scale + floating `+N`/`-N`) with independent animation profiles in `battle-ui`.
+- New `battle-ui.jsonc` keys added: `healChangeMs`, `healChangeScale`, `healChangeFloatMs`, `healChangeFloatRisePx`, `aggressionChangeMs`, `aggressionChangeScale`, `aggressionChangeFloatMs`, `aggressionChangeFloatRisePx`.
+- `data-validation` now accepts and validates those values; legacy `healthChange*` still acts as health fallback defaults when bar-specific keys are missing.
+- Visual behavior of the floating number is now duration- and rise-distance controlled per meter (`animations.*FloatMs`, `animations.*FloatRisePx`).
+- Context: UI feedback readability became inconsistent as logic expanded beyond HP; this keeps per-meter polish in data and avoids hardcoded behavior for new bars.
+- Changed files: `src/battle/battle-view.js`, `src/styles.css`, `src/data-validation.js`, `data/settings/battle-ui.jsonc`, `data/settings/battle-ui.example.jsonc`, `data/README.md`, `VERSIONS.md`.
+- Check: `node --check src/battle/battle-view.js`, `node --check src/data-validation.js`, JSONC parse for `data/settings/battle-ui.jsonc` and `data/settings/battle-ui.example.jsonc`.
+
+### 2026-06-03 - Ajust battle enemy window and ultimate panel spacing
+- Increased battle enemy visual height row to ~20% (clamp(350px, 53vh, 516px) from previous row config).
+- Made enemy info panel fill available vertical space to the lower battle-edge and keep ultimate panel symmetric to container (.battle-scaffold-enemy-info, .battle-scaffold-ultimate).
+- Updated styles cache-buster in index.html to 2026-06-03-ultimate-to-bottom.

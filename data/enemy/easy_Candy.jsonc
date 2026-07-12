@@ -1,5 +1,6 @@
 {
-  "enemyId": "Candy",
+  "enemyId": "easy_Candy",
+  "baseEnemyId": "Candy",
   "nameTextKey": "enemy.Candy.name",
   "descriptionTextKey": "enemy.Candy.description",
   "stageCount": 1,
@@ -50,7 +51,7 @@
         }
       ],
       "aggression": {
-        "threshold": 50,
+        "threshold": 100,
         "damage": 3,
         "resetOnTrigger": true
       },

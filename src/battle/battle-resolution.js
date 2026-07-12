@@ -6,6 +6,8 @@ import {
 } from "./battle-animations.js";
 
 export async function resolveBattleCascades(deps, board, context, renderTargets) {
+  // Единственный основной цикл resolve: найти матчи, применить эффекты,
+  // удалить/создать бонусы, refill из reserve, повторить до лимита.
   const { boardElement, statusElement, enemyStatsElement, playerMetersElement, ultimateTextElement } = renderTargets;
   let currentBoard = board;
   let cascades = 0;

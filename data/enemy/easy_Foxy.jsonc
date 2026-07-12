@@ -1,5 +1,6 @@
 {
-  "enemyId": "Foxy",
+  "enemyId": "easy_Foxy",
+  "baseEnemyId": "Foxy",
   "nameTextKey": "enemy.Foxy.name",
   "descriptionTextKey": "enemy.Foxy.description",
   "stageCount": 1,
@@ -50,7 +51,7 @@
         }
       ],
       "aggression": {
-        "threshold": 50,
+        "threshold": 100,
         "damage": 3,
         "resetOnTrigger": true
       },

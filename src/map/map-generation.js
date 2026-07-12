@@ -1,4 +1,6 @@
 export function generateMap(config, options = {}) {
+  // Генератор чистый относительно DOM/state: все случайное поведение приходит
+  // через options.random, поэтому карта воспроизводится от run seed.
   const random = typeof options.random === "function" ? options.random : Math.random;
   const eventCatalog = getMapEventCatalog(config);
   const levelConfigs = getMapLevelConfigs(config);
@@ -59,7 +61,7 @@ function getLevelPathConfig(config, levelConfig, singlePathDepths = new Map()) {
   };
 }
 
-function getMapEventCatalog(config) {
+export function getMapEventCatalog(config) {
   const events = Array.isArray(config.events) ? config.events : [];
   return new Map(events.map((eventConfig) => [eventConfig.name, eventConfig]));
 }
@@ -127,7 +129,7 @@ function createNode(config, levelNumber, index, eventConfig, random) {
   };
 }
 
-function pickEventPayload(config, eventName, eventType, levelNumber, random) {
+export function pickEventPayload(config, eventName, eventType, levelNumber, random) {
   const variants = Array.isArray(config[eventType]) ? config[eventType] : [];
   const available = variants.filter(
     (variant) =>
@@ -142,6 +144,8 @@ function pickEventPayload(config, eventName, eventType, levelNumber, random) {
 }
 
 function connectLevels(currentNodes, nextNodes, pathConfig, random) {
+  // Инвариант графа: каждый source получает выход, каждый target получает вход,
+  // а дополнительные ребра выбираются с учетом читаемости путей.
   const connectionSets = new Map(currentNodes.map((node) => [node.id, new Set()]));
   const sourceIndexById = new Map(currentNodes.map((node, index) => [node.id, index]));
   const targetIndexById = new Map(nextNodes.map((node, index) => [node.id, index]));

@@ -1,0 +1,271 @@
+{
+  "id": "Tutorial",
+  "nameTextKey": "Tutorial.name",
+  "mapImage": "data/Assets/map/WildWest_map.png",
+  "pathRules": {
+    "connectionCountWeights": [
+      {
+        "count": 1,
+        "weight": 100
+      }
+    ],
+    "maxSinglePathChain": 1
+  },
+  "events": [
+    {
+      "name": "tutorial_battle",
+      "type": "battle",
+      "icon": "data/Assets/icons/dialog.png"
+    }
+  ],
+  "levels": [
+    {
+      "level": 1,
+      "nodes": {
+        "count": 1
+      },
+      "paths": {
+        "minConnectionsFromNode": 1,
+        "maxConnectionsFromNode": 1,
+        "extraConnectionChance": 0
+      },
+      "events": [
+        {
+          "name": "tutorial_battle",
+          "weight": 100,
+          "guaranteed": true
+        }
+      ]
+    }
+  ],
+  "battle": [
+    {
+      "eventName": "tutorial_battle",
+      "enemyId": "tutorial_Dolly",
+      "background": "data/Assets/backgrounds/WildWest_1.png",
+      "minLevel": 1,
+      "maxLevel": 1,
+      "weight": 100,
+      "nodeTitleTextKey": "tutorial.map.node.battle",
+      "tutorial": {
+        "enabled": true,
+        "titleTextKey": "battle.tutorial.title",
+        "wrongMoveTextKey": "battle.tutorial.wrongMove",
+        "teacherImage": "data/Assets/enemy/captain.png",
+        "steps": [
+          {
+            "id": "match_bullets",
+            "action": "swap",
+            "textKey": "battle.tutorial.step.matchBullets",
+            "from": { "row": 2, "col": 4 },
+            "to": { "row": 1, "col": 4 },
+            "matchCells": [
+              { "row": 1, "col": 2 },
+              { "row": 1, "col": 3 },
+              { "row": 1, "col": 4 }
+            ],
+            "board": [
+              ["granate", "Knife", "Bandage", "Shield", "bullet", "Knife", "Shield", "Bandage", "bullet"],
+              ["Bandage", "granate", "bullet", "bullet", "Shield", "granate", "trash_1", "trash_1", "granate"],
+              ["Shield", "Bandage", "granate", "bullet", "bullet", "Knife", "bullet", "Shield", "Bandage"],
+              ["Knife", "granate", "Shield", "trash_1", "granate", "Knife", "trash_1", "Knife", "Bandage"],
+              ["Knife", "trash_1", "trash_1", "Bandage", "trash_1", "trash_1", "bullet", "Knife", "Shield"],
+              ["bullet", "Knife", "granate", "Bandage", "trash_1", "granate", "bullet", "trash_1", "granate"],
+              ["Shield", "bullet", "Knife", "bullet", "granate", "bullet", "trash_1", "Knife", "bullet"],
+              ["Bandage", "Shield", "trash_1", "bullet", "bullet", "trash_1", "Shield", "Knife", "Knife"]
+            ]
+          },
+          {
+            "id": "match_grenades",
+            "action": "swap",
+            "textKey": "battle.tutorial.step.matchGrenades",
+            "from": { "row": 3, "col": 5 },
+            "to": { "row": 3, "col": 4 },
+            "matchCells": [
+              { "row": 3, "col": 2 },
+              { "row": 3, "col": 3 },
+              { "row": 3, "col": 4 }
+            ],
+            "board": [
+              ["Bandage", "bullet", "granate", "Shield", "Bandage", "bullet", "Shield", "Shield", "Bandage"],
+              ["bullet", "trash_1", "granate", "Knife", "Bandage", "Bandage", "bullet", "bullet", "Bandage"],
+              ["granate", "granate", "Knife", "trash_1", "granate", "bullet", "Bandage", "Bandage", "trash_1"],
+              ["Knife", "bullet", "granate", "granate", "Bandage", "granate", "Knife", "Shield", "granate"],
+              ["bullet", "trash_1", "granate", "granate", "Bandage", "Bandage", "Shield", "trash_1", "Bandage"],
+              ["granate", "Knife", "bullet", "Knife", "trash_1", "Shield", "trash_1", "Knife", "trash_1"],
+              ["Bandage", "granate", "Bandage", "Bandage", "trash_1", "granate", "Shield", "bullet", "Shield"],
+              ["trash_1", "Knife", "granate", "Shield", "granate", "Knife", "Bandage", "granate", "Knife"]
+            ]
+          },
+          {
+            "id": "match_knives",
+            "action": "swap",
+            "textKey": "battle.tutorial.step.matchKnives",
+            "from": { "row": 5, "col": 2 },
+            "to": { "row": 4, "col": 2 },
+            "matchCells": [
+              { "row": 4, "col": 0 },
+              { "row": 4, "col": 1 },
+              { "row": 4, "col": 2 }
+            ],
+            "board": [
+              ["bullet", "Shield", "granate", "Shield", "granate", "bullet", "Knife", "trash_1", "trash_1"],
+              ["Knife", "granate", "Knife", "Knife", "Bandage", "Bandage", "Shield", "bullet", "Shield"],
+              ["Bandage", "granate", "Shield", "granate", "trash_1", "Bandage", "Shield", "trash_1", "Bandage"],
+              ["Shield", "bullet", "Shield", "Bandage", "granate", "trash_1", "bullet", "Shield", "bullet"],
+              ["Knife", "Knife", "trash_1", "Bandage", "granate", "Knife", "Shield", "trash_1", "trash_1"],
+              ["granate", "bullet", "Knife", "bullet", "Shield", "Shield", "trash_1", "Shield", "Shield"],
+              ["Bandage", "trash_1", "Shield", "Bandage", "bullet", "Shield", "bullet", "granate", "granate"],
+              ["bullet", "Shield", "Shield", "Bandage", "Knife", "bullet", "Shield", "granate", "bullet"]
+            ]
+          },
+          {
+            "id": "match_bandages",
+            "action": "swap",
+            "textKey": "battle.tutorial.step.matchBandages",
+            "playerHealthCurrent": 70,
+            "playerHealCurrent": 90,
+            "from": { "row": 2, "col": 6 },
+            "to": { "row": 2, "col": 5 },
+            "matchCells": [
+              { "row": 2, "col": 3 },
+              { "row": 2, "col": 4 },
+              { "row": 2, "col": 5 }
+            ],
+            "board": [
+              ["Knife", "Knife", "trash_1", "Shield", "Shield", "Bandage", "Knife", "bullet", "Bandage"],
+              ["trash_1", "trash_1", "bullet", "granate", "Knife", "trash_1", "Shield", "granate", "trash_1"],
+              ["bullet", "trash_1", "Shield", "Bandage", "Bandage", "Shield", "Bandage", "Shield", "trash_1"],
+              ["trash_1", "bullet", "bullet", "granate", "Knife", "granate", "Bandage", "bullet", "Shield"],
+              ["granate", "granate", "Knife", "bullet", "Shield", "trash_1", "Knife", "Bandage", "trash_1"],
+              ["Knife", "bullet", "granate", "trash_1", "Shield", "bullet", "Bandage", "granate", "Knife"],
+              ["granate", "bullet", "trash_1", "bullet", "Knife", "trash_1", "bullet", "trash_1", "trash_1"],
+              ["Knife", "Knife", "bullet", "Knife", "Shield", "Bandage", "Bandage", "trash_1", "bullet"]
+            ]
+          },
+          {
+            "id": "match_trash",
+            "action": "swap",
+            "textKey": "battle.tutorial.step.matchTrash",
+            "enemyAggressionCurrent": 80,
+            "from": { "row": 4, "col": 7 },
+            "to": { "row": 4, "col": 6 },
+            "matchCells": [
+              { "row": 4, "col": 4 },
+              { "row": 4, "col": 5 },
+              { "row": 4, "col": 6 }
+            ],
+            "board": [
+              ["Shield", "bullet", "Bandage", "Shield", "granate", "Knife", "Knife", "granate", "Knife"],
+              ["Knife", "Shield", "trash_1", "bullet", "bullet", "Knife", "trash_1", "granate", "bullet"],
+              ["Shield", "Shield", "trash_1", "trash_1", "granate", "bullet", "Bandage", "Bandage", "granate"],
+              ["trash_1", "trash_1", "granate", "Shield", "Bandage", "Bandage", "trash_1", "Knife", "Bandage"],
+              ["trash_1", "granate", "Shield", "Bandage", "trash_1", "trash_1", "bullet", "trash_1", "Shield"],
+              ["Knife", "bullet", "granate", "Shield", "trash_1", "Knife", "Knife", "Shield", "trash_1"],
+              ["bullet", "granate", "bullet", "Bandage", "bullet", "bullet", "granate", "Bandage", "Knife"],
+              ["Shield", "trash_1", "granate", "bullet", "bullet", "granate", "Knife", "Bandage", "bullet"]
+            ]
+          },
+          {
+            "id": "match_shields",
+            "action": "swap",
+            "textKey": "battle.tutorial.step.matchShields",
+            "enemyAggressionCurrent": 50,
+            "from": { "row": 6, "col": 4 },
+            "to": { "row": 5, "col": 4 },
+            "matchCells": [
+              { "row": 5, "col": 2 },
+              { "row": 5, "col": 3 },
+              { "row": 5, "col": 4 },
+              { "row": 5, "col": 5 }
+            ],
+            "board": [
+              ["granate", "Shield", "Knife", "Shield", "Shield", "bullet", "Bandage", "Knife", "bullet"],
+              ["Shield", "Knife", "Shield", "trash_1", "trash_1", "Bandage", "trash_1", "Knife", "granate"],
+              ["granate", "Bandage", "trash_1", "Shield", "Bandage", "Shield", "bullet", "granate", "Bandage"],
+              ["trash_1", "Shield", "Shield", "granate", "Bandage", "trash_1", "Knife", "trash_1", "Knife"],
+              ["Knife", "granate", "granate", "bullet", "Shield", "granate", "Bandage", "Bandage", "Shield"],
+              ["Shield", "bullet", "Shield", "Shield", "bullet", "Shield", "granate", "bullet", "Bandage"],
+              ["Shield", "Knife", "Knife", "bullet", "Shield", "granate", "granate", "Knife", "trash_1"],
+              ["bullet", "Knife", "Bandage", "Shield", "Knife", "Bandage", "bullet", "Knife", "granate"]
+            ]
+          },
+          {
+            "id": "match_four",
+            "action": "swap",
+            "textKey": "battle.tutorial.step.matchFour",
+            "from": { "row": 2, "col": 4 },
+            "to": { "row": 1, "col": 4 },
+            "matchCells": [
+              { "row": 1, "col": 2 },
+              { "row": 1, "col": 3 },
+              { "row": 1, "col": 4 },
+              { "row": 1, "col": 5 }
+            ],
+            "board": [
+              ["Bandage", "Bandage", "Shield", "Shield", "trash_1", "Bandage", "trash_1", "Knife", "granate"],
+              ["granate", "Bandage", "bullet", "bullet", "Bandage", "bullet", "Bandage", "Shield", "Bandage"],
+              ["granate", "granate", "Shield", "bullet", "bullet", "Bandage", "Bandage", "Knife", "Bandage"],
+              ["trash_1", "Knife", "Bandage", "Bandage", "trash_1", "granate", "granate", "Shield", "bullet"],
+              ["trash_1", "bullet", "Bandage", "Shield", "trash_1", "Shield", "Bandage", "Shield", "granate"],
+              ["Shield", "Knife", "trash_1", "Shield", "granate", "granate", "trash_1", "Knife", "bullet"],
+              ["granate", "trash_1", "Knife", "granate", "Knife", "bullet", "Shield", "Bandage", "Bandage"],
+              ["Bandage", "Knife", "Knife", "bullet", "trash_1", "trash_1", "Bandage", "Shield", "Shield"]
+            ]
+          },
+          {
+            "id": "match_five",
+            "action": "swap",
+            "textKey": "battle.tutorial.step.matchFive",
+            "from": { "row": 4, "col": 4 },
+            "to": { "row": 3, "col": 4 },
+            "matchCells": [
+              { "row": 3, "col": 2 },
+              { "row": 3, "col": 3 },
+              { "row": 3, "col": 4 },
+              { "row": 3, "col": 5 },
+              { "row": 3, "col": 6 }
+            ],
+            "board": [
+              ["trash_1", "Knife", "Shield", "trash_1", "Bandage", "trash_1", "trash_1", "Knife", "bullet"],
+              ["trash_1", "granate", "Knife", "Bandage", "Knife", "trash_1", "Bandage", "granate", "Shield"],
+              ["granate", "Shield", "granate", "bullet", "bullet", "Knife", "bullet", "granate", "bullet"],
+              ["Knife", "trash_1", "granate", "granate", "Shield", "granate", "granate", "trash_1", "Bandage"],
+              ["granate", "Bandage", "Shield", "Bandage", "granate", "bullet", "Knife", "Knife", "Bandage"],
+              ["trash_1", "granate", "granate", "Knife", "granate", "trash_1", "Bandage", "bullet", "granate"],
+              ["Bandage", "trash_1", "Bandage", "trash_1", "Bandage", "Knife", "bullet", "Knife", "bullet"],
+              ["granate", "Bandage", "trash_1", "Knife", "Shield", "trash_1", "Shield", "Shield", "trash_1"]
+            ]
+          },
+          {
+            "id": "use_generator",
+            "action": "battery",
+            "textKey": "battle.tutorial.step.useGenerator",
+            "from": { "row": 3, "col": 3 },
+            "to": { "row": 3, "col": 4 },
+            "matchCells": [
+              { "row": 3, "col": 3 },
+              { "row": 3, "col": 4 }
+            ],
+            "board": [
+              ["bullet", "trash_1", "bullet", "Shield", "bullet", "granate", "Bandage", "trash_1", "granate"],
+              ["granate", "Bandage", "granate", "Bandage", "Knife", "bullet", "granate", "trash_1", "trash_1"],
+              ["bullet", "bullet", "granate", "granate", "Knife", "trash_1", "granate", "Bandage", "Bandage"],
+              ["granate", "granate", "Shield", "battary", "bullet", "trash_1", "Bandage", "trash_1", "Bandage"],
+              ["granate", "granate", "Bandage", "Shield", "granate", "bullet", "granate", "bullet", "Knife"],
+              ["bullet", "bullet", "granate", "granate", "Knife", "Shield", "Shield", "Knife", "Bandage"],
+              ["trash_1", "Shield", "bullet", "Bandage", "bullet", "Shield", "granate", "Bandage", "Bandage"],
+              ["granate", "granate", "Knife", "trash_1", "Knife", "bullet", "Bandage", "Knife", "Knife"]
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "reward": [],
+  "heal": [],
+  "shop": [],
+  "skip": [],
+  "dialog": [],
+  "boss": null
+}

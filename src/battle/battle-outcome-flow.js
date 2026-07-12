@@ -98,6 +98,8 @@ export function showBattleDefeat(deps, context, renderTargets) {
 }
 
 export function restartCurrentBattle(deps, context, renderTargets, banner) {
+  // Restart сохраняет общий lifecycle overlay, но начинает новую attempt:
+  // старые idle/rage/animation callbacks больше не проходят token checks.
   let activeRenderTargets = deps.normalizeBattleRenderTargets(context, renderTargets);
   if (!deps.shouldContinueBattle(context, activeRenderTargets)) {
     return;
@@ -172,6 +174,8 @@ export function createBattleOutcomeElement(title) {
 }
 
 export function finishBattle(deps, context, renderTargets, outcome) {
+  // finishBattle - единственная точка, которая закрывает scaffold и resolve'ит
+  // Promise battleView.start(). Остальные flow должны приходить сюда.
   if (!deps.shouldContinueBattle(context, renderTargets) || context.battleLifecycle?.isFinishing) {
     return;
   }

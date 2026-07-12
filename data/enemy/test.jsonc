@@ -1,7 +1,7 @@
 {
   "enemyId": "test",
-  "nameTextKey": "Boss_1.name",
-  "descriptionTextKey": "enemy.Boss_1.description",
+  "nameTextKey": "enemy.test.name",
+  "descriptionTextKey": "enemy.test.description",
   "stageCount": 2,
   "battle_music": "data/Assets/sound/battle_3.mp3",
   "wall": 5,
@@ -29,7 +29,7 @@
         }
       ],
       "aggression": {
-        "threshold": 50,
+        "threshold": 100,
         "damage": 3,
         "resetOnTrigger": true
       },
@@ -68,7 +68,7 @@
         }
       ],
       "aggression": {
-        "threshold": 50,
+        "threshold": 100,
         "damage": 5,
         "resetOnTrigger": true
       },

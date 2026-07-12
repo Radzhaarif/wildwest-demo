@@ -1,5 +1,6 @@
 {
-  "enemyId": "Cookie",
+  "enemyId": "easy_Cookie",
+  "baseEnemyId": "Cookie",
   "nameTextKey": "enemy.Cookie.name",
   "descriptionTextKey": "enemy.Cookie.description",
   "stageCount": 1,
@@ -23,7 +24,7 @@
         }
       ],
       "aggression": {
-        "threshold": 50,
+        "threshold": 100,
         "damage": 3,
         "resetOnTrigger": true
       },

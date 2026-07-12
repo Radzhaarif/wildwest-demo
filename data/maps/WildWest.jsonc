@@ -26,6 +26,11 @@
       "icon": "data/Assets/icons/clown_skull.png"
     },
     {
+      "name": "battle_test",
+      "type": "battle",
+      "icon": "data/Assets/icons/black_skull.png"
+    },
+    {
       "name": "battle",
       "type": "battle",
       "icon": "data/Assets/icons/white_skull.png"
@@ -59,13 +64,18 @@
       "name": "shop",
       "type": "shop",
       "icon": "data/Assets/icons/shop.png"
+    },
+    {
+      "name": "opening_dialog",
+      "type": "dialog",
+      "icon": "data/Assets/icons/dialog.png"
     }
   ],
   "levels": [
     {
       "level": 1,
       "nodes": {
-        "count": 1
+        "count": 2
       },
       "paths": {
         "minConnectionsFromNode": 1,
@@ -75,6 +85,11 @@
       "events": [
         {
           "name": "battle_easy",
+          "weight": 100,
+          "guaranteed": true
+        },
+        {
+          "name": "opening_dialog",
           "weight": 100,
           "guaranteed": true
         }
@@ -297,6 +312,14 @@
       "weight": 100
     },
     {
+      "eventName": "battle_test",
+      "enemyId": "test",
+      "background": "data/Assets/backgrounds/WildWest_1.png",
+      "minLevel": 1,
+      "maxLevel": 1,
+      "weight": 100
+    },
+    {
       "eventName": "battle",
       "enemyId": "easy_Candy",
       "background": "data/Assets/backgrounds/WildWest_1.png",
@@ -349,6 +372,31 @@
   "reward": [
     {
       "eventName": "reward",
+      "minLevel": 1,
+      "maxLevel": 1,
+      "weight": 100,
+      "dialogTextKey": "reward.item.text_01",
+      "eventImage": "data/Assets/events/reward_gold.png",
+      "itemCount": 1,
+      "rewards": [
+        {
+          "type": "gold",
+          "amount": 20
+        },
+        {
+          "type": "item",
+          "itemId": "item_skull",
+          "amount": 1
+        },
+        {
+          "type": "item",
+          "itemId": "item_swap",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "eventName": "reward",
       "minLevel": 4,
       "maxLevel": 6,
       "weight": 100,
@@ -364,6 +412,16 @@
     }
   ],
   "heal": [
+    {
+      "eventName": "heal",
+      "minLevel": 1,
+      "maxLevel": 1,
+      "healPercent": 25,
+      "dialogTextKey": "healer.text_01",
+      "eventImage": "data/Assets/events/doctor.png",
+      "goldPrice": 0,
+      "weight": 100
+    },
     {
       "eventName": "heal",
       "minLevel": 3,
@@ -388,6 +446,76 @@
   "shop": [
     {
       "eventName": "shop",
+      "minLevel": 1,
+      "maxLevel": 1,
+      "weight": 100,
+      "dialogTextKey": "trader.text_01",
+      "eventImage": "data/Assets/events/trader.png",
+      "items": [
+        {
+          "itemId": "item_Knife",
+          "amount": 1,
+          "goldPrice": 50
+        },
+        {
+          "itemId": "item_bullet",
+          "amount": 1,
+          "goldPrice": 50
+        },
+        {
+          "itemId": "item_granate",
+          "amount": 1,
+          "goldPrice": 50
+        },
+        {
+          "itemId": "item_Bandage",
+          "amount": 1,
+          "goldPrice": 50
+        },
+        {
+          "itemId": "item_Shield",
+          "amount": 1,
+          "goldPrice": 50
+        },
+        {
+          "itemId": "item_Knife_power",
+          "amount": 1,
+          "goldPrice": 100
+        },
+        {
+          "itemId": "item_bullet_power",
+          "amount": 1,
+          "goldPrice": 100
+        },
+        {
+          "itemId": "item_granate_power",
+          "amount": 1,
+          "goldPrice": 100
+        },
+        {
+          "itemId": "item_Bandage_power",
+          "amount": 1,
+          "goldPrice": 100
+        },
+        {
+          "itemId": "item_Shield_power",
+          "amount": 1,
+          "goldPrice": 100
+        },
+        {
+          "itemId": "red",
+          "amount": 1,
+          "goldPrice": 200
+        },
+        {
+          "itemId": "green",
+          "amount": 1,
+          "goldPrice": 100
+        }
+      ]
+    },
+    {
+      "eventName": "shop",
       "minLevel": 3,
       "maxLevel": 8,
       "weight": 100,
@@ -408,5 +536,42 @@
     }
   ],
   "skip": [],
-  "dialog": []
+  "dialog": [
+    {
+      "eventName": "opening_dialog",
+      "minLevel": 1,
+      "maxLevel": 1,
+      "weight": 100,
+      "characterImage": "data/Assets/enemy/Sweety.png",
+      "characterNameTextKey": "sweety.name",
+      "characterWidthPct": 58,
+      "characterCenterXPct": 50,
+      "characterCenterYPct": 48,
+      "initialStepId": "choice",
+      "steps": [
+        {
+          "stepId": "choice",
+          "textKey": "dialog.sweety.startChoice",
+          "answers": [
+            {
+              "textKey": "dialog.sweety.answer.testBattle",
+              "eventName": "battle_test"
+            },
+            {
+              "textKey": "dialog.sweety.answer.shop",
+              "eventName": "shop"
+            },
+            {
+              "textKey": "dialog.sweety.answer.doctor",
+              "eventName": "heal"
+            },
+            {
+              "textKey": "dialog.sweety.answer.reward",
+              "eventName": "reward"
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

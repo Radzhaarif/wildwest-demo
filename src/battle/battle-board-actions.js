@@ -1,3 +1,5 @@
+// Board actions сами выставляют isResolving, пишут battle trace и в конце
+// вызывают finishBattleMoveIfNeeded. Это не просто click-handlers, а turn flow.
 export async function handleGoldBoardClick(deps, context, cell, renderTargets) {
   if (!deps.shouldContinueBattle(context, renderTargets)) {
     return;

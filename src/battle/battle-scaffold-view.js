@@ -1,3 +1,7 @@
+const BATTLE_ENEMY_TITLE_MAX_FONT_SIZE_PX = 40;
+const BATTLE_ENEMY_TITLE_MIN_FONT_SIZE_PX = 14;
+const BATTLE_ENEMY_TITLE_FIT_PADDING_PX = 1;
+
 export function showBattleScaffold(deps, context, root) {
   return new Promise((resolve) => {
     deps.ensureBattleStateShape(context);
@@ -152,10 +156,10 @@ export function showBattleScaffold(deps, context, root) {
     enemyHeaderTitle.className = "battle-scaffold-enemy-title";
     enemyHeaderTitle.append(title, enemyStage);
 
-    enemyHeader.append(enemyHeaderTitle, enemyHeaderValues);
+    enemyHeader.append(enemyHeaderTitle);
     enemyHeaderRow.append(enemyHeader, menuButton);
     enemyInfo.append(enemyStats, ultimateText);
-    rightColumn.append(enemyHeaderRow, enemyVisual, enemyInfo);
+    rightColumn.append(enemyHeaderRow, enemyVisual, enemyInfo, enemyHeaderValues);
     leftBottom.append(shuffleButton);
     layout.append(leftColumn, rightColumn, leftBottom);
     panel.append(layout);
@@ -178,6 +182,8 @@ export function showBattleScaffold(deps, context, root) {
       deps.alignBattleBagSlotToHealMeter(renderTargets);
     };
 
+    // renderTargets - общий набор DOM-ручек для всех battle flow. Его кладем в
+    // context, чтобы popover/rage/resolution не искали элементы заново.
     const renderTargets = {
       boardElement,
       specialItems,
@@ -206,6 +212,7 @@ export function showBattleScaffold(deps, context, root) {
       lifecycleToken,
       attemptToken,
     };
+    renderTargets.fitBattleEnemyTitle = () => fitBattleEnemyTitle(renderTargets);
     context.battleRenderTargets = renderTargets;
     renderTargets.cleanupBattleViewportScale = setupBattleViewportScale(
       deps,
@@ -218,11 +225,13 @@ export function showBattleScaffold(deps, context, root) {
     );
     deps.attachBattlePointerTracker(context, overlay);
     deps.attachBattleLanguageChangeListener(context, renderTargets);
+    deps.attachBattleCheatCommands?.(context, renderTargets);
 
     deps.renderBattleStats(enemyStats, playerMeters, ultimateText, context);
     deps.renderBattleInventory(specialItems, handItems, context, renderTargets);
     deps.renderBattleBoard(boardElement, context, status, enemyStats, playerMeters, ultimateText);
     deps.startBattleRuntime(context, renderTargets);
+    scheduleBattleEnemyTitleFit(renderTargets);
     requestAnimationFrame(alignBattleSideWidgetsToBoardRightEdge);
 
     logButton.addEventListener("click", () => {
@@ -337,13 +346,13 @@ export function setupBattleViewportScale(deps, context, overlay, frame, panel, r
     const viewport = getBattleViewportSize(deps);
     const availableWidth = Math.max(1, viewport.width - layout.viewportPaddingPx * 2);
     const availableHeight = Math.max(1, viewport.height - layout.viewportPaddingPx * 2);
-    const fitScale = Math.min(
+    const coverScale = Math.max(
       availableWidth / layout.designWidthPx,
       availableHeight / layout.designHeightPx,
     );
-    const scale = fitScale > 1
-      ? (layout.allowUpscale ? 1 + (fitScale - 1) * layout.upscaleFactor : 1)
-      : Math.max(fitScale, layout.minScale);
+    const scale = coverScale > 1
+      ? (layout.allowUpscale ? 1 + (coverScale - 1) * layout.upscaleFactor : 1)
+      : Math.max(coverScale, layout.minScale);
 
     overlay.style.setProperty("--battle-viewport-padding", `${layout.viewportPaddingPx}px`);
     frame.style.width = `${layout.designWidthPx * scale}px`;
@@ -364,6 +373,7 @@ export function setupBattleViewportScale(deps, context, overlay, frame, panel, r
       if (!deps.shouldContinueBattle(context, renderTargets)) {
         return;
       }
+      fitBattleEnemyTitle(renderTargets);
       if (typeof afterApply === "function") {
         afterApply();
       }
@@ -403,6 +413,49 @@ export function getBattleViewportSize(deps) {
     };
   }
   return viewport;
+}
+
+export function scheduleBattleEnemyTitleFit(renderTargets) {
+  if (typeof requestAnimationFrame === "function") {
+    requestAnimationFrame(() => fitBattleEnemyTitle(renderTargets));
+    return;
+  }
+  fitBattleEnemyTitle(renderTargets);
+}
+
+export function fitBattleEnemyTitle(renderTargets) {
+  const title = renderTargets?.title;
+  if (!title?.isConnected || !title.textContent.trim()) {
+    return;
+  }
+
+  title.style.setProperty(
+    "--battle-enemy-title-font-size",
+    `${BATTLE_ENEMY_TITLE_MAX_FONT_SIZE_PX}px`,
+  );
+
+  let fontSize = BATTLE_ENEMY_TITLE_MAX_FONT_SIZE_PX;
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    const availableWidth = Number(title.clientWidth) || 0;
+    const requiredWidth = Number(title.scrollWidth) || 0;
+    if (availableWidth <= 0 || requiredWidth <= 0) {
+      return;
+    }
+    if (requiredWidth <= availableWidth + BATTLE_ENEMY_TITLE_FIT_PADDING_PX) {
+      return;
+    }
+
+    const nextFontSize = Math.max(
+      BATTLE_ENEMY_TITLE_MIN_FONT_SIZE_PX,
+      Math.floor((fontSize * availableWidth / requiredWidth) * 10) / 10,
+    );
+    if (nextFontSize >= fontSize) {
+      return;
+    }
+
+    fontSize = nextFontSize;
+    title.style.setProperty("--battle-enemy-title-font-size", `${fontSize}px`);
+  }
 }
 
 export function getBattleLayoutConfig(deps, context) {
@@ -498,6 +551,10 @@ export function cleanupBattleScaffold(deps, context, overlay) {
     context.unsubscribeLanguageChange();
   }
   context.unsubscribeLanguageChange = null;
+  if (typeof context.cleanupBattleCheatCommands === "function") {
+    context.cleanupBattleCheatCommands();
+  }
+  context.cleanupBattleCheatCommands = null;
   deps.removeActiveBattleSpecialCursor(context);
   if (context.battlePointer?.moveHandler && overlay) {
     overlay.removeEventListener("pointermove", context.battlePointer.moveHandler);

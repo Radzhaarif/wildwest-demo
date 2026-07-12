@@ -1,6 +1,8 @@
 {
   // Таблица уровней игрока. requiredExperience - общее количество опыта,
   // которое нужно накопить, чтобы считаться достигшим уровня.
+  "limitedItemInventoryThreshold": 50,
+  "rewardWeightReductionPercentPerInventoryItem": 1,
   "levels": [
     {
       "level": 0,
@@ -19,62 +21,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 100,
+          "weight": 2125,
           "amount": 1
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 1
         },
         {
           "itemId": "item_bullet",
-          "weight": 100,
+          "weight": 2125,
           "amount": 1
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 1
         },
         {
           "itemId": "item_granate",
-          "weight": 100,
+          "weight": 2125,
           "amount": 1
         },
         {
           "itemId": "item_granate_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 1
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 1600,
           "amount": 1
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 1
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 1600,
           "amount": 1
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 1
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 1
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 1
         }
       ]
@@ -88,62 +90,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 100,
+          "weight": 2125,
           "amount": 1
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 1
         },
         {
           "itemId": "item_bullet",
-          "weight": 100,
+          "weight": 2125,
           "amount": 1
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 1
         },
         {
           "itemId": "item_granate",
-          "weight": 100,
+          "weight": 2125,
           "amount": 1
         },
         {
           "itemId": "item_granate_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 1
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 1600,
           "amount": 1
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 1
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 1600,
           "amount": 1
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 1
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 1
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 1
         }
       ]
@@ -157,62 +159,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 48,
+          "weight": 1600,
           "amount": 1
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 1
         },
         {
           "itemId": "item_bullet",
-          "weight": 48,
+          "weight": 1600,
           "amount": 1
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 1
         },
         {
           "itemId": "item_granate",
-          "weight": 48,
+          "weight": 1600,
           "amount": 1
         },
         {
           "itemId": "item_granate_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 1
         },
         {
           "itemId": "item_Bandage",
-          "weight": 128,
+          "weight": 2095,
           "amount": 1
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 1
         },
         {
           "itemId": "item_Shield",
-          "weight": 128,
+          "weight": 2095,
           "amount": 1
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 1
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 1
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 1
         }
       ]
@@ -226,62 +228,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 48,
+          "weight": 1600,
           "amount": 1
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 1
         },
         {
           "itemId": "item_bullet",
-          "weight": 48,
+          "weight": 1600,
           "amount": 1
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 1
         },
         {
           "itemId": "item_granate",
-          "weight": 48,
+          "weight": 1600,
           "amount": 1
         },
         {
           "itemId": "item_granate_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 1
         },
         {
           "itemId": "item_Bandage",
-          "weight": 128,
+          "weight": 2095,
           "amount": 1
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 1
         },
         {
           "itemId": "item_Shield",
-          "weight": 128,
+          "weight": 2095,
           "amount": 1
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 1
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 1
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 1
         }
       ]
@@ -295,62 +297,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 50,
+          "weight": 400,
           "amount": 1
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 1
         },
         {
           "itemId": "item_bullet",
-          "weight": 50,
+          "weight": 400,
           "amount": 1
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 1
         },
         {
           "itemId": "item_granate",
-          "weight": 50,
+          "weight": 400,
           "amount": 1
         },
         {
           "itemId": "item_granate_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 1
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 400,
           "amount": 1
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 1
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 400,
           "amount": 1
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 1
         },
         {
           "itemId": "red",
-          "weight": 125,
+          "weight": 2400,
           "amount": 1
         },
         {
           "itemId": "green",
-          "weight": 125,
+          "weight": 2400,
           "amount": 1
         }
       ]
@@ -364,63 +366,63 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 100,
-          "amount": 2
+          "weight": 2125,
+          "amount": 1
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 12,
-          "amount": 2
+          "weight": 1025,
+          "amount": 1
         },
         {
           "itemId": "item_bullet",
-          "weight": 100,
-          "amount": 2
+          "weight": 2125,
+          "amount": 1
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 12,
-          "amount": 2
+          "weight": 1025,
+          "amount": 1
         },
         {
           "itemId": "item_granate",
-          "weight": 100,
-          "amount": 2
+          "weight": 2125,
+          "amount": 1
         },
         {
           "itemId": "item_granate_power",
-          "weight": 12,
-          "amount": 2
+          "weight": 1025,
+          "amount": 1
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
-          "amount": 2
+          "weight": 1600,
+          "amount": 1
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 7,
-          "amount": 2
+          "weight": 700,
+          "amount": 1
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
-          "amount": 2
+          "weight": 1600,
+          "amount": 1
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 7,
-          "amount": 2
+          "weight": 700,
+          "amount": 1
         },
         {
           "itemId": "red",
-          "weight": 25,
-          "amount": 2
+          "weight": 1180,
+          "amount": 1
         },
         {
           "itemId": "green",
-          "weight": 25,
-          "amount": 2
+          "weight": 1180,
+          "amount": 1
         }
       ]
     },
@@ -433,62 +435,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 100,
+          "weight": 2125,
           "amount": 1
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 1
         },
         {
           "itemId": "item_bullet",
-          "weight": 100,
+          "weight": 2125,
           "amount": 1
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 1
         },
         {
           "itemId": "item_granate",
-          "weight": 100,
+          "weight": 2125,
           "amount": 1
         },
         {
           "itemId": "item_granate_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 1
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 1600,
           "amount": 1
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 1
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 1600,
           "amount": 1
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 1
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 1
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 1
         }
       ]
@@ -502,62 +504,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 48,
+          "weight": 1600,
           "amount": 1
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 1
         },
         {
           "itemId": "item_bullet",
-          "weight": 48,
+          "weight": 1600,
           "amount": 1
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 1
         },
         {
           "itemId": "item_granate",
-          "weight": 48,
+          "weight": 1600,
           "amount": 1
         },
         {
           "itemId": "item_granate_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 1
         },
         {
           "itemId": "item_Bandage",
-          "weight": 128,
+          "weight": 2095,
           "amount": 1
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 1
         },
         {
           "itemId": "item_Shield",
-          "weight": 128,
+          "weight": 2095,
           "amount": 1
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 1
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 1
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 1
         }
       ]
@@ -571,62 +573,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 48,
+          "weight": 1600,
           "amount": 1
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 1
         },
         {
           "itemId": "item_bullet",
-          "weight": 48,
+          "weight": 1600,
           "amount": 1
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 1
         },
         {
           "itemId": "item_granate",
-          "weight": 48,
+          "weight": 1600,
           "amount": 1
         },
         {
           "itemId": "item_granate_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 1
         },
         {
           "itemId": "item_Bandage",
-          "weight": 128,
+          "weight": 2095,
           "amount": 1
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 1
         },
         {
           "itemId": "item_Shield",
-          "weight": 128,
+          "weight": 2095,
           "amount": 1
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 1
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 1
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 1
         }
       ]
@@ -640,62 +642,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 50,
+          "weight": 400,
           "amount": 1
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 1
         },
         {
           "itemId": "item_bullet",
-          "weight": 50,
+          "weight": 400,
           "amount": 1
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 1
         },
         {
           "itemId": "item_granate",
-          "weight": 50,
+          "weight": 400,
           "amount": 1
         },
         {
           "itemId": "item_granate_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 1
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 400,
           "amount": 1
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 1
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 400,
           "amount": 1
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 1
         },
         {
           "itemId": "red",
-          "weight": 125,
+          "weight": 2400,
           "amount": 1
         },
         {
           "itemId": "green",
-          "weight": 125,
+          "weight": 2400,
           "amount": 1
         }
       ]
@@ -709,62 +711,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 100,
+          "weight": 2125,
           "amount": 2
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 2
         },
         {
           "itemId": "item_bullet",
-          "weight": 100,
+          "weight": 2125,
           "amount": 2
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 2
         },
         {
           "itemId": "item_granate",
-          "weight": 100,
+          "weight": 2125,
           "amount": 2
         },
         {
           "itemId": "item_granate_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 2
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 1600,
           "amount": 2
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 2
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 1600,
           "amount": 2
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 2
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 2
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 2
         }
       ]
@@ -778,62 +780,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 100,
+          "weight": 2125,
           "amount": 2
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 2
         },
         {
           "itemId": "item_bullet",
-          "weight": 100,
+          "weight": 2125,
           "amount": 2
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 2
         },
         {
           "itemId": "item_granate",
-          "weight": 100,
+          "weight": 2125,
           "amount": 2
         },
         {
           "itemId": "item_granate_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 2
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 1600,
           "amount": 2
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 2
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 1600,
           "amount": 2
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 2
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 2
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 2
         }
       ]
@@ -847,62 +849,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 48,
+          "weight": 1600,
           "amount": 2
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 2
         },
         {
           "itemId": "item_bullet",
-          "weight": 48,
+          "weight": 1600,
           "amount": 2
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 2
         },
         {
           "itemId": "item_granate",
-          "weight": 48,
+          "weight": 1600,
           "amount": 2
         },
         {
           "itemId": "item_granate_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 2
         },
         {
           "itemId": "item_Bandage",
-          "weight": 128,
+          "weight": 2095,
           "amount": 2
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 2
         },
         {
           "itemId": "item_Shield",
-          "weight": 128,
+          "weight": 2095,
           "amount": 2
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 2
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 2
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 2
         }
       ]
@@ -916,62 +918,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 48,
+          "weight": 1600,
           "amount": 2
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 2
         },
         {
           "itemId": "item_bullet",
-          "weight": 48,
+          "weight": 1600,
           "amount": 2
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 2
         },
         {
           "itemId": "item_granate",
-          "weight": 48,
+          "weight": 1600,
           "amount": 2
         },
         {
           "itemId": "item_granate_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 2
         },
         {
           "itemId": "item_Bandage",
-          "weight": 128,
+          "weight": 2095,
           "amount": 2
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 2
         },
         {
           "itemId": "item_Shield",
-          "weight": 128,
+          "weight": 2095,
           "amount": 2
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 2
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 2
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 2
         }
       ]
@@ -985,62 +987,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 50,
+          "weight": 400,
           "amount": 2
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 2
         },
         {
           "itemId": "item_bullet",
-          "weight": 50,
+          "weight": 400,
           "amount": 2
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 2
         },
         {
           "itemId": "item_granate",
-          "weight": 50,
+          "weight": 400,
           "amount": 2
         },
         {
           "itemId": "item_granate_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 2
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 400,
           "amount": 2
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 2
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 400,
           "amount": 2
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 2
         },
         {
           "itemId": "red",
-          "weight": 125,
+          "weight": 2400,
           "amount": 2
         },
         {
           "itemId": "green",
-          "weight": 125,
+          "weight": 2400,
           "amount": 2
         }
       ]
@@ -1054,62 +1056,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 100,
+          "weight": 2125,
           "amount": 2
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 2
         },
         {
           "itemId": "item_bullet",
-          "weight": 100,
+          "weight": 2125,
           "amount": 2
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 2
         },
         {
           "itemId": "item_granate",
-          "weight": 100,
+          "weight": 2125,
           "amount": 2
         },
         {
           "itemId": "item_granate_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 2
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 1600,
           "amount": 2
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 2
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 1600,
           "amount": 2
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 2
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 2
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 2
         }
       ]
@@ -1123,62 +1125,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 100,
+          "weight": 2125,
           "amount": 2
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 2
         },
         {
           "itemId": "item_bullet",
-          "weight": 100,
+          "weight": 2125,
           "amount": 2
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 2
         },
         {
           "itemId": "item_granate",
-          "weight": 100,
+          "weight": 2125,
           "amount": 2
         },
         {
           "itemId": "item_granate_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 2
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 1600,
           "amount": 2
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 2
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 1600,
           "amount": 2
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 2
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 2
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 2
         }
       ]
@@ -1192,62 +1194,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 48,
+          "weight": 1600,
           "amount": 2
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 2
         },
         {
           "itemId": "item_bullet",
-          "weight": 48,
+          "weight": 1600,
           "amount": 2
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 2
         },
         {
           "itemId": "item_granate",
-          "weight": 48,
+          "weight": 1600,
           "amount": 2
         },
         {
           "itemId": "item_granate_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 2
         },
         {
           "itemId": "item_Bandage",
-          "weight": 128,
+          "weight": 2095,
           "amount": 2
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 2
         },
         {
           "itemId": "item_Shield",
-          "weight": 128,
+          "weight": 2095,
           "amount": 2
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 2
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 2
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 2
         }
       ]
@@ -1261,62 +1263,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 48,
+          "weight": 1600,
           "amount": 2
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 2
         },
         {
           "itemId": "item_bullet",
-          "weight": 48,
+          "weight": 1600,
           "amount": 2
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 2
         },
         {
           "itemId": "item_granate",
-          "weight": 48,
+          "weight": 1600,
           "amount": 2
         },
         {
           "itemId": "item_granate_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 2
         },
         {
           "itemId": "item_Bandage",
-          "weight": 128,
+          "weight": 2095,
           "amount": 2
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 2
         },
         {
           "itemId": "item_Shield",
-          "weight": 128,
+          "weight": 2095,
           "amount": 2
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 2
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 2
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 2
         }
       ]
@@ -1330,62 +1332,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 50,
+          "weight": 400,
           "amount": 2
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 2
         },
         {
           "itemId": "item_bullet",
-          "weight": 50,
+          "weight": 400,
           "amount": 2
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 2
         },
         {
           "itemId": "item_granate",
-          "weight": 50,
+          "weight": 400,
           "amount": 2
         },
         {
           "itemId": "item_granate_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 2
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 400,
           "amount": 2
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 2
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 400,
           "amount": 2
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 2
         },
         {
           "itemId": "red",
-          "weight": 125,
+          "weight": 2400,
           "amount": 2
         },
         {
           "itemId": "green",
-          "weight": 125,
+          "weight": 2400,
           "amount": 2
         }
       ]
@@ -1399,62 +1401,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 100,
+          "weight": 2125,
           "amount": 3
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 3
         },
         {
           "itemId": "item_bullet",
-          "weight": 100,
+          "weight": 2125,
           "amount": 3
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 3
         },
         {
           "itemId": "item_granate",
-          "weight": 100,
+          "weight": 2125,
           "amount": 3
         },
         {
           "itemId": "item_granate_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 3
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 1600,
           "amount": 3
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 3
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 1600,
           "amount": 3
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 3
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 3
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 3
         }
       ]
@@ -1468,62 +1470,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 100,
+          "weight": 2125,
           "amount": 3
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 3
         },
         {
           "itemId": "item_bullet",
-          "weight": 100,
+          "weight": 2125,
           "amount": 3
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 3
         },
         {
           "itemId": "item_granate",
-          "weight": 100,
+          "weight": 2125,
           "amount": 3
         },
         {
           "itemId": "item_granate_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 3
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 1600,
           "amount": 3
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 3
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 1600,
           "amount": 3
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 3
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 3
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 3
         }
       ]
@@ -1537,62 +1539,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 48,
+          "weight": 1600,
           "amount": 3
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 3
         },
         {
           "itemId": "item_bullet",
-          "weight": 48,
+          "weight": 1600,
           "amount": 3
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 3
         },
         {
           "itemId": "item_granate",
-          "weight": 48,
+          "weight": 1600,
           "amount": 3
         },
         {
           "itemId": "item_granate_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 3
         },
         {
           "itemId": "item_Bandage",
-          "weight": 128,
+          "weight": 2095,
           "amount": 3
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 3
         },
         {
           "itemId": "item_Shield",
-          "weight": 128,
+          "weight": 2095,
           "amount": 3
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 3
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 3
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 3
         }
       ]
@@ -1606,62 +1608,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 48,
+          "weight": 1600,
           "amount": 3
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 3
         },
         {
           "itemId": "item_bullet",
-          "weight": 48,
+          "weight": 1600,
           "amount": 3
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 3
         },
         {
           "itemId": "item_granate",
-          "weight": 48,
+          "weight": 1600,
           "amount": 3
         },
         {
           "itemId": "item_granate_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 3
         },
         {
           "itemId": "item_Bandage",
-          "weight": 128,
+          "weight": 2095,
           "amount": 3
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 3
         },
         {
           "itemId": "item_Shield",
-          "weight": 128,
+          "weight": 2095,
           "amount": 3
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 3
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 3
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 3
         }
       ]
@@ -1675,62 +1677,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 50,
+          "weight": 400,
           "amount": 3
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 3
         },
         {
           "itemId": "item_bullet",
-          "weight": 50,
+          "weight": 400,
           "amount": 3
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 3
         },
         {
           "itemId": "item_granate",
-          "weight": 50,
+          "weight": 400,
           "amount": 3
         },
         {
           "itemId": "item_granate_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 3
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 400,
           "amount": 3
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 3
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 400,
           "amount": 3
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 3
         },
         {
           "itemId": "red",
-          "weight": 125,
+          "weight": 2400,
           "amount": 3
         },
         {
           "itemId": "green",
-          "weight": 125,
+          "weight": 2400,
           "amount": 3
         }
       ]
@@ -1744,62 +1746,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 100,
+          "weight": 2125,
           "amount": 3
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 3
         },
         {
           "itemId": "item_bullet",
-          "weight": 100,
+          "weight": 2125,
           "amount": 3
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 3
         },
         {
           "itemId": "item_granate",
-          "weight": 100,
+          "weight": 2125,
           "amount": 3
         },
         {
           "itemId": "item_granate_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 3
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 1600,
           "amount": 3
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 3
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 1600,
           "amount": 3
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 3
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 3
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 3
         }
       ]
@@ -1813,62 +1815,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 100,
+          "weight": 2125,
           "amount": 3
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 3
         },
         {
           "itemId": "item_bullet",
-          "weight": 100,
+          "weight": 2125,
           "amount": 3
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 3
         },
         {
           "itemId": "item_granate",
-          "weight": 100,
+          "weight": 2125,
           "amount": 3
         },
         {
           "itemId": "item_granate_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 3
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 1600,
           "amount": 3
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 3
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 1600,
           "amount": 3
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 3
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 3
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 3
         }
       ]
@@ -1882,62 +1884,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 48,
+          "weight": 1600,
           "amount": 3
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 3
         },
         {
           "itemId": "item_bullet",
-          "weight": 48,
+          "weight": 1600,
           "amount": 3
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 3
         },
         {
           "itemId": "item_granate",
-          "weight": 48,
+          "weight": 1600,
           "amount": 3
         },
         {
           "itemId": "item_granate_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 3
         },
         {
           "itemId": "item_Bandage",
-          "weight": 128,
+          "weight": 2095,
           "amount": 3
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 3
         },
         {
           "itemId": "item_Shield",
-          "weight": 128,
+          "weight": 2095,
           "amount": 3
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 3
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 3
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 3
         }
       ]
@@ -1951,62 +1953,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 48,
+          "weight": 1600,
           "amount": 3
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 3
         },
         {
           "itemId": "item_bullet",
-          "weight": 48,
+          "weight": 1600,
           "amount": 3
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 3
         },
         {
           "itemId": "item_granate",
-          "weight": 48,
+          "weight": 1600,
           "amount": 3
         },
         {
           "itemId": "item_granate_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 3
         },
         {
           "itemId": "item_Bandage",
-          "weight": 128,
+          "weight": 2095,
           "amount": 3
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 3
         },
         {
           "itemId": "item_Shield",
-          "weight": 128,
+          "weight": 2095,
           "amount": 3
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 3
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 3
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 3
         }
       ]
@@ -2020,62 +2022,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 50,
+          "weight": 400,
           "amount": 3
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 3
         },
         {
           "itemId": "item_bullet",
-          "weight": 50,
+          "weight": 400,
           "amount": 3
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 3
         },
         {
           "itemId": "item_granate",
-          "weight": 50,
+          "weight": 400,
           "amount": 3
         },
         {
           "itemId": "item_granate_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 3
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 400,
           "amount": 3
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 3
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 400,
           "amount": 3
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 3
         },
         {
           "itemId": "red",
-          "weight": 125,
+          "weight": 2400,
           "amount": 3
         },
         {
           "itemId": "green",
-          "weight": 125,
+          "weight": 2400,
           "amount": 3
         }
       ]
@@ -2089,62 +2091,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 100,
+          "weight": 2125,
           "amount": 4
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 4
         },
         {
           "itemId": "item_bullet",
-          "weight": 100,
+          "weight": 2125,
           "amount": 4
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 4
         },
         {
           "itemId": "item_granate",
-          "weight": 100,
+          "weight": 2125,
           "amount": 4
         },
         {
           "itemId": "item_granate_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 4
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 1600,
           "amount": 4
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 4
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 1600,
           "amount": 4
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 4
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 4
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 4
         }
       ]
@@ -2158,62 +2160,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 100,
+          "weight": 2125,
           "amount": 4
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 4
         },
         {
           "itemId": "item_bullet",
-          "weight": 100,
+          "weight": 2125,
           "amount": 4
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 4
         },
         {
           "itemId": "item_granate",
-          "weight": 100,
+          "weight": 2125,
           "amount": 4
         },
         {
           "itemId": "item_granate_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 4
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 1600,
           "amount": 4
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 4
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 1600,
           "amount": 4
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 4
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 4
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 4
         }
       ]
@@ -2227,62 +2229,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 48,
+          "weight": 1600,
           "amount": 4
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 4
         },
         {
           "itemId": "item_bullet",
-          "weight": 48,
+          "weight": 1600,
           "amount": 4
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 4
         },
         {
           "itemId": "item_granate",
-          "weight": 48,
+          "weight": 1600,
           "amount": 4
         },
         {
           "itemId": "item_granate_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 4
         },
         {
           "itemId": "item_Bandage",
-          "weight": 128,
+          "weight": 2095,
           "amount": 4
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 4
         },
         {
           "itemId": "item_Shield",
-          "weight": 128,
+          "weight": 2095,
           "amount": 4
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 4
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 4
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 4
         }
       ]
@@ -2296,62 +2298,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 48,
+          "weight": 1600,
           "amount": 4
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 4
         },
         {
           "itemId": "item_bullet",
-          "weight": 48,
+          "weight": 1600,
           "amount": 4
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 4
         },
         {
           "itemId": "item_granate",
-          "weight": 48,
+          "weight": 1600,
           "amount": 4
         },
         {
           "itemId": "item_granate_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 4
         },
         {
           "itemId": "item_Bandage",
-          "weight": 128,
+          "weight": 2095,
           "amount": 4
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 4
         },
         {
           "itemId": "item_Shield",
-          "weight": 128,
+          "weight": 2095,
           "amount": 4
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 4
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 4
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 4
         }
       ]
@@ -2365,62 +2367,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 50,
+          "weight": 400,
           "amount": 4
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 4
         },
         {
           "itemId": "item_bullet",
-          "weight": 50,
+          "weight": 400,
           "amount": 4
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 4
         },
         {
           "itemId": "item_granate",
-          "weight": 50,
+          "weight": 400,
           "amount": 4
         },
         {
           "itemId": "item_granate_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 4
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 400,
           "amount": 4
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 4
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 400,
           "amount": 4
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 4
         },
         {
           "itemId": "red",
-          "weight": 125,
+          "weight": 2400,
           "amount": 4
         },
         {
           "itemId": "green",
-          "weight": 125,
+          "weight": 2400,
           "amount": 4
         }
       ]
@@ -2434,62 +2436,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 100,
+          "weight": 2125,
           "amount": 4
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 4
         },
         {
           "itemId": "item_bullet",
-          "weight": 100,
+          "weight": 2125,
           "amount": 4
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 4
         },
         {
           "itemId": "item_granate",
-          "weight": 100,
+          "weight": 2125,
           "amount": 4
         },
         {
           "itemId": "item_granate_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 4
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 1600,
           "amount": 4
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 4
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 1600,
           "amount": 4
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 4
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 4
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 4
         }
       ]
@@ -2503,62 +2505,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 100,
+          "weight": 2125,
           "amount": 4
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 4
         },
         {
           "itemId": "item_bullet",
-          "weight": 100,
+          "weight": 2125,
           "amount": 4
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 4
         },
         {
           "itemId": "item_granate",
-          "weight": 100,
+          "weight": 2125,
           "amount": 4
         },
         {
           "itemId": "item_granate_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 4
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 1600,
           "amount": 4
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 4
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 1600,
           "amount": 4
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 4
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 4
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 4
         }
       ]
@@ -2572,62 +2574,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 48,
+          "weight": 1600,
           "amount": 4
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 4
         },
         {
           "itemId": "item_bullet",
-          "weight": 48,
+          "weight": 1600,
           "amount": 4
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 4
         },
         {
           "itemId": "item_granate",
-          "weight": 48,
+          "weight": 1600,
           "amount": 4
         },
         {
           "itemId": "item_granate_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 4
         },
         {
           "itemId": "item_Bandage",
-          "weight": 128,
+          "weight": 2095,
           "amount": 4
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 4
         },
         {
           "itemId": "item_Shield",
-          "weight": 128,
+          "weight": 2095,
           "amount": 4
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 4
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 4
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 4
         }
       ]
@@ -2641,62 +2643,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 48,
+          "weight": 1600,
           "amount": 4
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 4
         },
         {
           "itemId": "item_bullet",
-          "weight": 48,
+          "weight": 1600,
           "amount": 4
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 4
         },
         {
           "itemId": "item_granate",
-          "weight": 48,
+          "weight": 1600,
           "amount": 4
         },
         {
           "itemId": "item_granate_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 4
         },
         {
           "itemId": "item_Bandage",
-          "weight": 128,
+          "weight": 2095,
           "amount": 4
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 4
         },
         {
           "itemId": "item_Shield",
-          "weight": 128,
+          "weight": 2095,
           "amount": 4
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 4
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 4
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 4
         }
       ]
@@ -2710,62 +2712,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 50,
+          "weight": 400,
           "amount": 4
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 4
         },
         {
           "itemId": "item_bullet",
-          "weight": 50,
+          "weight": 400,
           "amount": 4
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 4
         },
         {
           "itemId": "item_granate",
-          "weight": 50,
+          "weight": 400,
           "amount": 4
         },
         {
           "itemId": "item_granate_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 4
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 400,
           "amount": 4
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 4
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 400,
           "amount": 4
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 4
         },
         {
           "itemId": "red",
-          "weight": 125,
+          "weight": 2400,
           "amount": 4
         },
         {
           "itemId": "green",
-          "weight": 125,
+          "weight": 2400,
           "amount": 4
         }
       ]
@@ -2779,62 +2781,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 100,
+          "weight": 2125,
           "amount": 5
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 5
         },
         {
           "itemId": "item_bullet",
-          "weight": 100,
+          "weight": 2125,
           "amount": 5
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 5
         },
         {
           "itemId": "item_granate",
-          "weight": 100,
+          "weight": 2125,
           "amount": 5
         },
         {
           "itemId": "item_granate_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 5
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 1600,
           "amount": 5
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 5
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 1600,
           "amount": 5
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 5
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 5
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 5
         }
       ]
@@ -2848,62 +2850,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 100,
+          "weight": 2125,
           "amount": 5
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 5
         },
         {
           "itemId": "item_bullet",
-          "weight": 100,
+          "weight": 2125,
           "amount": 5
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 5
         },
         {
           "itemId": "item_granate",
-          "weight": 100,
+          "weight": 2125,
           "amount": 5
         },
         {
           "itemId": "item_granate_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 5
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 1600,
           "amount": 5
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 5
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 1600,
           "amount": 5
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 5
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 5
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 5
         }
       ]
@@ -2917,62 +2919,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 48,
+          "weight": 1600,
           "amount": 5
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 5
         },
         {
           "itemId": "item_bullet",
-          "weight": 48,
+          "weight": 1600,
           "amount": 5
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 5
         },
         {
           "itemId": "item_granate",
-          "weight": 48,
+          "weight": 1600,
           "amount": 5
         },
         {
           "itemId": "item_granate_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 5
         },
         {
           "itemId": "item_Bandage",
-          "weight": 128,
+          "weight": 2095,
           "amount": 5
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 5
         },
         {
           "itemId": "item_Shield",
-          "weight": 128,
+          "weight": 2095,
           "amount": 5
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 5
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 5
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 5
         }
       ]
@@ -2986,62 +2988,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 48,
+          "weight": 1600,
           "amount": 5
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 5
         },
         {
           "itemId": "item_bullet",
-          "weight": 48,
+          "weight": 1600,
           "amount": 5
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 5
         },
         {
           "itemId": "item_granate",
-          "weight": 48,
+          "weight": 1600,
           "amount": 5
         },
         {
           "itemId": "item_granate_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 5
         },
         {
           "itemId": "item_Bandage",
-          "weight": 128,
+          "weight": 2095,
           "amount": 5
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 5
         },
         {
           "itemId": "item_Shield",
-          "weight": 128,
+          "weight": 2095,
           "amount": 5
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 5
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 5
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 5
         }
       ]
@@ -3055,62 +3057,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 50,
+          "weight": 400,
           "amount": 5
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 5
         },
         {
           "itemId": "item_bullet",
-          "weight": 50,
+          "weight": 400,
           "amount": 5
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 5
         },
         {
           "itemId": "item_granate",
-          "weight": 50,
+          "weight": 400,
           "amount": 5
         },
         {
           "itemId": "item_granate_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 5
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 400,
           "amount": 5
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 5
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 400,
           "amount": 5
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 5
         },
         {
           "itemId": "red",
-          "weight": 125,
+          "weight": 2400,
           "amount": 5
         },
         {
           "itemId": "green",
-          "weight": 125,
+          "weight": 2400,
           "amount": 5
         }
       ]
@@ -3124,62 +3126,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 100,
+          "weight": 2125,
           "amount": 5
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 5
         },
         {
           "itemId": "item_bullet",
-          "weight": 100,
+          "weight": 2125,
           "amount": 5
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 5
         },
         {
           "itemId": "item_granate",
-          "weight": 100,
+          "weight": 2125,
           "amount": 5
         },
         {
           "itemId": "item_granate_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 5
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 1600,
           "amount": 5
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 5
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 1600,
           "amount": 5
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 5
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 5
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 5
         }
       ]
@@ -3193,62 +3195,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 100,
+          "weight": 2125,
           "amount": 5
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 5
         },
         {
           "itemId": "item_bullet",
-          "weight": 100,
+          "weight": 2125,
           "amount": 5
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 5
         },
         {
           "itemId": "item_granate",
-          "weight": 100,
+          "weight": 2125,
           "amount": 5
         },
         {
           "itemId": "item_granate_power",
-          "weight": 12,
+          "weight": 1025,
           "amount": 5
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 1600,
           "amount": 5
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 5
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 1600,
           "amount": 5
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 7,
+          "weight": 700,
           "amount": 5
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 5
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 5
         }
       ]
@@ -3262,62 +3264,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 48,
+          "weight": 1600,
           "amount": 5
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 5
         },
         {
           "itemId": "item_bullet",
-          "weight": 48,
+          "weight": 1600,
           "amount": 5
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 5
         },
         {
           "itemId": "item_granate",
-          "weight": 48,
+          "weight": 1600,
           "amount": 5
         },
         {
           "itemId": "item_granate_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 5
         },
         {
           "itemId": "item_Bandage",
-          "weight": 128,
+          "weight": 2095,
           "amount": 5
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 5
         },
         {
           "itemId": "item_Shield",
-          "weight": 128,
+          "weight": 2095,
           "amount": 5
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 5
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 5
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 5
         }
       ]
@@ -3331,62 +3333,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 48,
+          "weight": 1600,
           "amount": 5
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 5
         },
         {
           "itemId": "item_bullet",
-          "weight": 48,
+          "weight": 1600,
           "amount": 5
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 5
         },
         {
           "itemId": "item_granate",
-          "weight": 48,
+          "weight": 1600,
           "amount": 5
         },
         {
           "itemId": "item_granate_power",
-          "weight": 6,
+          "weight": 700,
           "amount": 5
         },
         {
           "itemId": "item_Bandage",
-          "weight": 128,
+          "weight": 2095,
           "amount": 5
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 5
         },
         {
           "itemId": "item_Shield",
-          "weight": 128,
+          "weight": 2095,
           "amount": 5
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 16,
+          "weight": 1005,
           "amount": 5
         },
         {
           "itemId": "red",
-          "weight": 25,
+          "weight": 1180,
           "amount": 5
         },
         {
           "itemId": "green",
-          "weight": 25,
+          "weight": 1180,
           "amount": 5
         }
       ]
@@ -3400,62 +3402,62 @@
       "rewards": [
         {
           "itemId": "item_Knife",
-          "weight": 50,
+          "weight": 400,
           "amount": 5
         },
         {
           "itemId": "item_Knife_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 5
         },
         {
           "itemId": "item_bullet",
-          "weight": 50,
+          "weight": 400,
           "amount": 5
         },
         {
           "itemId": "item_bullet_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 5
         },
         {
           "itemId": "item_granate",
-          "weight": 50,
+          "weight": 400,
           "amount": 5
         },
         {
           "itemId": "item_granate_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 5
         },
         {
           "itemId": "item_Bandage",
-          "weight": 50,
+          "weight": 400,
           "amount": 5
         },
         {
           "itemId": "item_Bandage_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 5
         },
         {
           "itemId": "item_Shield",
-          "weight": 50,
+          "weight": 400,
           "amount": 5
         },
         {
           "itemId": "item_Shield_power",
-          "weight": 5,
+          "weight": 1000,
           "amount": 5
         },
         {
           "itemId": "red",
-          "weight": 125,
+          "weight": 2400,
           "amount": 5
         },
         {
           "itemId": "green",
-          "weight": 125,
+          "weight": 2400,
           "amount": 5
         }
       ]

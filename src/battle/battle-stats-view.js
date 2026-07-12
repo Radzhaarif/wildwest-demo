@@ -297,7 +297,9 @@ function createLabeledIconProgressRow(deps, context, {
 
   const fill = document.createElement("span");
   fill.className = "battle-scaffold-meter-track-fill";
-  fill.style.width = `${max > 0 ? Math.max(0, Math.min(100, (current / max) * 100)) : 0}%`;
+  const fillPercent = max > 0 ? Math.max(0, Math.min(100, (current / max) * 100)) : 0;
+  meter.style.setProperty("--battle-meter-ratio", String(fillPercent / 100));
+  fill.style.width = `${fillPercent}%`;
   fill.style.background = color;
   track.append(fill);
 
@@ -368,7 +370,9 @@ function updateBattleLabeledIconProgressRow(deps, context, meter, {
 
   const trackFill = meter.querySelector(".battle-scaffold-meter-track-fill");
   if (trackFill) {
-    trackFill.style.width = `${max > 0 ? Math.max(0, Math.min(100, (current / max) * 100)) : 0}%`;
+    const fillPercent = max > 0 ? Math.max(0, Math.min(100, (current / max) * 100)) : 0;
+    meter.style.setProperty("--battle-meter-ratio", String(fillPercent / 100));
+    trackFill.style.width = `${fillPercent}%`;
     trackFill.style.background = color;
   }
 

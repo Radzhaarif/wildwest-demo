@@ -33,6 +33,7 @@
             <h1 id="mainMenuTitle">Wild West</h1>
             <div id="mainMenuActions" class="menu-actions">
               <button id="startGameButton" type="button">START</button>
+              <button id="smokeTestButton" class="hidden" type="button">Start Smoke Test</button>
               <button id="settingsButton" type="button">Settings</button>
             </div>
           </div>
@@ -247,17 +248,55 @@
         ["--cursor-hand-take", "../data/Assets/cursor/ready/hand_take.png", "14 14"],
         ["--cursor-up-down", "../data/Assets/cursor/ready/up_down.png", "16 16"],
       ];
+      // Import map перечисляет все JS-модули, которые браузер должен грузить
+      // с version param. Smoke отдельно проверяет, что project resources не
+      // уходят без версии.
       const VERSIONED_MODULE_PATHS = [
         "./src/app-version.js",
         "./src/asset-preloader.js",
         "./src/audio-module.js",
         "./src/data-loader.js",
         "./src/data-validation.js",
+        "./src/data-validation/core.js",
+        "./src/data-validation/campaign.js",
+        "./src/data-validation/cheats.js",
+        "./src/data-validation/common.js",
+        "./src/data-validation/enemy.js",
+        "./src/data-validation/items.js",
+        "./src/data-validation/map-config.js",
+        "./src/data-validation/player-locales.js",
+        "./src/data-validation/ui-battle.js",
+        "./src/data-validation/ui-map.js",
         "./src/debug-hooks.js",
+        "./src/jsonc-utils.js",
         "./src/map-module.js",
         "./src/rich-text.js",
         "./src/seeded-random.js",
+        "./src/map/map-animations.js",
+        "./src/map/map-audio.js",
+        "./src/map/map-battle-controller.js",
+        "./src/map/map-boot-controller.js",
+        "./src/map/map-cheats.js",
+        "./src/map/map-completion.js",
+        "./src/map/map-data-preload.js",
+        "./src/map/map-dialog.js",
+        "./src/map/map-dom.js",
         "./src/map/map-generation.js",
+        "./src/map/map-hud.js",
+        "./src/map/map-items.js",
+        "./src/map/map-layout.js",
+        "./src/map/map-loading-ui.js",
+        "./src/map/map-media.js",
+        "./src/map/map-node-flow.js",
+        "./src/map/map-renderer.js",
+        "./src/map/map-rewards.js",
+        "./src/map/map-run-controller.js",
+        "./src/map/map-scroll.js",
+        "./src/map/map-settings.js",
+        "./src/map/map-shell-ui.js",
+        "./src/map/map-shop-heal.js",
+        "./src/map/map-tooltips.js",
+        "./src/map/map-ui-scale.js",
         "./src/battle/battle-animations.js",
         "./src/battle/battle-board-actions.js",
         "./src/battle/battle-board-view.js",
@@ -265,9 +304,12 @@
         "./src/battle/battle-contract.js",
         "./src/battle/battle-data.js",
         "./src/battle/battle-engine.js",
+        "./src/battle/battle-effect-summary.js",
         "./src/battle/battle-feedback-view.js",
         "./src/battle/battle-formatters.js",
         "./src/battle/battle-inventory-view.js",
+        "./src/battle/battle-language-flow.js",
+        "./src/battle/battle-match-feedback.js",
         "./src/battle/battle-module.js",
         "./src/battle/battle-outcome-flow.js",
         "./src/battle/battle-player-items.js",

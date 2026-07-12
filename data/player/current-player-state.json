@@ -10,7 +10,7 @@
   "heal": {
     "health": 5,
     "current": 0,
-    "max": 50
+    "max": 100
   },
   "inventory": [
     {

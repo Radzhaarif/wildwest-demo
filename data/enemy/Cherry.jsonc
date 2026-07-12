@@ -28,7 +28,7 @@
       "health": 50,
       "shield": 0,
       "aggression": {
-        "threshold": 50,
+        "threshold": 100,
         "damage": 3,
         "resetOnTrigger": true
       },

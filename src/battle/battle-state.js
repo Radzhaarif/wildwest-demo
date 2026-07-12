@@ -1,6 +1,8 @@
 import { getBattleGenerationConfig as getBattleGenerationConfigFromConfig } from "./battle-config.js";
 
 export function ensureBattleStateShape(context) {
+  // Старые и прямые entrypoints могут передать неполный battleState. Перед
+  // scaffold нормализуем форму, чтобы view-модули не дублировали guard'ы.
   const { battleState, battleData, engine } = context;
   if (!battleState.enemyState) {
     battleState.enemyState = engine.createBattleEnemyState(battleData.enemyConfig);
@@ -95,6 +97,8 @@ export function getCurrentBattleConvertEffects(context) {
 }
 
 export function prepareBattleAttemptState(context) {
+  // Новая attempt пересоздает board/reserve/obstacles, но сохраняет request и
+  // battleData. Это используется и при первом старте, и при restart после defeat.
   context.battleHealthFeedbackState = {};
   context.battleState.healthFeedbackSuppression = {};
   context.battleState.pendingRageAction = false;

@@ -5,6 +5,8 @@ const battleHealthSourceElementKeys = new WeakMap();
 let battleHealthSourceElementKeyCounter = 0;
 
 export function getBattleHealthChangeFeedback(context, statId, currentValue) {
+  // Feedback хранит прошлое значение стата отдельно от самого battleState.
+  // Так render может показывать delta, не влияя на механику боя.
   const normalizedValue = Number(currentValue) || 0;
   context.battleHealthFeedbackState = context.battleHealthFeedbackState || {};
   const stateEntry = context.battleHealthFeedbackState[statId];
@@ -45,6 +47,8 @@ export function getBattleHealthChangeFeedback(context, statId, currentValue) {
 }
 
 export function setBattleHealthFeedbackDelta(context, statId, delta, options = {}) {
+  // Несколько изменений здоровья за один визуальный шаг сливаются в pending
+  // delta, чтобы игрок видел один понятный floating number.
   if (!context?.battleHealthFeedbackState) {
     context.battleHealthFeedbackState = {};
   }

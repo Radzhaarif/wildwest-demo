@@ -1,5 +1,6 @@
 {
-  "enemyId": "Rusty",
+  "enemyId": "easy_Rusty",
+  "baseEnemyId": "Rusty",
   "nameTextKey": "enemy.Rusty.name",
   "descriptionTextKey": "enemy.Rusty.description",
   "stageCount": 1,
@@ -23,7 +24,7 @@
         }
       ],
       "aggression": {
-        "threshold": 50,
+        "threshold": 100,
         "damage": 3,
         "resetOnTrigger": true
       },

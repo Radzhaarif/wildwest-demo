@@ -58,9 +58,9 @@
   "layout": {
     "designWidthPx": 1500,
     "designHeightPx": 860,
-    "viewportPaddingPx": 8,
+    "viewportPaddingPx": 0,
     "allowUpscale": true,
-    "upscaleFactor": 0.5,
+    "upscaleFactor": 1,
     "minScale": 0.1
   },
   "shuffleButton": {

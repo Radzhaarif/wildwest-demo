@@ -1,0 +1,33 @@
+{
+  "health": {
+    "current": 40,
+    "max": 100
+  },
+  "experience": {
+    "level": 1,
+    "total": 0
+  },
+  "heal": {
+    "health": 5,
+    "current": 0,
+    "max": 100
+  },
+  "inventory": [
+    {
+      "itemId": "gold",
+      "quantity": 1000
+    },
+    {
+      "itemId": "item_skull",
+      "quantity": 2
+    },
+    {
+      "itemId": "item_swap",
+      "quantity": 2
+    },
+    {
+      "itemId": "item_time",
+      "quantity": 2
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 {
-  "enemyId": "Cherry",
+  "enemyId": "easy_Cherry",
+  "baseEnemyId": "Cherry",
   "nameTextKey": "enemy.Cherry.name",
   "descriptionTextKey": "enemy.Cherry.description",
   "stageCount": 1,
@@ -28,7 +29,7 @@
         }
       ],
       "aggression": {
-        "threshold": 50,
+        "threshold": 100,
         "damage": 3,
         "resetOnTrigger": true
       },

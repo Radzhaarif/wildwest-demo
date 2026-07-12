@@ -4,6 +4,8 @@ const DEBUG_QUERY_PARAMS = ["debug", "wildwestDebug"];
 const LEGACY_GLOBAL_KEYS = ["context", "contex"];
 
 export function exposeWildwestDebug(section, values = {}) {
+  // Debug API существует только при ?debug=1/localStorage flag. В обычной игре
+  // глобальный state не публикуется, а legacy context/contex чистятся.
   clearLegacyDebugGlobals();
   if (!isWildwestDebugEnabled()) {
     clearDebugRoot();

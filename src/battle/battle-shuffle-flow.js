@@ -1,4 +1,6 @@
 export async function handleBattleIdle(deps, context, renderTargets) {
+  // Idle сначала ищет легальную подсказку. Только если ходов нет, показывает
+  // no-moves сообщение и предлагает ручной shuffle с ценой агрессии.
   if (!context.battleRuntime || context.battleState.isComplete || !deps.shouldContinueBattle(context, renderTargets)) {
     return;
   }

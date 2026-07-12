@@ -50,6 +50,15 @@ export function createAudioController({ resolveAssetPath }) {
     audioState.click.play().catch(() => {});
   }
 
+  function playSoundEffect(src, settings) {
+    if (!src || settings.soundVolume <= 0) {
+      return;
+    }
+    const sound = new Audio(resolveAssetPath(src));
+    sound.volume = settings.soundVolume;
+    sound.play().catch(() => {});
+  }
+
   function playMusic(src, settings) {
     const trackId = resolveMusicTrackId(src);
     if (!trackId) {
@@ -353,6 +362,7 @@ export function createAudioController({ resolveAssetPath }) {
     setup,
     applySettings,
     playClick,
+    playSoundEffect,
     playMusic,
     startBattleMusic,
     resumeMapMusicAfterBattle,

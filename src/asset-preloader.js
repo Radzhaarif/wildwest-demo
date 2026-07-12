@@ -4,6 +4,8 @@ const AUDIO_ASSET_PATTERN = /\.(?:mp3|ogg|wav|m4a)(?:[?#].*)?$/i;
 const assetMemoryCache = new Map();
 
 export function collectAssetPaths(...sources) {
+  // Сборщик намеренно рекурсивный по любым data/config объектам: новые ассеты
+  // должны попадать в preload без ручного списка в коде.
   const paths = new Set();
   for (const source of sources) {
     collectAssetPathsFromValue(source, paths);
@@ -117,6 +119,8 @@ function collectAssetPathsFromValue(value, paths) {
 }
 
 function preloadAsset(assetPath, options) {
+  // Cache хранит один promise на assetKey. Параллельные preload-запросы ждут
+  // один fetch и получают один objectUrl.
   const assetKey = normalizeAssetKey(assetPath);
   const cachedEntry = assetMemoryCache.get(assetKey);
   if (cachedEntry?.status === "loaded") {

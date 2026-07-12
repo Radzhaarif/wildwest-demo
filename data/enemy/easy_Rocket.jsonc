@@ -1,5 +1,6 @@
 {
-  "enemyId": "Rocket",
+  "enemyId": "easy_Rocket",
+  "baseEnemyId": "Rocket",
   "nameTextKey": "enemy.Rocket.name",
   "descriptionTextKey": "enemy.Rocket.description",
   "stageCount": 1,
@@ -29,7 +30,7 @@
         }
       ],
       "aggression": {
-        "threshold": 50,
+        "threshold": 100,
         "damage": 3,
         "resetOnTrigger": true
       },

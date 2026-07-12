@@ -9,6 +9,8 @@ export function renderInlineRichText(target, text, options = {}) {
 }
 
 export function createInlineRichTextNodes(text, options = {}) {
+  // Rich-text сейчас поддерживает только item token. Если токен не найден в
+  // каталоге, оставляем исходный текст, чтобы локаль не ломала UI.
   const source = String(text || "");
   const nodes = [];
   let lastIndex = 0;

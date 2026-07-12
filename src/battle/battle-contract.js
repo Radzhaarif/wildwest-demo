@@ -21,6 +21,7 @@ export const BATTLE_OUTCOMES = Object.freeze({
  * @property {object} itemCatalog
  * @property {object} locale
  * @property {object} settings
+ * @property {object=} cheats
  * @property {string} language
  */
 

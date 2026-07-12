@@ -1,5 +1,6 @@
 {
-  "enemyId": "Sweety",
+  "enemyId": "easy_Sweety",
+  "baseEnemyId": "Sweety",
   "nameTextKey": "enemy.Sweety.name",
   "descriptionTextKey": "enemy.Sweety.description",
   "stageCount": 1,
@@ -50,7 +51,7 @@
         }
       ],
       "aggression": {
-        "threshold": 50,
+        "threshold": 100,
         "damage": 3,
         "resetOnTrigger": true
       },

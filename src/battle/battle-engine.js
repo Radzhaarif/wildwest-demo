@@ -54,6 +54,8 @@ export function getCurrentBattleStage(enemyConfig, enemyState) {
 }
 
 export function createBattleBoard(itemCatalog, options = {}) {
+  // Стартовое поле не должно содержать готовых матчей. Если inventory/enemy
+  // transform_chance сжимает drop pool до слишком похожих типов, падаем явно.
   const width = options.width || BATTLE_BOARD_WIDTH;
   const height = options.height || BATTLE_BOARD_HEIGHT;
   const attempts = options.attempts || DEFAULT_BOARD_CREATE_ATTEMPTS;
@@ -555,6 +557,8 @@ export function findBattleBatteryActivation(board, itemCatalog, firstCell, secon
 }
 
 export function applyBattleMatchEffects(battleState, matches, itemCatalog, options = {}) {
+  // Здесь считается чистая экономика одного resolve-step: щит съедает удар до
+  // HP, heal применяется к игроку, aggression/calm могут тут же нанести урон.
   const cells = collectBattleMatchCells(matches);
   const summary = {
     activatedCells: cells.length,
@@ -646,6 +650,8 @@ export function tickBattleRage(enemyState, elapsedSeconds = 1) {
 }
 
 export function applyBattleUltimateEffects(battleState, itemCatalog, stageOrEffects, options = {}) {
+  // Ultimate работает поверх текущего stage config. В summary собираем не
+  // только итоговые числа, но и sourceCells для последующей анимации.
   const effects = Array.isArray(stageOrEffects)
     ? stageOrEffects
     : Array.isArray(stageOrEffects?.ultimate?.effects)
@@ -1029,6 +1035,8 @@ export function refillBattleBoard(board, itemCatalog, options = {}) {
 }
 
 export function refillBattleBoardFromReserve(board, reserveBoard, itemCatalog, options = {}) {
+  // Reserve board является "верхней лентой" будущих падений. Так анимация и
+  // логика видят одни и те же предметы до и после refill.
   assertRectangularBoard(board);
   assertMatchingBoardSize(board, reserveBoard);
 
@@ -1300,6 +1308,8 @@ function getBattleGoldLootPool(itemCatalog) {
 }
 
 function applyBattleDropTransforms(itemCatalog, itemId, options = {}) {
+  // Вражеский convert идет раньше inventory transforms: stage-механика врага
+  // должна иметь приоритет над бонусами предметов игрока при генерации drop.
   const random = typeof options.random === "function" ? options.random : Math.random;
   const enemyResult = applyBattleEnemyConvertTransforms(itemCatalog, itemId, options, random);
   if (enemyResult.converted) {
@@ -1776,6 +1786,8 @@ function getBattleInventoryModifiers(itemCatalog, targetItemId, playerState) {
 }
 
 function applyBattleDamage(enemyState, enemyConfig, damage) {
+  // Урон переводит врага максимум на одну следующую stage за resolve-step.
+  // Новый stage пересоздает HP/shield/aggression/rage из конфига.
   const result = {
     stageChanged: false,
     enemyDefeated: false,

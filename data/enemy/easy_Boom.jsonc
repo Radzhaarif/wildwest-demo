@@ -1,5 +1,6 @@
 {
-  "enemyId": "boom",
+  "enemyId": "easy_Boom",
+  "baseEnemyId": "boom",
   "nameTextKey": "enemy.boom.name",
   "descriptionTextKey": "enemy.boom.description",
   "stageCount": 1,
@@ -50,7 +51,7 @@
         }
       ],
       "aggression": {
-        "threshold": 50,
+        "threshold": 100,
         "damage": 3,
         "resetOnTrigger": true
       },

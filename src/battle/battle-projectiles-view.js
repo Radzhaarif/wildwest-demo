@@ -1,6 +1,8 @@
 import { wait } from "./battle-animations.js";
 
 export function triggerBattleLightDamageProjectiles(deps, context, iconWrapper, statDelta, modifier, sourceElements = [], options = {}) {
+  // Projectile effects только визуальные: они возвращают задержку до impact,
+  // чтобы health feedback синхронизировался с полетом, но не меняют state.
   const normalizedStatDelta = Number(statDelta) || 0;
   const resolvedOptions = Array.isArray(options) ? {} : options;
   const sourceConfig = getBattleStatProjectileConfig(deps, context, modifier, normalizedStatDelta, resolvedOptions);

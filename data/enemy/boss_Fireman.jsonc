@@ -1,5 +1,6 @@
 {
-  "enemyId": "Fireman",
+  "enemyId": "boss_Fireman",
+  "baseEnemyId": "Fireman",
   "nameTextKey": "enemy.Fireman.name",
   "descriptionTextKey": "enemy.Fireman.description",
   "stageCount": 1,
@@ -29,7 +30,7 @@
         }
       ],
       "aggression": {
-        "threshold": 50,
+        "threshold": 100,
         "damage": 5,
         "resetOnTrigger": true
       },

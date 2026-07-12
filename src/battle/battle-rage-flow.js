@@ -1,4 +1,6 @@
 export function tickBattleRuntime(deps, context, renderTargets) {
+  // Rage tick только ставит pending action. Сам ultimate ждет, пока поле
+  // перестанет резолвиться, чтобы не смешивать две мутации board одновременно.
   if (Date.now() < (context.battleState.ragePausedUntil || 0)) {
     if (renderTargets) {
       deps.updateBattleClockCooldownDisplay(context, renderTargets.specialItems);
@@ -72,6 +74,8 @@ export function isBattleFieldBusyForRage(deps, context) {
 }
 
 export async function runBattleRageAction(deps, context, renderTargets) {
+  // Во время rage flow блокируем обычный resolve и runtime. Все эффекты
+  // применяются по одному, чтобы анимации и health feedback знали source cells.
   if (
     context.battleState.isRageResolving
     || context.battleState.isComplete

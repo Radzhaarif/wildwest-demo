@@ -27,6 +27,8 @@ export async function startBattle(request, options = {}) {
 
   const battleData = await loadBattleData(request, options.loaders);
   const battleEngine = await importBattleEngine();
+  // context - приватный рантайм одной попытки боя. Карта видит его только через
+  // debug hook; официальный результат возвращается из battleView.start().
   const context = {
     request,
     battleData,
@@ -91,6 +93,8 @@ function importSeededRandom() {
 }
 
 function assertBattleRequest(request, contractVersion) {
+  // BattleRequest - узкая граница между картой и боем. Новые обязательные поля
+  // должны попадать сюда осознанно и синхронно с BATTLE_CONTRACT_VERSION.
   if (!request || request.contractVersion !== contractVersion) {
     throw new Error(`BattleRequest must use contractVersion ${contractVersion}.`);
   }
