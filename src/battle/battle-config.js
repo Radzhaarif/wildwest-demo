@@ -293,7 +293,7 @@ export function getBattleUiConfig(context) {
       rageProjectileSpreadPx: DEFAULT_LIGHT_PROJECTILE_SPREAD_PX,
       rageProjectileSizePx: 35,
       noMovesMessageMs: 3000,
-      noMovesShuffleMs: 2000,
+      noMovesShuffleMs: 500,
       outcomeBannerMs: 2000,
       healthChangeMs: 3000,
       healthChangeScale: 1.5,

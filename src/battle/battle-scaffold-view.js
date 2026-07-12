@@ -235,23 +235,26 @@ export function showBattleScaffold(deps, context, root) {
     requestAnimationFrame(alignBattleSideWidgetsToBoardRightEdge);
 
     logButton.addEventListener("click", () => {
-      deps.closeBattleMiniMenu(context, renderTargets);
-      deps.renderBattleLog(logOverlay, context);
-      logOverlay.classList.remove("hidden");
+      const activeRenderTargets = context.battleRenderTargets || renderTargets;
+      deps.closeBattleMiniMenu(context, activeRenderTargets);
+      deps.renderBattleLog(activeRenderTargets.logOverlay, context);
+      activeRenderTargets.logOverlay.classList.remove("hidden");
     });
 
     settingsButton.addEventListener("click", () => {
-      deps.closeBattleMiniMenu(context, renderTargets, { resume: false });
-      deps.openBattleSettings(context, renderTargets);
+      const activeRenderTargets = context.battleRenderTargets || renderTargets;
+      deps.closeBattleMiniMenu(context, activeRenderTargets, { resume: false });
+      deps.openBattleSettings(context, activeRenderTargets);
     });
 
     surrenderButton.addEventListener("click", () => {
-      deps.closeBattleMiniMenu(context, renderTargets, { resume: false });
-      deps.openBattleSurrender(context, renderTargets);
+      const activeRenderTargets = context.battleRenderTargets || renderTargets;
+      deps.closeBattleMiniMenu(context, activeRenderTargets, { resume: false });
+      deps.openBattleSurrender(context, activeRenderTargets);
     });
 
     shuffleButton.addEventListener("click", () => {
-      deps.handleManualBattleShuffle(context, renderTargets);
+      deps.handleManualBattleShuffle(context, context.battleRenderTargets || renderTargets);
     });
   });
 }

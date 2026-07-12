@@ -2,6 +2,7 @@ import {
   animateBattleShakeCells,
   getBattleCellElement,
   getBattleCellIconElement,
+  getBattleCellLocalMetrics,
   runCellAnimation,
 } from "./battle-animations.js";
 
@@ -204,20 +205,21 @@ export async function animateBattleBoardMove(deps, boardElement, movement, conte
     }
 
     const cellElement = getBattleCellElement(boardElement, move.to);
-    const cellRect = cellElement?.getBoundingClientRect();
-    const cellHeight = Math.max(1, cellRect?.height || 1);
+    const cellMetrics = getBattleCellLocalMetrics(boardElement, cellElement);
+    const cellHeight = cellMetrics.height;
+    const rowStep = cellMetrics.rowStep;
     const newItemStackStepPx = cellHeight + newItemStackGapPx;
     const moveDistanceRows = Math.max(
       1,
       move.isNew
-        ? move.to.row + (move.newIndex * (newItemStackStepPx / cellHeight))
+        ? move.to.row + (move.newIndex * (newItemStackStepPx / rowStep))
         : Math.abs(move.fromRow - move.to.row),
     );
     const delayMs = 0;
     const durationMs = Math.max(stepMs, moveDistanceRows * stepMs);
     const startTranslateY = move.isNew
-      ? -((move.to.row * cellHeight) + newItemSpawnOffsetPx + (move.newIndex * newItemStackStepPx))
-      : (move.fromRow - move.to.row) * cellHeight;
+      ? -((move.to.row * rowStep) + newItemSpawnOffsetPx + (move.newIndex * newItemStackStepPx))
+      : (move.fromRow - move.to.row) * rowStep;
 
     animationPlans.push({ element, startTranslateY, durationMs, delayMs });
   }

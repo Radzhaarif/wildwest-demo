@@ -146,7 +146,7 @@
     "idleHintDelayMs": 5000,
     "idleHintShakeMs": 500,
     "noMovesMessageMs": 3000,
-    "noMovesShuffleMs": 2000,
+    "noMovesShuffleMs": 500,
     "outcomeBannerMs": 2000,
     "lightDamageProjectileCount": 15,
     "lightDamageProjectilesPerDamage": 5,

@@ -20,6 +20,32 @@
 
 ## Изменения
 
+### 2026-07-13 - Точное завершение волнистого ручного перемешивания
+
+- `battle-shuffle-flow.js` сначала применяет и рендерит новую матрицу, а `battle-animations.js` перемещает её иконки из старых позиций через две плавно стыкующиеся cubic Bezier-кривые. Последний кадр всегда `translate(0, 0)`, то есть совпадает с реальным DOM-положением предмета.
+- Траектория теперь выполняется через `requestAnimationFrame`: `easeOutCubic` сразу даёт высокую скорость, затем плавно замедляет предмет к конечной клетке. Это снимает скачок, который появлялся при передаче положения между старым и новым DOM.
+- По визуальной доводке длительность перемешивания уменьшена до 500 мс в `animations.noMovesShuffleMs` и запасном дефолте.
+- `data/README.md` и `src/battle/README.md` фиксируют поведение. `version.json` поднят до `2026.07.13.5`.
+- Контекст версии: пользователь заметил, что CSS motion path визуально завершал полёт раньше передачи предмета в новую клетку. Не стоит возвращать анимацию на старый DOM или снимать transform до фактической целевой позиции: визуальная цель должна быть той же DOM-клеткой, которая останется после завершения движения.
+
+### 2026-07-13 - Ручное перемешивание работает после рестарта боя
+
+- `battle-scaffold-view.js` получает актуальные `context.battleRenderTargets` в обработчиках постоянных кнопок, а не targets из замыкания первоначальной попытки.
+- После поражения и нажатия `Начать сначала` новая попытка получает новый attempt-token. Кнопки больше не передают отменённый token в `shouldContinueBattle()`, поэтому ручное перемешивание и остальные battle actions снова выполняются.
+- `data/README.md` и `src/battle/README.md` фиксируют контракт persistent-контролов. `version.json` поднят до `2026.07.13.6`.
+- Контекст версии: restart намеренно отменяет callbacks прошлой попытки, но кнопки, которые живут дольше самой попытки, должны подхватывать её новый токен. Не стоит возвращать захваченные при первом рендере targets в такие обработчики, иначе корректная lifecycle-защита превращается в неработающий UI после рестарта.
+- Затронутые файлы: `src/battle/battle-scaffold-view.js`, `src/battle/README.md`, `data/README.md`, `VERSIONS.md`, `version.json`.
+- Затронутые файлы: `src/battle/battle-animations.js`, `src/styles.css`, `src/battle/battle-config.js`, `data/settings/battle-ui.jsonc`, `src/battle/README.md`, `data/README.md`, `version.json`, `VERSIONS.md`.
+
+### 2026-07-12 - Иконки боя удерживаются в сетке при swap и shuffle
+
+- `src/battle/battle-animations.js` больше не считает смещения swap/manual shuffle через viewport-координаты `getBoundingClientRect()`: иконки берут локальные позиции grid-ячеек, поэтому fullscreen/cover-масштаб панели не умножает расстояние перемещения.
+- `src/battle/battle-resolution.js` синхронизирует падение предметов с тем же локальным шагом строки и учитывает grid gap, чтобы каскады не накапливали визуальный сдвиг относительно ячеек.
+- `data/README.md` и `src/battle/README.md` фиксируют контракт: визуальные перемещения предметов должны оставаться привязанными к DOM-сетке при любом масштабе боя. `version.json` поднят до `2026.07.12.1`.
+- Контекст версии: пользователь показал, что после ручного перемешивания предметы разлетаются по полю, а при обмене двух предметов заметно отклоняются от клеток. Не стоит возвращать расчеты к viewport-пикселям без отдельной проверки fullscreen/cover-режима, потому что родительская панель масштабируется CSS transform и такие пиксели дают неверную дистанцию внутри grid.
+- Затронутые файлы: `src/battle/battle-animations.js`, `src/battle/battle-resolution.js`, `src/battle/README.md`, `data/README.md`, `version.json`, `VERSIONS.md`.
+- Проверка: выполнены `node --check src/battle/battle-animations.js`; `node --check src/battle/battle-resolution.js`; `node scripts/check-project.mjs`; `node scripts/check-encoding.mjs`; `node scripts/browser-smoke.mjs --start=battle --screenshot=artifacts/battle-grid-motion-fixed.png`.
+
 ### 2026-07-01 - Battle HUD синхронизирован по вертикали
 
 - `src/styles.css` поднимает match-3 поле, вертикальные player heal/HP bars, enemy HP/aggression bars, damage badge и rage timer на тот же шаг, на который раньше был поднят нижний ряд активных предметов.

@@ -127,17 +127,13 @@ export async function handleManualBattleShuffle(deps, context, renderTargets) {
 export async function shuffleCurrentBattleBoard(deps, context, renderTargets, durationMs) {
   const { boardElement, status, enemyStats, playerMeters, ultimateText } = renderTargets;
   const shuffleResult = createNoMovesBattleShuffle(deps, context);
-  await deps.animateBattleBoardShuffleMovement(boardElement, shuffleResult.movement, durationMs);
-  if (!deps.shouldContinueBattle(context, renderTargets)) {
-    return;
-  }
-
   context.battleState.board = shuffleResult.board;
   context.battleState.reserveBoard = deps.createBattleReserveBoardForCurrentStage(context);
   deps.syncBattleWallsWithStage(context, { force: true });
   deps.syncBattleBoxesWithStage(context, { force: true });
   deps.syncBattleVinesWithStage(context, { force: true });
   deps.renderBattleBoard(boardElement, context, status, enemyStats, playerMeters, ultimateText);
+  await deps.animateBattleBoardShuffleMovement(boardElement, shuffleResult.movement, durationMs);
 }
 
 export function areBattleBoardsEqual(firstBoard, secondBoard) {
