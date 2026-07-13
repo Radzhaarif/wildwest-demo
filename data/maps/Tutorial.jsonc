@@ -32,6 +32,46 @@
       "name": "tutorial_advanced_battle",
       "type": "battle",
       "icon": "data/Assets/icons/battle.png"
+    },
+    {
+      "name": "tutorial_chest",
+      "type": "reward",
+      "icon": "data/Assets/icons/reward.png"
+    },
+    {
+      "name": "tutorial_shop",
+      "type": "shop",
+      "icon": "data/Assets/icons/shop.png"
+    },
+    {
+      "name": "tutorial_doctor",
+      "type": "heal",
+      "icon": "data/Assets/icons/heal.png"
+    },
+    {
+      "name": "tutorial_items_intro",
+      "type": "dialog",
+      "icon": "data/Assets/icons/dialog.png"
+    },
+    {
+      "name": "tutorial_obstacles_battle",
+      "type": "battle",
+      "icon": "data/Assets/icons/battle.png"
+    },
+    {
+      "name": "tutorial_rage_intro",
+      "type": "dialog",
+      "icon": "data/Assets/icons/dialog.png"
+    },
+    {
+      "name": "tutorial_captain_battle",
+      "type": "battle",
+      "icon": "data/Assets/icons/battle.png"
+    },
+    {
+      "name": "tutorial_final_dialog",
+      "type": "dialog",
+      "icon": "data/Assets/icons/dialog.png"
     }
   ],
   "levels": [
@@ -106,6 +146,54 @@
           "guaranteed": true
         }
       ]
+    },
+    {
+      "level": 5,
+      "nodes": { "count": 1 },
+      "paths": { "minConnectionsFromNode": 1, "maxConnectionsFromNode": 1, "extraConnectionChance": 0 },
+      "events": [{ "name": "tutorial_chest", "weight": 100, "guaranteed": true }]
+    },
+    {
+      "level": 6,
+      "nodes": { "count": 1 },
+      "paths": { "minConnectionsFromNode": 1, "maxConnectionsFromNode": 1, "extraConnectionChance": 0 },
+      "events": [{ "name": "tutorial_shop", "weight": 100, "guaranteed": true }]
+    },
+    {
+      "level": 7,
+      "nodes": { "count": 1 },
+      "paths": { "minConnectionsFromNode": 1, "maxConnectionsFromNode": 1, "extraConnectionChance": 0 },
+      "events": [{ "name": "tutorial_doctor", "weight": 100, "guaranteed": true }]
+    },
+    {
+      "level": 8,
+      "nodes": { "count": 1 },
+      "paths": { "minConnectionsFromNode": 1, "maxConnectionsFromNode": 1, "extraConnectionChance": 0 },
+      "events": [{ "name": "tutorial_items_intro", "weight": 100, "guaranteed": true }]
+    },
+    {
+      "level": 9,
+      "nodes": { "count": 1 },
+      "paths": { "minConnectionsFromNode": 1, "maxConnectionsFromNode": 1, "extraConnectionChance": 0 },
+      "events": [{ "name": "tutorial_obstacles_battle", "weight": 100, "guaranteed": true }]
+    },
+    {
+      "level": 10,
+      "nodes": { "count": 1 },
+      "paths": { "minConnectionsFromNode": 1, "maxConnectionsFromNode": 1, "extraConnectionChance": 0 },
+      "events": [{ "name": "tutorial_rage_intro", "weight": 100, "guaranteed": true }]
+    },
+    {
+      "level": 11,
+      "nodes": { "count": 1 },
+      "paths": { "minConnectionsFromNode": 1, "maxConnectionsFromNode": 1, "extraConnectionChance": 0 },
+      "events": [{ "name": "tutorial_captain_battle", "weight": 100, "guaranteed": true }]
+    },
+    {
+      "level": 12,
+      "nodes": { "count": 1 },
+      "paths": { "minConnectionsFromNode": 1, "maxConnectionsFromNode": 1, "extraConnectionChance": 0 },
+      "events": [{ "name": "tutorial_final_dialog", "weight": 100, "guaranteed": true }]
     }
   ],
   "battle": [
@@ -438,11 +526,434 @@
           }
         ]
       }
+    },
+    {
+      "eventName": "tutorial_obstacles_battle",
+      "enemyId": "tutorial_Dolly_obstacles",
+      "background": "data/Assets/backgrounds/WildWest_1.png",
+      "minLevel": 9,
+      "maxLevel": 9,
+      "weight": 100,
+      "nodeTitleTextKey": "tutorial.map.node.obstaclesBattle",
+      "levelUpTutorial": {
+        "enabled": true,
+        "introTextKey": "tutorial.levelUp.intro",
+        "rewards": [
+          { "itemId": "item_bullet", "textKey": "tutorial.levelUp.standardItem" },
+          { "itemId": "item_Shield_power", "textKey": "tutorial.levelUp.poweredItem" },
+          { "itemId": "red", "textKey": "tutorial.levelUp.redSerum" },
+          { "itemId": "green", "textKey": "tutorial.levelUp.greenStim" }
+        ]
+      },
+      "tutorial": {
+        "enabled": true,
+        "titleTextKey": "battle.tutorial.obstacles.title",
+        "wrongMoveTextKey": "battle.tutorial.wrongMove",
+        "teacherImage": "data/Assets/enemy/captain.png",
+        "steps": [
+          {
+            "id": "blocked_wall",
+            "action": "blockedWall",
+            "textKey": "battle.tutorial.obstacles.wall",
+            "retryTextKey": "battle.tutorial.obstacles.wallRetry",
+            "playerHealthCurrent": 100,
+            "playerHealCurrent": 0,
+            "enemyHealthCurrent": 100,
+            "enemyAggressionCurrent": 0,
+            "requiredAttempts": 2,
+            "from": { "row": 4, "col": 2 },
+            "to": { "row": 4, "col": 3 },
+            "guideCells": [
+              { "row": 4, "col": 0 },
+              { "row": 4, "col": 1 },
+              { "row": 4, "col": 2 },
+              { "row": 4, "col": 3 }
+            ],
+            "walls": [{ "from": { "row": 4, "col": 2 }, "to": { "row": 4, "col": 3 } }],
+            "board": [
+              ["bullet", "Shield", "granate", "Shield", "granate", "bullet", "Knife", "trash_1", "trash_1"],
+              ["Knife", "granate", "Knife", "Knife", "Bandage", "Bandage", "Shield", "bullet", "Shield"],
+              ["Bandage", "granate", "Shield", "granate", "trash_1", "Bandage", "Shield", "trash_1", "Bandage"],
+              ["Shield", "bullet", "Shield", "Bandage", "granate", "trash_1", "bullet", "Shield", "bullet"],
+              ["granate", "granate", "Bandage", "granate", "granate", "Knife", "Shield", "trash_1", "trash_1"],
+              ["granate", "bullet", "Knife", "granate", "Shield", "Shield", "trash_1", "Shield", "Shield"],
+              ["Bandage", "trash_1", "Shield", "Bandage", "bullet", "Shield", "bullet", "granate", "granate"],
+              ["bullet", "Shield", "Shield", "Bandage", "Knife", "bullet", "Shield", "granate", "bullet"]
+            ]
+          },
+          {
+            "id": "use_glove",
+            "action": "freeSwap",
+            "textKey": "battle.tutorial.obstacles.glove",
+            "requiredItemId": "item_swap",
+            "from": { "row": 4, "col": 2 },
+            "to": { "row": 4, "col": 3 },
+            "matchCells": [
+              { "row": 4, "col": 0 },
+              { "row": 4, "col": 1 },
+              { "row": 4, "col": 2 }
+            ],
+            "guideCells": [
+              { "row": 4, "col": 0 },
+              { "row": 4, "col": 1 },
+              { "row": 4, "col": 2 },
+              { "row": 4, "col": 3 }
+            ],
+            "walls": [{ "from": { "row": 4, "col": 2 }, "to": { "row": 4, "col": 3 } }],
+            "board": [
+              ["bullet", "Shield", "granate", "Shield", "granate", "bullet", "Knife", "trash_1", "trash_1"],
+              ["Knife", "granate", "Knife", "Knife", "Bandage", "Bandage", "Shield", "bullet", "Shield"],
+              ["Bandage", "granate", "Shield", "granate", "trash_1", "Bandage", "Shield", "trash_1", "Bandage"],
+              ["Shield", "bullet", "Shield", "Bandage", "granate", "trash_1", "bullet", "Shield", "bullet"],
+              ["granate", "granate", "Bandage", "granate", "granate", "Knife", "Shield", "trash_1", "trash_1"],
+              ["granate", "bullet", "Knife", "granate", "Shield", "Shield", "trash_1", "Shield", "Shield"],
+              ["Bandage", "trash_1", "Shield", "Bandage", "bullet", "Shield", "bullet", "granate", "granate"],
+              ["bullet", "Shield", "Shield", "Bandage", "Knife", "bullet", "Shield", "granate", "bullet"]
+            ]
+          },
+          {
+            "id": "blocked_vine",
+            "action": "blockedVine",
+            "textKey": "battle.tutorial.obstacles.vine",
+            "retryTextKey": "battle.tutorial.obstacles.vineRetry",
+            "requiredAttempts": 2,
+            "from": { "row": 4, "col": 2 },
+            "guideCells": [
+              { "row": 4, "col": 1 },
+              { "row": 4, "col": 2 },
+              { "row": 4, "col": 3 },
+              { "row": 5, "col": 3 }
+            ],
+            "vines": [{ "row": 4, "col": 2 }],
+            "board": [
+              ["bullet", "Shield", "granate", "Shield", "granate", "bullet", "Knife", "trash_1", "trash_1"],
+              ["Knife", "granate", "Knife", "Knife", "Bandage", "Bandage", "Shield", "bullet", "Shield"],
+              ["Bandage", "granate", "Shield", "granate", "trash_1", "Bandage", "Shield", "trash_1", "Bandage"],
+              ["Shield", "bullet", "Shield", "Bandage", "granate", "trash_1", "bullet", "Shield", "bullet"],
+              ["granate", "Knife", "Knife", "bullet", "granate", "Knife", "Shield", "trash_1", "trash_1"],
+              ["granate", "bullet", "Knife", "Knife", "Shield", "Shield", "trash_1", "Shield", "Shield"],
+              ["Bandage", "trash_1", "Shield", "Bandage", "bullet", "Shield", "bullet", "granate", "granate"],
+              ["bullet", "Shield", "Shield", "Bandage", "Knife", "bullet", "Shield", "granate", "bullet"]
+            ]
+          },
+          {
+            "id": "clear_vine",
+            "action": "swap",
+            "textKey": "battle.tutorial.obstacles.clearVine",
+            "from": { "row": 5, "col": 3 },
+            "to": { "row": 4, "col": 3 },
+            "matchCells": [
+              { "row": 4, "col": 1 },
+              { "row": 4, "col": 2 },
+              { "row": 4, "col": 3 }
+            ],
+            "vines": [{ "row": 4, "col": 2 }],
+            "board": [
+              ["bullet", "Shield", "granate", "Shield", "granate", "bullet", "Knife", "trash_1", "trash_1"],
+              ["Knife", "granate", "Knife", "Knife", "Bandage", "Bandage", "Shield", "bullet", "Shield"],
+              ["Bandage", "granate", "Shield", "granate", "trash_1", "Bandage", "Shield", "trash_1", "Bandage"],
+              ["Shield", "bullet", "Shield", "Bandage", "granate", "trash_1", "bullet", "Shield", "bullet"],
+              ["granate", "Knife", "Knife", "bullet", "granate", "Knife", "Shield", "trash_1", "trash_1"],
+              ["granate", "bullet", "Knife", "Knife", "Shield", "Shield", "trash_1", "Shield", "Shield"],
+              ["Bandage", "trash_1", "Shield", "Bandage", "bullet", "Shield", "bullet", "granate", "granate"],
+              ["bullet", "Shield", "Shield", "Bandage", "Knife", "bullet", "Shield", "granate", "bullet"]
+            ]
+          },
+          {
+            "id": "flames_move_one",
+            "action": "swap",
+            "textKey": "battle.tutorial.obstacles.flames",
+            "from": { "row": 5, "col": 2 },
+            "to": { "row": 4, "col": 2 },
+            "matchCells": [
+              { "row": 4, "col": 0 },
+              { "row": 4, "col": 1 },
+              { "row": 4, "col": 2 }
+            ],
+            "guideCells": [
+              { "row": 0, "col": 6 },
+              { "row": 0, "col": 8 },
+              { "row": 2, "col": 6 },
+              { "row": 2, "col": 8 }
+            ],
+            "board": [
+              ["bullet", "Shield", "granate", "Shield", "granate", "bullet", "flame", "trash_1", "flame"],
+              ["Knife", "granate", "Knife", "Knife", "Bandage", "Bandage", "Shield", "bullet", "Shield"],
+              ["Bandage", "granate", "Shield", "granate", "trash_1", "Bandage", "flame", "trash_1", "flame"],
+              ["Shield", "bullet", "Shield", "Bandage", "granate", "trash_1", "bullet", "Shield", "bullet"],
+              ["Knife", "Knife", "bullet", "Bandage", "granate", "Knife", "Shield", "trash_1", "trash_1"],
+              ["granate", "bullet", "Knife", "granate", "Shield", "Shield", "trash_1", "Shield", "Shield"],
+              ["Bandage", "trash_1", "Shield", "Bandage", "bullet", "Shield", "bullet", "granate", "granate"],
+              ["bullet", "Shield", "Shield", "Bandage", "Knife", "bullet", "Shield", "granate", "bullet"]
+            ]
+          },
+          {
+            "id": "flames_move_two",
+            "action": "swap",
+            "textKey": "battle.tutorial.obstacles.flamesAgain",
+            "from": { "row": 5, "col": 2 },
+            "to": { "row": 4, "col": 2 },
+            "matchCells": [
+              { "row": 4, "col": 0 },
+              { "row": 4, "col": 1 },
+              { "row": 4, "col": 2 }
+            ],
+            "guideCells": [
+              { "row": 0, "col": 6 },
+              { "row": 0, "col": 8 },
+              { "row": 2, "col": 6 },
+              { "row": 2, "col": 8 }
+            ],
+            "board": [
+              ["bullet", "Shield", "granate", "Shield", "granate", "bullet", "flame", "trash_1", "flame"],
+              ["Knife", "granate", "Knife", "Knife", "Bandage", "Bandage", "Shield", "bullet", "Shield"],
+              ["Bandage", "granate", "Shield", "granate", "trash_1", "Bandage", "flame", "trash_1", "flame"],
+              ["Shield", "bullet", "Shield", "Bandage", "granate", "trash_1", "bullet", "Shield", "bullet"],
+              ["Knife", "Knife", "bullet", "Bandage", "granate", "Knife", "Shield", "trash_1", "trash_1"],
+              ["granate", "bullet", "Knife", "granate", "Shield", "Shield", "trash_1", "Shield", "Shield"],
+              ["Bandage", "trash_1", "Shield", "Bandage", "bullet", "Shield", "bullet", "granate", "granate"],
+              ["bullet", "Shield", "Shield", "Bandage", "Knife", "bullet", "Shield", "granate", "bullet"]
+            ]
+          },
+          {
+            "id": "flames_move_three",
+            "action": "swap",
+            "textKey": "battle.tutorial.obstacles.flamesLast",
+            "from": { "row": 5, "col": 2 },
+            "to": { "row": 4, "col": 2 },
+            "matchCells": [
+              { "row": 4, "col": 0 },
+              { "row": 4, "col": 1 },
+              { "row": 4, "col": 2 }
+            ],
+            "guideCells": [
+              { "row": 0, "col": 6 },
+              { "row": 0, "col": 8 },
+              { "row": 2, "col": 6 },
+              { "row": 2, "col": 8 }
+            ],
+            "board": [
+              ["bullet", "Shield", "granate", "Shield", "granate", "bullet", "flame", "trash_1", "flame"],
+              ["Knife", "granate", "Knife", "Knife", "Bandage", "Bandage", "Shield", "bullet", "Shield"],
+              ["Bandage", "granate", "Shield", "granate", "trash_1", "Bandage", "flame", "trash_1", "flame"],
+              ["Shield", "bullet", "Shield", "Bandage", "granate", "trash_1", "bullet", "Shield", "bullet"],
+              ["Knife", "Knife", "bullet", "Bandage", "granate", "Knife", "Shield", "trash_1", "trash_1"],
+              ["granate", "bullet", "Knife", "granate", "Shield", "Shield", "trash_1", "Shield", "Shield"],
+              ["Bandage", "trash_1", "Shield", "Bandage", "bullet", "Shield", "bullet", "granate", "granate"],
+              ["bullet", "Shield", "Shield", "Bandage", "Knife", "bullet", "Shield", "granate", "bullet"]
+            ]
+          },
+          {
+            "id": "use_skull_on_flames",
+            "action": "skull",
+            "textKey": "battle.tutorial.obstacles.skull",
+            "requiredItemId": "item_skull",
+            "to": { "row": 1, "col": 7 },
+            "guideCells": [
+              { "row": 0, "col": 6 },
+              { "row": 0, "col": 8 },
+              { "row": 2, "col": 6 },
+              { "row": 2, "col": 8 }
+            ],
+            "board": [
+              ["bullet", "Shield", "granate", "Shield", "granate", "bullet", "flame", "trash_1", "flame"],
+              ["Knife", "granate", "Knife", "Knife", "Bandage", "Bandage", "Shield", "bullet", "Shield"],
+              ["Bandage", "granate", "Shield", "granate", "trash_1", "Bandage", "flame", "trash_1", "flame"],
+              ["Shield", "bullet", "Shield", "Bandage", "granate", "trash_1", "bullet", "Shield", "bullet"],
+              ["Knife", "Knife", "bullet", "Bandage", "granate", "Knife", "Shield", "trash_1", "trash_1"],
+              ["granate", "bullet", "Knife", "granate", "Shield", "Shield", "trash_1", "Shield", "Shield"],
+              ["Bandage", "trash_1", "Shield", "Bandage", "bullet", "Shield", "bullet", "granate", "granate"],
+              ["bullet", "Shield", "Shield", "Bandage", "Knife", "bullet", "Shield", "granate", "bullet"]
+            ]
+          },
+          {
+            "id": "use_gold_on_flame",
+            "action": "gold",
+            "textKey": "battle.tutorial.obstacles.gold",
+            "requiredItemId": "gold",
+            "to": { "row": 1, "col": 7 },
+            "guideCells": [{ "row": 1, "col": 7 }],
+            "board": [
+              ["bullet", "Shield", "granate", "Shield", "granate", "bullet", "Knife", "trash_1", "trash_1"],
+              ["Knife", "granate", "Knife", "Knife", "Bandage", "Bandage", "Shield", "flame", "Shield"],
+              ["Bandage", "granate", "Shield", "granate", "trash_1", "Bandage", "Shield", "trash_1", "Bandage"],
+              ["Shield", "bullet", "Shield", "Bandage", "granate", "trash_1", "bullet", "Shield", "bullet"],
+              ["Knife", "Knife", "bullet", "Bandage", "granate", "Knife", "Shield", "trash_1", "trash_1"],
+              ["granate", "bullet", "Knife", "granate", "Shield", "Shield", "trash_1", "Shield", "Shield"],
+              ["Bandage", "trash_1", "Shield", "Bandage", "bullet", "Shield", "bullet", "granate", "granate"],
+              ["bullet", "Shield", "Shield", "Bandage", "Knife", "bullet", "Shield", "granate", "bullet"]
+            ]
+          },
+          {
+            "id": "obstacles_shuffle",
+            "action": "shuffle",
+            "textKey": "battle.tutorial.obstacles.shuffle",
+            "wrongTextKey": "battle.tutorial.shuffleRequired",
+            "board": [
+              ["bullet", "Shield", "granate", "Shield", "granate", "bullet", "Knife", "trash_1", "trash_1"],
+              ["Knife", "granate", "Knife", "Knife", "Bandage", "Bandage", "Shield", "bullet", "Shield"],
+              ["Bandage", "granate", "Shield", "granate", "trash_1", "Bandage", "Shield", "trash_1", "Bandage"],
+              ["Shield", "bullet", "Shield", "Bandage", "granate", "trash_1", "bullet", "Shield", "bullet"],
+              ["Knife", "Knife", "bullet", "Bandage", "granate", "Knife", "Shield", "trash_1", "trash_1"],
+              ["granate", "bullet", "Knife", "granate", "Shield", "Shield", "trash_1", "Shield", "Shield"],
+              ["Bandage", "trash_1", "Shield", "Bandage", "bullet", "Shield", "bullet", "granate", "granate"],
+              ["bullet", "Shield", "Shield", "Bandage", "Knife", "bullet", "Shield", "granate", "bullet"]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "eventName": "tutorial_captain_battle",
+      "enemyId": "tutorial_Captain",
+      "background": "data/Assets/backgrounds/WildWest_1.png",
+      "minLevel": 11,
+      "maxLevel": 11,
+      "weight": 100,
+      "nodeTitleTextKey": "tutorial.map.node.captainBattle",
+      "tutorialRetry": {
+        "enabled": true,
+        "enemyId": "tutorial_Captain_retry",
+        "defeatTextKey": "tutorial.captain.defeat",
+        "tutorial": {
+          "enabled": true,
+          "titleTextKey": "battle.tutorial.captain.title",
+          "wrongMoveTextKey": "battle.tutorial.captain.clockRequired",
+          "teacherImage": "data/Assets/enemy/captain.png",
+          "playerInventoryQuantities": {
+            "item_time": 5
+          },
+          "steps": [
+            {
+              "id": "use_clock",
+              "action": "clock",
+              "requiredItemId": "item_time",
+              "textKey": "battle.tutorial.captain.useClock"
+            },
+            {
+              "id": "break_shields",
+              "action": "swap",
+              "textKey": "battle.tutorial.captain.breakShields",
+              "from": { "row": 5, "col": 2 },
+              "to": { "row": 4, "col": 2 },
+              "matchCells": [
+                { "row": 4, "col": 0 },
+                { "row": 4, "col": 1 },
+                { "row": 4, "col": 2 }
+              ],
+              "walls": [
+                { "from": { "row": 0, "col": 0 }, "to": { "row": 0, "col": 1 } },
+                { "from": { "row": 1, "col": 3 }, "to": { "row": 1, "col": 4 } },
+                { "from": { "row": 2, "col": 6 }, "to": { "row": 2, "col": 7 } },
+                { "from": { "row": 6, "col": 0 }, "to": { "row": 7, "col": 0 } },
+                { "from": { "row": 6, "col": 7 }, "to": { "row": 6, "col": 8 } }
+              ],
+              "boxes": [
+                { "row": 0, "col": 3 },
+                { "row": 1, "col": 6 },
+                { "row": 2, "col": 8 },
+                { "row": 6, "col": 5 }
+              ],
+              "vines": [
+                { "row": 0, "col": 5 },
+                { "row": 1, "col": 1 },
+                { "row": 2, "col": 4 },
+                { "row": 6, "col": 8 }
+              ],
+              "board": [
+                ["bullet", "Shield", "granate", "Shield", "granate", "bullet", "Knife", "trash_1", "trash_1"],
+                ["Knife", "granate", "Knife", "Knife", "Bandage", "Bandage", "Shield", "bullet", "Shield"],
+                ["Bandage", "granate", "Shield", "granate", "trash_1", "Bandage", "Shield", "trash_1", "Bandage"],
+                ["Shield", "bullet", "Shield", "Bandage", "granate", "trash_1", "bullet", "Shield", "bullet"],
+                ["Knife", "Knife", "bullet", "Bandage", "granate", "Knife", "Shield", "trash_1", "trash_1"],
+                ["granate", "bullet", "Knife", "granate", "Shield", "Shield", "trash_1", "Shield", "Shield"],
+                ["Bandage", "trash_1", "Shield", "Bandage", "bullet", "Shield", "bullet", "granate", "granate"],
+                ["bullet", "Shield", "Shield", "Bandage", "Knife", "bullet", "Shield", "granate", "bullet"]
+              ]
+            },
+            {
+              "id": "captain_shuffle",
+              "action": "shuffle",
+              "textKey": "battle.tutorial.captain.shuffle",
+              "wrongTextKey": "battle.tutorial.shuffleRequired",
+              "walls": [
+                { "from": { "row": 0, "col": 0 }, "to": { "row": 0, "col": 1 } },
+                { "from": { "row": 1, "col": 3 }, "to": { "row": 1, "col": 4 } },
+                { "from": { "row": 2, "col": 6 }, "to": { "row": 2, "col": 7 } },
+                { "from": { "row": 6, "col": 0 }, "to": { "row": 7, "col": 0 } },
+                { "from": { "row": 6, "col": 7 }, "to": { "row": 6, "col": 8 } }
+              ],
+              "boxes": [
+                { "row": 0, "col": 3 },
+                { "row": 1, "col": 6 },
+                { "row": 2, "col": 8 },
+                { "row": 6, "col": 5 }
+              ],
+              "vines": [
+                { "row": 0, "col": 5 },
+                { "row": 1, "col": 1 },
+                { "row": 2, "col": 4 },
+                { "row": 6, "col": 8 }
+              ],
+              "board": [
+                ["bullet", "Shield", "granate", "Shield", "granate", "bullet", "Knife", "trash_1", "trash_1"],
+                ["Knife", "granate", "Knife", "Knife", "Bandage", "Bandage", "Shield", "bullet", "Shield"],
+                ["Bandage", "granate", "Shield", "granate", "trash_1", "Bandage", "Shield", "trash_1", "Bandage"],
+                ["Shield", "bullet", "Shield", "Bandage", "granate", "trash_1", "bullet", "Shield", "bullet"],
+                ["Knife", "Knife", "bullet", "Bandage", "granate", "Knife", "Shield", "trash_1", "trash_1"],
+                ["granate", "bullet", "Knife", "granate", "Shield", "Shield", "trash_1", "Shield", "Shield"],
+                ["Bandage", "trash_1", "Shield", "Bandage", "bullet", "Shield", "bullet", "granate", "granate"],
+                ["bullet", "Shield", "Shield", "Bandage", "Knife", "bullet", "Shield", "granate", "bullet"]
+              ]
+            }
+          ]
+        }
+      }
     }
   ],
-  "reward": [],
-  "heal": [],
-  "shop": [],
+  "reward": [
+    {
+      "eventName": "tutorial_chest",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 100,
+      "dialogTextKey": "tutorial.chest.text",
+      "eventImage": "data/Assets/events/reward_gold.png",
+      "itemCount": 1,
+      "rewards": [{ "type": "gold", "amount": 100 }]
+    }
+  ],
+  "heal": [
+    {
+      "eventName": "tutorial_doctor",
+      "minLevel": 7,
+      "maxLevel": 7,
+      "weight": 100,
+      "healPercent": 100,
+      "dialogTextKey": "tutorial.doctor.text",
+      "eventImage": "data/Assets/events/doctor.png",
+      "goldPrice": 0
+    }
+  ],
+  "shop": [
+    {
+      "eventName": "tutorial_shop",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 100,
+      "dialogTextKey": "tutorial.shop.text",
+      "eventImage": "data/Assets/events/trader.png",
+      "items": [
+        { "itemId": "item_skull", "amount": 5, "goldPrice": 10 },
+        { "itemId": "item_swap", "amount": 5, "goldPrice": 10 }
+      ],
+      "tutorial": {
+        "enabled": true,
+        "wrongTextKey": "tutorial.shop.wrong",
+        "requiredItemIds": ["item_skull", "item_swap"]
+      }
+    }
+  ],
   "skip": [],
   "dialog": [
     {
@@ -511,6 +1022,71 @@
               "end": true
             }
           ]
+        }
+      ]
+    },
+    {
+      "eventName": "tutorial_items_intro",
+      "minLevel": 8,
+      "maxLevel": 8,
+      "weight": 100,
+      "nodeTitleTextKey": "tutorial.map.node.itemsDialog",
+      "characterImage": "data/Assets/enemy/captain.png",
+      "characterNameTextKey": "captain.name",
+      "characterWidthPct": 58,
+      "characterCenterXPct": 50,
+      "characterCenterYPct": 48,
+      "initialStepId": "assessment",
+      "steps": [
+        {
+          "stepId": "assessment",
+          "textKey": "tutorial.items.dialog.assessment",
+          "answers": [{ "textKey": "tutorial.items.dialog.answer.items", "nextStepId": "items" }]
+        },
+        {
+          "stepId": "items",
+          "textKey": "tutorial.items.dialog.items",
+          "answers": [{ "textKey": "tutorial.items.dialog.answer.ready", "end": true }]
+        }
+      ]
+    },
+    {
+      "eventName": "tutorial_rage_intro",
+      "minLevel": 10,
+      "maxLevel": 10,
+      "weight": 100,
+      "nodeTitleTextKey": "tutorial.map.node.rageDialog",
+      "characterImage": "data/Assets/enemy/captain.png",
+      "characterNameTextKey": "captain.name",
+      "characterWidthPct": 58,
+      "characterCenterXPct": 50,
+      "characterCenterYPct": 48,
+      "initialStepId": "rage",
+      "steps": [
+        {
+          "stepId": "rage",
+          "textKey": "tutorial.rage.dialog.intro",
+          "answers": [{ "textKey": "tutorial.rage.dialog.answer.ready", "end": true }]
+        }
+      ]
+    },
+    {
+      "eventName": "tutorial_final_dialog",
+      "minLevel": 12,
+      "maxLevel": 12,
+      "weight": 100,
+      "nodeTitleTextKey": "tutorial.map.node.finalDialog",
+      "characterImage": "data/Assets/enemy/captain.png",
+      "characterNameTextKey": "captain.name",
+      "characterWidthPct": 58,
+      "characterCenterXPct": 50,
+      "characterCenterYPct": 48,
+      "initialStepId": "farewell",
+      "steps": [
+        {
+          "stepId": "farewell",
+          "textKey": "tutorial.final.dialog.farewell",
+          "answers": [{ "textKey": "tutorial.final.dialog.answer.road", "end": true }]
         }
       ]
     }

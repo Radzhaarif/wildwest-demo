@@ -1,0 +1,65 @@
+{
+  "enemyId": "tutorial_Captain",
+  "baseEnemyId": "Captain",
+  "nameTextKey": "captain.name",
+  "descriptionTextKey": "enemy.Captain.tutorial.description",
+  "stageCount": 1,
+  "battle_music": "data/Assets/sound/battle_1.mp3",
+  "wall": 5,
+  "box": 4,
+  "vines": 4,
+  "stages": [
+    {
+      "stageId": "deadly_lesson",
+      "nameTextKey": "enemy.Captain.stage.deadly.name",
+      "appearance": "data/Assets/enemy/captain.png",
+      "health": 200,
+      "shield": 0,
+      "convert": [
+        {
+          "effectId": "tutorialCaptainFlames",
+          "type": "convertItems",
+          "chance": 0.05,
+          "from": {
+            "itemId": ["bullet", "Knife", "granate", "Bandage", "Shield", "trash_1", "trash_2"]
+          },
+          "to": {
+            "itemId": ["flame"]
+          },
+          "scope": "all"
+        }
+      ],
+      "aggression": {
+        "threshold": 100,
+        "damage": 5,
+        "resetOnTrigger": true
+      },
+      "rage": {
+        "secondsToUltimate": 10,
+        "resetAfterUltimate": false
+      },
+      "ultimate": {
+        "nameTextKey": "enemy.Captain.ultimate.kick.name",
+        "descriptionTextKey": "enemy.Captain.ultimate.kick.deadly.description",
+        "effects": [
+          {
+            "effectId": "captainDeadlyKick",
+            "type": "damagePlayerFixed",
+            "amount": 1000
+          }
+        ]
+      }
+    }
+  ],
+  "reward": {
+    "eventImage": "data/Assets/events/reward_gold.png",
+    "dialogTextKey": "battle.reward.tutorial.captain",
+    "itemCount": 1,
+    "rewards": [
+      {
+        "type": "experience",
+        "amount": 20
+      }
+    ]
+  }
+}

@@ -79,6 +79,12 @@ function validateTutorialEntry(tutorial, issues) {
   }
   requireString(tutorial.onComplete.titleTextKey, "campaign.tutorial.onComplete.titleTextKey", issues);
   requireString(tutorial.onComplete.messageTextKey, "campaign.tutorial.onComplete.messageTextKey", issues);
+  if (
+    tutorial.onComplete.returnToMainMenu !== undefined
+    && typeof tutorial.onComplete.returnToMainMenu !== "boolean"
+  ) {
+    issues.push("campaign.tutorial.onComplete.returnToMainMenu: expected boolean");
+  }
 }
 
 function validateTutorialStartingInventory(quantities, issues) {

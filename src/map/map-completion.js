@@ -4,6 +4,7 @@ export function createMapCompletionController(deps) {
     translate,
     formatText,
     showDialog,
+    returnToMainMenu,
     addLog,
     startCampaignMap,
   } = deps;
@@ -16,7 +17,10 @@ export function createMapCompletionController(deps) {
     if (entry.onComplete.type === "victory") {
       const title = translate(entry.onComplete.titleTextKey);
       const message = translate(entry.onComplete.messageTextKey);
-      showDialog(`${title} ${message}`);
+      showDialog(
+        `${title} ${message}`,
+        entry.onComplete.returnToMainMenu === true ? returnToMainMenu : undefined,
+      );
       addLog(formatText("log.mapVictory", { message }));
       state.availableNodeIds = new Set();
       return;

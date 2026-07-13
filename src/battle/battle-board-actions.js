@@ -111,6 +111,10 @@ export async function handleGoldBoardClick(deps, context, cell, renderTargets) {
     moveResult = result;
     deps.setBattleStatus(context, statusElement, deps.formatMoveStatus(context, result, context.battleState.enemyState));
   } else {
+    context.battleState.lastMoveSummary = {
+      tutorialAction: "gold",
+      replacedCell: { row: cell.row, col: cell.col },
+    };
     deps.setBattleStatus(context, statusElement, deps.translateBattleText(context, "freeSwapDone"));
   }
 

@@ -1,0 +1,45 @@
+{
+  "enemyId": "tutorial_Dolly_obstacles",
+  "baseEnemyId": "Dolly",
+  "nameTextKey": "enemy.Dolly.name",
+  "descriptionTextKey": "enemy.Dolly.description",
+  "stageCount": 1,
+  "battle_music": "data/Assets/sound/battle_1.mp3",
+  "wall": 0,
+  "box": 0,
+  "vines": 0,
+  "stages": [
+    {
+      "stageId": "obstacles_training",
+      "nameTextKey": "enemy.Dolly.stage.training.name",
+      "appearance": "data/Assets/enemy/Dolly.png",
+      "health": 100,
+      "shield": 0,
+      "aggression": {
+        "threshold": 100,
+        "damage": 5,
+        "resetOnTrigger": true
+      },
+      "rage": {
+        "secondsToUltimate": 999,
+        "resetAfterUltimate": true
+      },
+      "ultimate": {
+        "nameTextKey": "enemy.Dolly.ultimate.training.name",
+        "descriptionTextKey": "enemy.Dolly.ultimate.training.description",
+        "effects": []
+      }
+    }
+  ],
+  "reward": {
+    "eventImage": "data/Assets/events/reward_gold.png",
+    "dialogTextKey": "battle.reward.tutorial.obstacles",
+    "itemCount": 1,
+    "rewards": [
+      {
+        "type": "experience",
+        "amount": 20
+      }
+    ]
+  }
+}

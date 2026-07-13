@@ -233,6 +233,8 @@ function createInventorySlot(deps, context, itemId, options = {}) {
   const clockCooldownSeconds = isClock ? getClockCooldownState(context).seconds : 0;
   const isActiveSpecial = activeSpecialItemId === itemId;
   const isBattleActiveItem = deps.ACTIVE_BATTLE_ITEM_IDS.includes(itemId);
+  const isTutorialUnavailable = (isBattleActiveItem || itemId === deps.GOLD_ITEM_ID)
+    && !deps.isBattleTutorialInventoryItemAllowed(context, itemId);
   const isBlockedByOtherSpecial = Boolean(activeSpecialItemId && activeSpecialItemId !== itemId && isBattleActiveItem);
   const isClockUnavailable = isClock
     && (clockCooldownSeconds > 0 || itemQuantity <= 0);
@@ -246,7 +248,7 @@ function createInventorySlot(deps, context, itemId, options = {}) {
     slot.classList.add("is-active");
   }
 
-  if (isClockUnavailable || isSpecialUnavailable) {
+  if (isClockUnavailable || isSpecialUnavailable || isTutorialUnavailable) {
     slot.classList.add("is-disabled");
   }
 
@@ -279,11 +281,18 @@ function createInventorySlot(deps, context, itemId, options = {}) {
     slot.classList.add("is-clickable");
     slot.setAttribute("role", "button");
     slot.tabIndex = 0;
-    slot.addEventListener("click", () => options.onClick(slot));
+    slot.addEventListener("click", () => {
+      if (!deps.isBattleTutorialInventoryItemAllowed(context, itemId)) {
+        return;
+      }
+      options.onClick(slot);
+    });
     slot.addEventListener("keydown", (event) => {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
-        options.onClick(slot);
+        if (deps.isBattleTutorialInventoryItemAllowed(context, itemId)) {
+          options.onClick(slot);
+        }
       }
     });
   }
@@ -380,6 +389,7 @@ function handleClockClick(deps, context, slot, renderTargets) {
   deps.changeInventoryQuantity(context.battleState.playerState, deps.CLOCK_ITEM_ID, -1);
   const pauseStart = Math.max(Date.now(), context.battleState.ragePausedUntil || 0);
   context.battleState.ragePausedUntil = pauseStart + stopSeconds * 1000;
+  deps.advanceBattleTutorialAfterInventoryAction(context, deps.CLOCK_ITEM_ID, renderTargets);
 
   if (renderTargets?.status) {
     deps.setBattleStatus(context, renderTargets.status, deps.translate(context.request.locale, uiConfig.textKeys.clockUsed));

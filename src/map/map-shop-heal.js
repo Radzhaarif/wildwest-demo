@@ -149,6 +149,7 @@ export function createMapShopHealController(deps) {
     elements.shopBuyButton.textContent = translate("ui.purchase");
     elements.inventoryTitle.textContent = translate("ui.inventory");
     elements.shopDialogText.textContent = translate(node.payload.dialogTextKey);
+    elements.shopOverlay.classList.toggle("is-tutorial-active", isShopTutorialActive(node));
     setEventImage(
       elements.shopEventImage,
       node.payload.eventImage,
@@ -170,6 +171,7 @@ export function createMapShopHealController(deps) {
       return;
     }
     elements.shopOverlay.classList.add("hidden");
+    elements.shopOverlay.classList.remove("is-tutorial-active");
     const completion = state.activeShopCompletion;
     state.activeShopNode = null;
     state.activeShopCompletion = null;
@@ -220,7 +222,6 @@ export function createMapShopHealController(deps) {
     if (isSelected) {
       card.classList.add("selected");
     }
-
     const image = document.createElement("img");
     image.src = getItemImagePath(item.itemId);
     image.alt = getItemName(item.itemId);
@@ -281,7 +282,8 @@ export function createMapShopHealController(deps) {
 
   function updateShopBuyButton() {
     const total = getShopSelectionTotal();
-    elements.shopBuyButton.disabled = total <= 0;
+    elements.shopBuyButton.disabled = total <= 0 || !isShopTutorialSelectionComplete();
+    elements.shopLeaveButton.disabled = isShopTutorialActive();
     elements.shopBuyButton.textContent =
       total > 0
         ? `${translate("ui.purchase")} (${total} ${getItemName("gold")})`
@@ -292,7 +294,10 @@ export function createMapShopHealController(deps) {
     // Подтверждение покупки живет внутри игрового интерфейса, без browser confirm.
     // Недостаток золота проверяется до показа подтверждения.
     const total = getShopSelectionTotal();
-    if (total <= 0) {
+    if (total <= 0 || !isShopTutorialSelectionComplete()) {
+      if (isShopTutorialActive()) {
+        showShopError(translate(getShopTutorial().wrongTextKey));
+      }
       return;
     }
     if (total > getInventoryQuantity("gold")) {
@@ -304,6 +309,7 @@ export function createMapShopHealController(deps) {
       "ui.purchase.question",
     )} ${total} ${getItemName("gold")}`;
     elements.shopConfirm.classList.remove("hidden");
+    elements.shopConfirmNoButton.disabled = false;
   }
 
   function hideShopConfirm() {
@@ -311,6 +317,7 @@ export function createMapShopHealController(deps) {
       return;
     }
     elements.shopConfirm.classList.add("hidden");
+    elements.shopConfirmNoButton.disabled = false;
   }
 
   function showShopError(message) {
@@ -330,7 +337,7 @@ export function createMapShopHealController(deps) {
     // amount предметов в инвентарь. После успешной покупки магазин закрывается.
     syncShopSelectionToGoods(getPurchasableShopItems(state.activeShopNode));
     const total = getShopSelectionTotal();
-    if (total <= 0 || total > getInventoryQuantity("gold")) {
+    if (total <= 0 || !isShopTutorialSelectionComplete() || total > getInventoryQuantity("gold")) {
       showShopError(translate("ui.notEnoughGold"));
       return;
     }
@@ -373,6 +380,24 @@ export function createMapShopHealController(deps) {
 
   function getShopItems(node) {
     return node?.payload?.items || [];
+  }
+
+  function getShopTutorial(node = state.activeShopNode) {
+    const tutorial = node?.payload?.tutorial;
+    return tutorial?.enabled === true ? tutorial : null;
+  }
+
+  function isShopTutorialActive(node = state.activeShopNode) {
+    return Boolean(getShopTutorial(node));
+  }
+
+  function isShopTutorialSelectionComplete() {
+    const tutorial = getShopTutorial();
+    if (!tutorial) {
+      return true;
+    }
+    const selectedItemIds = new Set([...state.shopSelection.values()].map((item) => item.itemId));
+    return tutorial.requiredItemIds.every((itemId) => selectedItemIds.has(itemId));
   }
 
   function getPurchasableShopItems(node) {

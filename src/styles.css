@@ -1346,6 +1346,17 @@ button:disabled {
   background: rgba(111, 65, 24, 0.72);
 }
 
+.shop-overlay.is-tutorial-active .shop-actions button:disabled {
+  opacity: 0.28;
+  filter: grayscale(0.86) brightness(0.6);
+}
+
+.shop-overlay.is-tutorial-active .shop-actions button:not(:disabled) {
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 0 18px rgba(255, 207, 64, 0.78);
+}
+
 .item-max-badge {
   position: absolute;
   top: 8px;
@@ -1705,6 +1716,39 @@ button.reward-item {
     0 0 54px rgba(255, 210, 94, 0.38);
 }
 
+.reward-overlay--tutorial-level-up .reward-item--choice::after {
+  content: "?";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(255, 226, 137, 0.86);
+  border-radius: 50%;
+  color: #fff0b2;
+  background: rgba(70, 43, 9, 0.92);
+  box-shadow: 0 0 24px rgba(255, 198, 55, 0.58);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.reward-overlay--tutorial-level-up .reward-item--choice.is-inspected::after {
+  content: "✓";
+  color: #241706;
+  background: #ffd66d;
+}
+
+.reward-overlay--tutorial-level-up:not(.reward-overlay--tutorial-ready)
+  .reward-item--choice:not(.is-inspected)::before {
+  border-color: rgba(255, 218, 102, 0.88);
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.56),
+    0 0 54px rgba(255, 195, 65, 0.42);
+}
+
 .reward-item::before {
   content: "";
   position: absolute;
@@ -1790,6 +1834,11 @@ button.reward-item {
 .reward-message button:disabled {
   opacity: 0.48;
   cursor: var(--cursor-default), auto;
+}
+
+.reward-overlay--tutorial-level-up .reward-message button:disabled {
+  color: var(--text);
+  opacity: 1;
 }
 
 @keyframes rewardWindowIn {
@@ -2218,6 +2267,13 @@ button.reward-item {
   text-shadow:
     2px 2px 0 #20140d,
     0 10px 22px rgba(0, 0, 0, 0.36);
+}
+
+.battle-outcome-banner p {
+  max-width: min(720px, 86vw);
+  margin: 0;
+  font-size: clamp(1.1rem, 2.4vw, 1.65rem);
+  line-height: 1.35;
 }
 
 .battle-outcome-banner.is-defeat {

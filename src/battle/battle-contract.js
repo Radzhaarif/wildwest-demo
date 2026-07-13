@@ -23,6 +23,7 @@ export const BATTLE_OUTCOMES = Object.freeze({
  * @property {object} settings
  * @property {object=} cheats
  * @property {object|null=} tutorial
+ * @property {object|null=} tutorialRetry
  * @property {string} language
  */
 

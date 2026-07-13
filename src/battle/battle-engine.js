@@ -671,6 +671,7 @@ export function applyBattleUltimateEffects(battleState, itemCatalog, stageOrEffe
     enemyHealthRecovered: 0,
     enemyShieldHealing: 0,
     enemyShieldRecovered: 0,
+    fixedDamage: 0,
     kamikazeDamage: 0,
     enemySelfDamage: 0,
     stageChanged: false,
@@ -693,6 +694,13 @@ export function applyBattleUltimateEffects(battleState, itemCatalog, stageOrEffe
         random,
         { boxes },
       );
+    } else if (isFixedPlayerDamageUltimateEffect(effect)) {
+      const playerDamage = applyPlayerDamage(
+        battleState.playerState,
+        Math.max(0, getNumber(effect?.amount)),
+      );
+      summary.fixedDamage += playerDamage;
+      summary.playerDamage += playerDamage;
     } else if (isDamagePlayerByBoardItemsUltimateEffect(effect)) {
       const damageResult = applyBattleUltimateDamagePlayerByBoardItems(
         battleState,
@@ -898,6 +906,11 @@ function isConvertBattleUltimateEffect(effect) {
 function isDamagePlayerByBoardItemsUltimateEffect(effect) {
   const effectType = String(effect?.type || effect?.effectId || effect?.id || "").trim();
   return ["damagePlayerByBoardItems", "damagePlayerByItems", "damageByBoardItems", "damagePlayer", "урон"].includes(effectType);
+}
+
+function isFixedPlayerDamageUltimateEffect(effect) {
+  const effectType = String(effect?.type || effect?.effectId || effect?.id || "").trim();
+  return ["damagePlayerFixed", "fixedPlayerDamage"].includes(effectType);
 }
 
 function isHealingEnemyByBoardItemsUltimateEffect(effect) {

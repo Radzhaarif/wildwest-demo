@@ -290,6 +290,7 @@ export function createMapShellUiController(deps) {
     showEventLogOverlay,
     hideEventLogOverlay,
     showDialog,
+    returnToMainMenu: surrenderToMainMenu,
     addRunLogHeader,
     addLog,
   };

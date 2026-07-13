@@ -447,6 +447,7 @@ const {
   showEventLogOverlay,
   hideEventLogOverlay,
   showDialog,
+  returnToMainMenu,
   addRunLogHeader,
   addLog,
 } = mapShellUi;
@@ -659,6 +660,7 @@ const mapCompletion = createMapCompletionController({
   translate,
   formatText,
   showDialog,
+  returnToMainMenu,
   addLog,
   startCampaignMap,
 });

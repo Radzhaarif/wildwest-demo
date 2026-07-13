@@ -36,6 +36,7 @@ export function createMapRewardsController(deps) {
       nodeId: node.id,
       entries: grantedRewards,
       logText: rewardText,
+      levelUpTutorial: options.levelUpTutorial || node.payload?.levelUpTutorial || null,
       onApplied: options.onApplied,
     };
     showRewardOverlay({
@@ -125,11 +126,11 @@ export function createMapRewardsController(deps) {
     return labels.length > 0 ? labels.join(", ") : "-";
   }
 
-  function applyRewardEntry(reward) {
+  function applyRewardEntry(reward, levelUpTutorial = null) {
     if (reward.type === "gold") {
       changeInventoryQuantity("gold", reward.amount || 0);
     } else if (reward.type === "experience") {
-      addExperience(reward.amount || 0);
+      addExperience(reward.amount || 0, levelUpTutorial);
     } else if (reward.type === "health") {
       state.playerState.health.current = Math.min(
         state.playerState.health.max,
@@ -143,7 +144,7 @@ export function createMapRewardsController(deps) {
     }
   }
 
-  function addExperience(amount) {
+  function addExperience(amount, levelUpTutorial = null) {
     if (!state.playerState.experience) {
       state.playerState.experience = { level: 1, total: 0 };
     }
@@ -152,7 +153,7 @@ export function createMapRewardsController(deps) {
     const nextTotal = previousTotal + gainedExperience;
     state.playerState.experience.total = nextTotal;
     state.playerState.experience.level = Math.max(1, getCurrentExperienceLevel(nextTotal).level);
-    queueReachedLevelUps(previousTotal, nextTotal);
+    queueReachedLevelUps(previousTotal, nextTotal, levelUpTutorial);
   }
 
   function getExperienceTotal() {
@@ -166,8 +167,9 @@ export function createMapRewardsController(deps) {
       .find((level) => level.requiredExperience <= totalExperience) || { level: 1 };
   }
 
-  function queueReachedLevelUps(previousTotal, nextTotal) {
+  function queueReachedLevelUps(previousTotal, nextTotal, levelUpTutorial = null) {
     const levels = Array.isArray(state.experienceTable?.levels) ? state.experienceTable.levels : [];
+    let queuedTutorial = levelUpTutorial;
     for (const level of levels) {
       if (level.requiredExperience <= previousTotal || level.requiredExperience > nextTotal) {
         continue;
@@ -175,11 +177,24 @@ export function createMapRewardsController(deps) {
       if (!Array.isArray(level.rewards) || level.rewards.length === 0 || level.rewardCount <= 0) {
         continue;
       }
-      state.pendingLevelUps.push(level);
+      state.pendingLevelUps.push({ level, tutorial: queuedTutorial });
+      queuedTutorial = null;
     }
   }
 
-  function pickLevelRewardOptions(level) {
+  function pickLevelRewardOptions(level, tutorial = null) {
+    if (tutorial?.enabled === true && Array.isArray(tutorial.rewards)) {
+      return tutorial.rewards
+        .map((tutorialReward) => {
+          const levelReward = level?.rewards?.find((reward) => reward.itemId === tutorialReward.itemId);
+          return {
+            ...(levelReward || { itemId: tutorialReward.itemId, amount: 1 }),
+            tutorialTextKey: tutorialReward.textKey,
+          };
+        })
+        .filter((reward) => !isRewardBlockedByInventoryLimit(reward));
+    }
+
     // Level-up выбор фиксируется при открытии оверлея. Повторный render не
     // должен менять варианты, иначе один и тот же seed перестанет быть честным.
     const rewardRandom = createLevelRewardRandom(level);
@@ -259,13 +274,17 @@ export function createMapRewardsController(deps) {
     elements.rewardClaimButton.textContent = translate("ui.claimReward");
     elements.rewardClaimButton.disabled = false;
     elements.rewardOverlay.classList.remove("reward-overlay--choice");
+    elements.rewardOverlay.classList.remove("reward-overlay--tutorial-level-up");
+    elements.rewardOverlay.classList.remove("reward-overlay--tutorial-ready");
     elements.rewardOverlay.classList.remove("hidden");
   }
 
   function showNextLevelUpReward(options = {}) {
     while (state.pendingLevelUps.length > 0) {
-      const level = state.pendingLevelUps.shift();
-      const rewards = pickLevelRewardOptions(level);
+      const pendingLevelUp = state.pendingLevelUps.shift();
+      const level = typeof pendingLevelUp?.level === "object" ? pendingLevelUp.level : pendingLevelUp;
+      const tutorial = typeof pendingLevelUp?.level === "object" ? pendingLevelUp.tutorial : null;
+      const rewards = pickLevelRewardOptions(level, tutorial);
       if (rewards.length === 0) {
         continue;
       }
@@ -274,6 +293,9 @@ export function createMapRewardsController(deps) {
         level,
         rewards,
         selectedIndex: null,
+        tutorial: tutorial?.enabled === true
+          ? { config: tutorial, inspectedIndices: new Set() }
+          : null,
         scrollToNext: options.scrollToNext !== false,
       };
       applyRewardAnimationSettings();
@@ -289,10 +311,14 @@ export function createMapRewardsController(deps) {
           { selectable: true },
         ));
       }
-      elements.rewardDialogText.textContent = translate(level.textKey);
-      elements.rewardClaimButton.textContent = translate("ui.claimReward");
+      elements.rewardDialogText.textContent = translate(tutorial?.introTextKey || level.textKey);
+      elements.rewardClaimButton.textContent = translate(
+        tutorial?.enabled === true ? "ui.inspectLevelRewards" : "ui.claimReward",
+      );
       elements.rewardClaimButton.disabled = true;
       elements.rewardOverlay.classList.add("reward-overlay--choice");
+      elements.rewardOverlay.classList.toggle("reward-overlay--tutorial-level-up", tutorial?.enabled === true);
+      elements.rewardOverlay.classList.remove("reward-overlay--tutorial-ready");
       elements.rewardOverlay.classList.remove("hidden");
       return true;
     }
@@ -353,6 +379,15 @@ export function createMapRewardsController(deps) {
     if (!state.activeLevelUp || !state.activeLevelUp.rewards[index]) {
       return;
     }
+    const tutorial = state.activeLevelUp.tutorial;
+    if (tutorial && tutorial.inspectedIndices.size < state.activeLevelUp.rewards.length) {
+      tutorial.inspectedIndices.add(index);
+      elements.rewardDialogText.textContent = translate(
+        state.activeLevelUp.rewards[index].tutorialTextKey,
+      );
+      updateLevelUpTutorialState();
+      return;
+    }
     state.activeLevelUp.selectedIndex = index;
     [...elements.rewardItems.children]
       .filter((item) => item.classList?.contains("reward-item--choice"))
@@ -361,7 +396,29 @@ export function createMapRewardsController(deps) {
       item.classList.toggle("is-selected", isSelected);
       item.setAttribute("aria-pressed", isSelected ? "true" : "false");
     });
+    elements.rewardClaimButton.textContent = translate("ui.claimReward");
     elements.rewardClaimButton.disabled = false;
+  }
+
+  function updateLevelUpTutorialState() {
+    const activeLevelUp = state.activeLevelUp;
+    const tutorial = activeLevelUp?.tutorial;
+    if (!tutorial) {
+      return;
+    }
+    [...elements.rewardItems.children]
+      .filter((item) => item.classList?.contains("reward-item--choice"))
+      .forEach((item) => {
+        item.classList.toggle(
+          "is-inspected",
+          tutorial.inspectedIndices.has(Number(item.dataset.rewardIndex)),
+        );
+      });
+    const isReady = tutorial.inspectedIndices.size >= activeLevelUp.rewards.length;
+    elements.rewardOverlay.classList.toggle("reward-overlay--tutorial-ready", isReady);
+    elements.rewardClaimButton.textContent = translate(
+      isReady ? "ui.chooseLevelReward" : "ui.inspectLevelRewards",
+    );
   }
 
   function applyRewardAnimationSettings() {
@@ -444,6 +501,8 @@ export function createMapRewardsController(deps) {
   function hideRewardOverlay() {
     elements.rewardOverlay.classList.add("hidden");
     elements.rewardOverlay.classList.remove("reward-overlay--choice");
+    elements.rewardOverlay.classList.remove("reward-overlay--tutorial-level-up");
+    elements.rewardOverlay.classList.remove("reward-overlay--tutorial-ready");
     elements.rewardItems.innerHTML = "";
     elements.rewardBackdrop.style.backgroundImage = "";
     elements.rewardDialogText.textContent = "";
@@ -456,7 +515,7 @@ export function createMapRewardsController(deps) {
     }
 
     for (const reward of state.pendingReward.entries) {
-      applyRewardEntry(reward);
+      applyRewardEntry(reward, state.pendingReward.levelUpTutorial);
     }
     addLog(
       formatText("log.rewardResolved", {

@@ -28,6 +28,9 @@ export function collectBattleEnemyIds(mapConfig, battleEnemyIds) {
     if (typeof variant?.enemyId === "string" && variant.enemyId.trim() !== "") {
       battleEnemyIds.add(variant.enemyId);
     }
+    if (typeof variant?.tutorialRetry?.enemyId === "string" && variant.tutorialRetry.enemyId.trim() !== "") {
+      battleEnemyIds.add(variant.tutorialRetry.enemyId);
+    }
   }
 }
 
@@ -325,6 +328,13 @@ function validateEventVariants(config, source, issues, requiredItemIds, eventCat
             requireNumberInRange(item.goldPrice, `${prefix}.items[${itemIndex}].goldPrice`, 0, Infinity, issues);
           });
         }
+        validateShopTutorialConfig(
+          variant.tutorial,
+          `${prefix}.tutorial`,
+          issues,
+          requiredItemIds,
+          variant.items || [],
+        );
       } else if (eventType === "heal") {
         requireString(variant.dialogTextKey, `${prefix}.dialogTextKey`, issues);
         validateEventImageField(variant.eventImage, `${prefix}.eventImage`, issues);
@@ -336,6 +346,18 @@ function validateEventVariants(config, source, issues, requiredItemIds, eventCat
           validateBattleBackgroundField(variant.background, `${prefix}.background`, issues);
         }
         validateBattleTutorialConfig(variant.tutorial, `${prefix}.tutorial`, issues, requiredItemIds);
+        validateLevelUpTutorialConfig(
+          variant.levelUpTutorial,
+          `${prefix}.levelUpTutorial`,
+          issues,
+          requiredItemIds,
+        );
+        validateBattleRetryTutorialConfig(
+          variant.tutorialRetry,
+          `${prefix}.tutorialRetry`,
+          issues,
+          requiredItemIds,
+        );
       } else if (eventType === "reward") {
         validateRewardConfig(variant, prefix, issues, requiredItemIds);
       } else if (eventType === "dialog") {
@@ -343,6 +365,88 @@ function validateEventVariants(config, source, issues, requiredItemIds, eventCat
       }
     });
   }
+}
+
+function validateBattleRetryTutorialConfig(retry, path, issues, requiredItemIds) {
+  if (retry === undefined) {
+    return;
+  }
+  if (!retry || typeof retry !== "object" || Array.isArray(retry)) {
+    issues.push(`${path}: must be an object when present`);
+    return;
+  }
+  if (retry.enabled !== true) {
+    issues.push(`${path}.enabled: expected true`);
+  }
+  requireString(retry.enemyId, `${path}.enemyId`, issues);
+  requireString(retry.defeatTextKey, `${path}.defeatTextKey`, issues);
+  validateBattleTutorialConfig(retry.tutorial, `${path}.tutorial`, issues, requiredItemIds);
+}
+
+function validateLevelUpTutorialConfig(tutorial, path, issues, requiredItemIds) {
+  if (tutorial === undefined) {
+    return;
+  }
+  if (!tutorial || typeof tutorial !== "object" || Array.isArray(tutorial)) {
+    issues.push(`${path}: must be an object when present`);
+    return;
+  }
+  if (tutorial.enabled !== true) {
+    issues.push(`${path}.enabled: expected true`);
+  }
+  requireString(tutorial.introTextKey, `${path}.introTextKey`, issues);
+  if (!Array.isArray(tutorial.rewards) || tutorial.rewards.length === 0) {
+    issues.push(`${path}.rewards: must contain at least one tutorial reward`);
+    return;
+  }
+  const itemIds = new Set();
+  tutorial.rewards.forEach((reward, index) => {
+    const rewardPath = `${path}.rewards[${index}]`;
+    if (!reward || typeof reward !== "object" || Array.isArray(reward)) {
+      issues.push(`${rewardPath}: must be an object`);
+      return;
+    }
+    if (requireString(reward.itemId, `${rewardPath}.itemId`, issues)) {
+      if (itemIds.has(reward.itemId)) {
+        issues.push(`${rewardPath}.itemId: duplicate itemId "${reward.itemId}"`);
+      }
+      itemIds.add(reward.itemId);
+      requiredItemIds.add(reward.itemId);
+    }
+    requireString(reward.textKey, `${rewardPath}.textKey`, issues);
+  });
+}
+
+function validateShopTutorialConfig(tutorial, path, issues, requiredItemIds, offers) {
+  if (tutorial === undefined) {
+    return;
+  }
+  if (!tutorial || typeof tutorial !== "object" || Array.isArray(tutorial)) {
+    issues.push(`${path}: must be an object when present`);
+    return;
+  }
+  if (tutorial.enabled !== true) {
+    issues.push(`${path}.enabled: expected true`);
+  }
+  requireString(tutorial.wrongTextKey, `${path}.wrongTextKey`, issues);
+  if (!Array.isArray(tutorial.requiredItemIds) || tutorial.requiredItemIds.length === 0) {
+    issues.push(`${path}.requiredItemIds: must contain at least one itemId`);
+    return;
+  }
+  const itemIds = new Set();
+  const offeredItemIds = new Set(offers.map((offer) => offer?.itemId));
+  tutorial.requiredItemIds.forEach((itemId, index) => {
+    if (requireString(itemId, `${path}.requiredItemIds[${index}]`, issues)) {
+      if (itemIds.has(itemId)) {
+        issues.push(`${path}.requiredItemIds[${index}]: duplicate itemId "${itemId}"`);
+      }
+      itemIds.add(itemId);
+      requiredItemIds.add(itemId);
+      if (!offeredItemIds.has(itemId)) {
+        issues.push(`${path}.requiredItemIds[${index}]: itemId "${itemId}" is not offered by this shop`);
+      }
+    }
+  });
 }
 
 function validateBattleTutorialConfig(tutorial, path, issues, requiredItemIds) {
@@ -386,14 +490,21 @@ function validateBattleTutorialConfig(tutorial, path, issues, requiredItemIds) {
       stepIds.add(step.id);
     }
     requireString(step.textKey, `${stepPath}.textKey`, issues);
-    if (!["swap", "battery", "shuffle"].includes(step.action)) {
-      issues.push(`${stepPath}.action: expected one of swap, battery, shuffle`);
+    if (!["swap", "battery", "shuffle", "blockedWall", "blockedVine", "freeSwap", "skull", "gold", "clock"].includes(step.action)) {
+      issues.push(`${stepPath}.action: expected a supported tutorial action`);
     }
     if (step.wrongTextKey !== undefined) {
       requireString(step.wrongTextKey, `${stepPath}.wrongTextKey`, issues);
     }
+    if (step.retryTextKey !== undefined) {
+      requireString(step.retryTextKey, `${stepPath}.retryTextKey`, issues);
+    }
 
-    const boardSize = validateBattleTutorialBoard(step.board, `${stepPath}.board`, issues, requiredItemIds);
+    const boardSize = step.action === "clock" && step.board === undefined
+      ? null
+      : validateBattleTutorialBoard(step.board, `${stepPath}.board`, issues, requiredItemIds);
+    validateBattleTutorialObstacles(step, stepPath, issues, boardSize);
+    validateBattleTutorialCells(step.guideCells, `${stepPath}.guideCells`, issues, boardSize);
     for (const field of [
       "playerHealthCurrent",
       "playerHealCurrent",
@@ -404,19 +515,75 @@ function validateBattleTutorialConfig(tutorial, path, issues, requiredItemIds) {
         requireNumberInRange(step[field], `${stepPath}.${field}`, 0, Infinity, issues);
       }
     }
-    if (step.action === "swap" || step.action === "battery") {
+    if (["swap", "battery", "blockedWall", "freeSwap"].includes(step.action)) {
       validateBattleTutorialCell(step.from, `${stepPath}.from`, issues, boardSize);
       validateBattleTutorialCell(step.to, `${stepPath}.to`, issues, boardSize);
-      const minMatchCells = step.action === "swap" ? 3 : 2;
-      if (!Array.isArray(step.matchCells) || step.matchCells.length < minMatchCells) {
+      const minMatchCells = step.action === "battery" ? 2 : 3;
+      if (["swap", "battery", "freeSwap"].includes(step.action) && (!Array.isArray(step.matchCells) || step.matchCells.length < minMatchCells)) {
         issues.push(`${stepPath}.matchCells: ${step.action} steps must contain at least ${minMatchCells} cells`);
-      } else {
+      } else if (Array.isArray(step.matchCells)) {
         step.matchCells.forEach((cell, cellIndex) => {
           validateBattleTutorialCell(cell, `${stepPath}.matchCells[${cellIndex}]`, issues, boardSize);
         });
       }
+    } else if (step.action === "blockedVine") {
+      validateBattleTutorialCell(step.from, `${stepPath}.from`, issues, boardSize);
+    } else if (step.action === "skull" || step.action === "gold") {
+      validateBattleTutorialCell(step.to, `${stepPath}.to`, issues, boardSize);
+    }
+    if (["blockedWall", "blockedVine"].includes(step.action)) {
+      requireIntegerInRange(step.requiredAttempts, `${stepPath}.requiredAttempts`, 1, Infinity, issues);
+    }
+    if (["freeSwap", "skull", "gold", "clock"].includes(step.action)) {
+      if (requireString(step.requiredItemId, `${stepPath}.requiredItemId`, issues)) {
+        requiredItemIds.add(step.requiredItemId);
+      }
     }
   });
+}
+
+function validateBattleTutorialCells(cells, path, issues, boardSize) {
+  if (cells === undefined) {
+    return;
+  }
+  if (!Array.isArray(cells)) {
+    issues.push(`${path}: must be an array when present`);
+    return;
+  }
+  cells.forEach((cell, index) => {
+    validateBattleTutorialCell(cell, `${path}[${index}]`, issues, boardSize);
+  });
+}
+
+function validateBattleTutorialObstacles(step, path, issues, boardSize) {
+  if (step.walls !== undefined) {
+    if (!Array.isArray(step.walls)) {
+      issues.push(`${path}.walls: must be an array when present`);
+    } else {
+      step.walls.forEach((wall, index) => {
+        validateBattleTutorialCell(wall?.from, `${path}.walls[${index}].from`, issues, boardSize);
+        validateBattleTutorialCell(wall?.to, `${path}.walls[${index}].to`, issues, boardSize);
+      });
+    }
+  }
+  if (step.vines !== undefined) {
+    if (!Array.isArray(step.vines)) {
+      issues.push(`${path}.vines: must be an array when present`);
+    } else {
+      step.vines.forEach((cell, index) => {
+        validateBattleTutorialCell(cell, `${path}.vines[${index}]`, issues, boardSize);
+      });
+    }
+  }
+  if (step.boxes !== undefined) {
+    if (!Array.isArray(step.boxes)) {
+      issues.push(`${path}.boxes: must be an array when present`);
+    } else {
+      step.boxes.forEach((cell, index) => {
+        validateBattleTutorialCell(cell, `${path}.boxes[${index}]`, issues, boardSize);
+      });
+    }
+  }
 }
 
 function validateBattleTutorialInventoryQuantities(quantities, path, issues, requiredItemIds) {

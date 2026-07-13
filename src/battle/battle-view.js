@@ -99,6 +99,7 @@ import {
   isBattleFieldBusyForRage as isBattleFieldBusyForRageRage,
   isBattleUltimateConvertEffect as isBattleUltimateConvertEffectRage,
   isBattleUltimateDamagePlayerByBoardItemsEffect as isBattleUltimateDamagePlayerByBoardItemsEffectRage,
+  isBattleUltimateFixedPlayerDamageEffect as isBattleUltimateFixedPlayerDamageEffectRage,
   isBattleUltimateHealingEnemyByBoardItemsEffect as isBattleUltimateHealingEnemyByBoardItemsEffectRage,
   isBattleUltimateKamikazeEffect as isBattleUltimateKamikazeEffectRage,
   isBattleUltimateRestoreEnemyShieldByBoardItemsEffect as isBattleUltimateRestoreEnemyShieldByBoardItemsEffectRage,
@@ -159,9 +160,11 @@ import {
   updateBattleShuffleButtonState as updateBattleShuffleButtonStateFlow,
 } from "./battle-shuffle-flow.js";
 import {
+  advanceBattleTutorialAfterInventoryAction,
   advanceBattleTutorialAfterMove,
   completeBattleTutorialAfterShuffle,
   guardBattleTutorialCellClick,
+  isBattleTutorialInventoryItemAllowed,
   isBattleTutorialActive,
   isBattleTutorialShuffleStep,
   prepareBattleTutorialAttemptState,
@@ -472,6 +475,7 @@ function createBattleProjectilesDeps() {
     getCurrentBattleUltimateEffects,
     isBattleUltimateConvertEffect,
     isBattleUltimateDamagePlayerByBoardItemsEffect,
+    isBattleUltimateFixedPlayerDamageEffect,
     isBattleUltimateHealingEnemyByBoardItemsEffect,
     isBattleUltimateRestoreEnemyShieldByBoardItemsEffect,
     isBattleUltimateKamikazeEffect,
@@ -546,6 +550,14 @@ function createBattleInventoryViewDeps() {
     GOLD_ITEM_ID,
     LITTLE_MENU_ITEM_ID,
     SPECIAL_ITEM_IDS,
+    advanceBattleTutorialAfterInventoryAction: (context, itemId, renderTargets) => (
+      advanceBattleTutorialAfterInventoryAction(
+        createBattleTutorialDeps(),
+        context,
+        itemId,
+        normalizeBattleRenderTargets(context, renderTargets),
+      )
+    ),
     attachBattleInventoryTooltip,
     changeInventoryQuantity,
     clearBattleGoldTargetPreview,
@@ -555,6 +567,7 @@ function createBattleInventoryViewDeps() {
     getInventoryQuantity,
     getItemDescription,
     getItemLabel,
+    isBattleTutorialInventoryItemAllowed,
     renderBattleBoard,
     resetBattleIdleTimer,
     resolveAssetPath,
@@ -1213,6 +1226,10 @@ function isBattleUltimateConvertEffect(effect) {
 
 function isBattleUltimateDamagePlayerByBoardItemsEffect(effect) {
   return isBattleUltimateDamagePlayerByBoardItemsEffectRage(effect);
+}
+
+function isBattleUltimateFixedPlayerDamageEffect(effect) {
+  return isBattleUltimateFixedPlayerDamageEffectRage(effect);
 }
 
 function isBattleUltimateHealingEnemyByBoardItemsEffect(effect) {

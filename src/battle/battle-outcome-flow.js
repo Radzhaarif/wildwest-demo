@@ -77,12 +77,22 @@ export function showBattleDefeat(deps, context, renderTargets) {
   );
   banner.classList.add("is-defeat");
 
+  const retryTutorial = context.request.tutorialRetry;
+  const isRequiredTutorialDefeat = retryTutorial?.enabled === true
+    && !context.battleState.tutorialRetryActivated;
+  if (isRequiredTutorialDefeat) {
+    const message = document.createElement("p");
+    message.textContent = deps.translate(context.request.locale, retryTutorial.defeatTextKey);
+    banner.append(message);
+  }
+
   const actions = document.createElement("div");
   actions.className = "battle-outcome-actions";
 
   const surrenderButton = document.createElement("button");
   surrenderButton.type = "button";
   surrenderButton.textContent = deps.translate(context.request.locale, "ui.surrender");
+  surrenderButton.disabled = isRequiredTutorialDefeat;
   surrenderButton.addEventListener("click", () => openBattleSurrender(deps, context, activeRenderTargets));
 
   const restartButton = document.createElement("button");
@@ -107,6 +117,9 @@ export function restartCurrentBattle(deps, context, renderTargets, banner) {
 
   deps.stopBattleRuntime(context);
   deps.cancelBattleAttempt(context);
+  context.battleTutorialUi?.layer?.remove();
+  context.battleTutorialUi = null;
+  activateBattleTutorialRetry(context);
   activeRenderTargets = deps.normalizeBattleRenderTargets(context, activeRenderTargets);
   activeRenderTargets.attemptToken = deps.startBattleAttemptLifecycle(context);
   context.battleRenderTargets = activeRenderTargets;
@@ -155,6 +168,26 @@ export function restartCurrentBattle(deps, context, renderTargets, banner) {
   );
   deps.setupBattleTutorialUi(context, activeRenderTargets);
   deps.startBattleRuntime(context, activeRenderTargets);
+}
+
+function activateBattleTutorialRetry(context) {
+  const retry = context.request.tutorialRetry;
+  const retryEnemyConfig = context.battleData.retryEnemyConfig;
+  if (
+    retry?.enabled !== true
+    || context.battleState.tutorialRetryActivated
+    || !retryEnemyConfig
+  ) {
+    return false;
+  }
+
+  context.battleState.tutorialRetryActivated = true;
+  context.battleData.enemyConfig = retryEnemyConfig;
+  context.battleData.enemyConfigUrl = context.battleData.retryEnemyConfigUrl;
+  context.battleState.enemyConfig = retryEnemyConfig;
+  context.battleState.enemyId = retryEnemyConfig.enemyId;
+  context.request.tutorial = retry.tutorial || null;
+  return true;
 }
 
 export async function showBattleOutcomeBanner(deps, overlay, title, durationMs) {

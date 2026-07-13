@@ -415,6 +415,10 @@ export function getBattleRageEffectTargetIcons(deps, context, boardElement, effe
     return getBattleUltimateDamageTargetIcons(deps, context, boardElement, effect);
   }
 
+  if (deps.isBattleUltimateFixedPlayerDamageEffect(effect)) {
+    return getBattlePlayerHealthTargetIcons(context);
+  }
+
   if (deps.isBattleUltimateHealingEnemyByBoardItemsEffect(effect)) {
     return getBattleUltimateDamageTargetIcons(deps, context, boardElement, effect);
   }

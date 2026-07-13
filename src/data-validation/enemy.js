@@ -191,6 +191,11 @@ function validateEnemyUltimateEffects(effects, path, issues, requiredItemIds) {
       return;
     }
 
+    if (isFixedPlayerDamageUltimateEffectType(effectType)) {
+      requireNumberInRange(effect.amount, `${prefix}.amount`, 0, Infinity, issues);
+      return;
+    }
+
     if (isDamagePlayerByBoardItemsUltimateEffectType(effectType)) {
       validateBoardItemCountEffect(effect, prefix, issues, requiredItemIds, "damagePlayerByBoardItems");
       return;
@@ -210,6 +215,10 @@ function validateEnemyUltimateEffects(effects, path, issues, requiredItemIds) {
       return;
     }
   });
+}
+
+function isFixedPlayerDamageUltimateEffectType(effectType) {
+  return ["damagePlayerFixed", "fixedPlayerDamage"].includes(effectType);
 }
 
 function validateBoardItemCountEffect(effect, prefix, issues, requiredItemIds, effectName) {

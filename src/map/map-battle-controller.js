@@ -99,6 +99,7 @@ export function createMapBattleController(deps) {
       source: "battle-victory",
       eventImage: result.reward.eventImage || node.payload.background,
       dialogTextKey: result.reward.dialogTextKey,
+      levelUpTutorial: node.payload.levelUpTutorial,
       onApplied: () => completeBattleNodeAfterVictory(node, result, { keepCurrentPlayerState: true, scrollToNext: false }),
     });
   }
@@ -147,6 +148,7 @@ export function createMapBattleController(deps) {
       seed: battleSeed.seed,
       seedName: battleSeed.name,
       tutorial: node.payload?.tutorial || null,
+      tutorialRetry: node.payload?.tutorialRetry || null,
     };
   }
 

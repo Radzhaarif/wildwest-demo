@@ -342,6 +342,11 @@ export function isBattleUltimateDamagePlayerByBoardItemsEffect(effect) {
   return ["damagePlayerByBoardItems", "damagePlayerByItems", "damageByBoardItems", "damagePlayer", "урон"].includes(effectType);
 }
 
+export function isBattleUltimateFixedPlayerDamageEffect(effect) {
+  const effectType = String(effect?.type || effect?.effectId || effect?.id || "").trim();
+  return ["damagePlayerFixed", "fixedPlayerDamage"].includes(effectType);
+}
+
 export function isBattleUltimateHealingEnemyByBoardItemsEffect(effect) {
   const effectType = String(effect?.type || effect?.effectId || effect?.id || "").trim();
   return [

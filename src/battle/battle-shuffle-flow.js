@@ -113,7 +113,10 @@ export async function handleManualBattleShuffle(deps, context, renderTargets) {
     return;
   }
 
-  deps.completeBattleTutorialAfterShuffle?.(context, renderTargets);
+  const tutorialCompleted = deps.completeBattleTutorialAfterShuffle?.(context, renderTargets) === true;
+  if (tutorialCompleted) {
+    deps.renderBattleInventory(renderTargets.specialItems, renderTargets.handItems, context, renderTargets);
+  }
   context.battleState.isResolving = false;
   deps.setBattleStatus(context, status, deps.translateBattleText(context, "shuffleBoardDone"));
   updateBattleShuffleButtonState(deps, context);

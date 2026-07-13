@@ -15,6 +15,13 @@ export async function loadBattleData(request, loaders = {}) {
   const enemyConfig = loaders.loadJsonc
     ? await loaders.loadJsonc(enemyConfigUrl)
     : null;
+  const retryEnemyId = request.tutorialRetry?.enabled === true
+    ? request.tutorialRetry.enemyId
+    : "";
+  const retryEnemyConfigUrl = retryEnemyId ? getEnemyConfigUrl(retryEnemyId) : "";
+  const retryEnemyConfig = retryEnemyConfigUrl && loaders.loadJsonc
+    ? await loaders.loadJsonc(retryEnemyConfigUrl)
+    : null;
   const uiConfig = loaders.loadJsonc
     ? await loadBattleUiConfig(loaders)
     : null;
@@ -22,6 +29,8 @@ export async function loadBattleData(request, loaders = {}) {
   return {
     enemyConfig,
     enemyConfigUrl,
+    retryEnemyConfig,
+    retryEnemyConfigUrl,
     itemCatalog: request.itemCatalog,
     uiConfig,
   };

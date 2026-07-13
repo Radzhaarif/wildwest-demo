@@ -11,6 +11,9 @@ const engine = await import(engineUrl);
 const formatterSource = readFileSync(resolve(rootDir, "src/battle/battle-formatters.js"), "utf8");
 const formatterUrl = `data:text/javascript;base64,${Buffer.from(formatterSource).toString("base64")}`;
 const formatters = await import(formatterUrl);
+const tutorialSource = readFileSync(resolve(rootDir, "src/battle/battle-tutorial-flow.js"), "utf8");
+const tutorialUrl = `data:text/javascript;base64,${Buffer.from(tutorialSource).toString("base64")}`;
+const tutorialFlow = await import(tutorialUrl);
 
 const itemCatalog = {
   items: [
@@ -807,6 +810,67 @@ run("ultimate damagePlayerByBoardItems damages player by matching board item cou
     { row: 1, col: 1 },
   ]);
   assert.equal(battleState.playerState.health.current, 14);
+});
+
+run("ultimate damagePlayerFixed applies configured flat damage", () => {
+  const battleState = createTestBattleState([["bullet"]]);
+
+  const summary = engine.applyBattleUltimateEffects(battleState, itemCatalog, {
+    ultimate: {
+      effects: [
+        {
+          type: "damagePlayerFixed",
+          amount: 10,
+        },
+      ],
+    },
+  });
+
+  assert.equal(summary.fixedDamage, 10);
+  assert.equal(summary.playerDamage, 10);
+  assert.equal(battleState.playerState.health.current, 90);
+});
+
+run("clock tutorial consumes one item without restoring it on the next step", () => {
+  const context = {
+    request: {
+      locale: "en",
+      tutorial: {
+        enabled: true,
+        playerInventoryQuantities: { item_time: 5 },
+        steps: [
+          { id: "clock", action: "clock", requiredItemId: "item_time", textKey: "clock" },
+          { id: "swap", action: "swap", textKey: "swap", board: [["Knife"]] },
+        ],
+      },
+    },
+    battleState: {
+      board: [["bullet"]],
+      playerState: { inventory: [{ itemId: "item_time", quantity: 0 }] },
+      enemyState: {},
+    },
+  };
+  const deps = {
+    renderBattleBoard() {},
+    renderBattleInventory() {},
+    renderBattleStats() {},
+    setBattleStatus() {},
+    translate(_locale, key) { return key; },
+  };
+
+  tutorialFlow.prepareBattleTutorialAttemptState(context);
+  assert.equal(context.battleState.playerState.inventory[0].quantity, 5);
+  context.battleState.playerState.inventory[0].quantity -= 1;
+  const result = tutorialFlow.advanceBattleTutorialAfterInventoryAction(
+    deps,
+    context,
+    "item_time",
+    {},
+  );
+
+  assert.equal(result.advanced, true);
+  assert.equal(context.battleState.tutorial.stepIndex, 1);
+  assert.equal(context.battleState.playerState.inventory[0].quantity, 4);
 });
 
 run("ultimate HealingEnemyByBoardItems heals enemy by matching item type count", () => {

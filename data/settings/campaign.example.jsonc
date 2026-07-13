@@ -25,7 +25,8 @@
     "onComplete": {
       "type": "victory",
       "titleTextKey": "tutorial.complete.title",
-      "messageTextKey": "tutorial.complete.message"
+      "messageTextKey": "tutorial.complete.message",
+      "returnToMainMenu": true
     }
   },
   // Список всех карт, которые входят в кампанию.

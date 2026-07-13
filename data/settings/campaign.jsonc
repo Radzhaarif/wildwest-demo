@@ -16,7 +16,8 @@
     "onComplete": {
       "type": "victory",
       "titleTextKey": "tutorial.complete.title",
-      "messageTextKey": "tutorial.complete.message"
+      "messageTextKey": "tutorial.complete.message",
+      "returnToMainMenu": true
     }
   },
   "maps": [

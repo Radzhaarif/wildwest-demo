@@ -43,6 +43,10 @@ export async function resolveBattleCascades(deps, board, context, renderTargets)
     }
 
     const matchCells = context.engine.collectBattleMatchCells(matches);
+    const matchedCellKeys = new Set(matchCells.map((cell) => `${cell.row}:${cell.col}`));
+    context.battleState.vines = context.battleState.vines.filter(
+      (vine) => !matchedCellKeys.has(`${vine.row}:${vine.col}`),
+    );
     await animateBattleShakeCells(boardElement, matchCells, deps.getBattleAnimationConfig(context).matchShakeMs);
     if (!deps.shouldContinueBattle(context, renderTargets)) {
       return makeResult(true);
