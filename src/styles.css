@@ -357,6 +357,20 @@ select {
     linear-gradient(0deg, rgba(12, 8, 5, 0.42), transparent 35%);
 }
 
+.main-menu-version {
+  position: absolute;
+  top: clamp(14px, 2vw, 28px);
+  right: clamp(16px, 2.4vw, 36px);
+  z-index: 1;
+  color: rgba(255, 244, 223, 0.72);
+  font-size: clamp(12px, 1.2vw, 18px);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  user-select: none;
+}
+
 .main-menu-frame {
   position: absolute;
   top: 50%;
