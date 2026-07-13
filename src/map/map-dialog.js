@@ -88,9 +88,33 @@ export function createMapDialogController(deps) {
       if (answer.end === true) {
         button.dataset.dialogEnd = "true";
       }
-      button.addEventListener("click", () => handleMapDialogAnswer(answer));
+      button.addEventListener("click", (event) => {
+        // Ответ сам меняет шаг. Не даём тому же клику всплыть до сцены и
+        // мгновенно раскрыть текст уже следующей реплики.
+        event.stopPropagation();
+        void handleMapDialogAnswer(answer);
+      });
       elements.mapDialogAnswers.append(button);
     }
+  }
+
+  function advanceMapDialogOnClick() {
+    if (!state.activeDialogNode) {
+      return false;
+    }
+    if (state.isDialogTextTyping) {
+      completeMapDialogTextTyping();
+      return true;
+    }
+
+    const step = getDialogStep(state.activeDialogNode.payload, state.activeDialogStepId);
+    const answers = Array.isArray(step?.answers) ? step.answers : [];
+    if (answers.length !== 1) {
+      return false;
+    }
+
+    void handleMapDialogAnswer(answers[0]);
+    return true;
   }
 
   function startMapDialogTextTyping(text) {
@@ -253,6 +277,7 @@ export function createMapDialogController(deps) {
 
   return {
     openMapDialogEvent,
+    advanceMapDialogOnClick,
     completeMapDialogTextTyping,
     closeMapDialogOverlay,
     finishMapDialogNode,

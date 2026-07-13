@@ -222,6 +222,9 @@ export function createMapShopHealController(deps) {
     if (isSelected) {
       card.classList.add("selected");
     }
+    const tutorial = getShopTutorial();
+    const isRequiredTutorialOffer = tutorial?.requiredItemIds?.includes(item.itemId) === true;
+    const showTutorialSelectArrow = isRequiredTutorialOffer && !isSelected && !isInventoryLimitBlocked;
     const image = document.createElement("img");
     image.src = getItemImagePath(item.itemId);
     image.alt = getItemName(item.itemId);
@@ -247,6 +250,7 @@ export function createMapShopHealController(deps) {
       : isSelected
         ? translate("ui.selected")
         : translate("ui.select");
+    toggle.classList.toggle("shop-select-button--tutorial-required", showTutorialSelectArrow);
     toggle.addEventListener("click", () => toggleShopOffer(item));
 
     controls.append(toggle);
@@ -282,8 +286,13 @@ export function createMapShopHealController(deps) {
 
   function updateShopBuyButton() {
     const total = getShopSelectionTotal();
-    elements.shopBuyButton.disabled = total <= 0 || !isShopTutorialSelectionComplete();
+    const isTutorialSelectionComplete = isShopTutorialSelectionComplete();
+    elements.shopBuyButton.disabled = total <= 0 || !isTutorialSelectionComplete;
     elements.shopLeaveButton.disabled = isShopTutorialActive();
+    elements.shopBuyButton.classList.toggle(
+      "shop-buy-button--tutorial-required",
+      isShopTutorialActive() && total > 0 && isTutorialSelectionComplete,
+    );
     elements.shopBuyButton.textContent =
       total > 0
         ? `${translate("ui.purchase")} (${total} ${getItemName("gold")})`
@@ -309,6 +318,7 @@ export function createMapShopHealController(deps) {
       "ui.purchase.question",
     )} ${total} ${getItemName("gold")}`;
     elements.shopConfirm.classList.remove("hidden");
+    elements.shopBuyButton.classList.remove("shop-buy-button--tutorial-required");
     elements.shopConfirmNoButton.disabled = false;
   }
 
@@ -318,6 +328,9 @@ export function createMapShopHealController(deps) {
     }
     elements.shopConfirm.classList.add("hidden");
     elements.shopConfirmNoButton.disabled = false;
+    if (state.activeShopNode) {
+      updateShopBuyButton();
+    }
   }
 
   function showShopError(message) {

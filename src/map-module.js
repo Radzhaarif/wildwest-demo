@@ -146,6 +146,11 @@ const elements = {
   soundVolumeInput: document.querySelector("#soundVolumeInput"),
   settingsLanguageLabel: document.querySelector("#settingsLanguageLabel"),
   settingsLanguageSelect: document.querySelector("#settingsLanguageSelect"),
+  settingsControlSchemeLabel: document.querySelector("#settingsControlSchemeLabel"),
+  settingsControlSchemeSelect: document.querySelector("#settingsControlSchemeSelect"),
+  settingsControlSchemeSwipeOption: document.querySelector("#settingsControlSchemeSwipeOption"),
+  settingsControlSchemeClickOption: document.querySelector("#settingsControlSchemeClickOption"),
+  settingsControlSchemeBothOption: document.querySelector("#settingsControlSchemeBothOption"),
   resetSettingsButton: document.querySelector("#resetSettingsButton"),
   backSettingsButton: document.querySelector("#backSettingsButton"),
   campaignStatus: document.querySelector("#campaignStatus"),
@@ -474,6 +479,7 @@ const {
   resetSettings,
   setMusicVolume,
   setSoundVolume,
+  setControlScheme,
   getLocaleUrl,
 } = mapSettings;
 
@@ -711,6 +717,11 @@ elements.soundVolumeInput.addEventListener("input", (event) => {
   setSoundVolume(event.target.value);
 });
 
+elements.settingsControlSchemeSelect.addEventListener("change", (event) => {
+  playClickSound();
+  setControlScheme(event.target.value);
+});
+
 elements.startGameButton.addEventListener("click", async () => {
   await startGame();
 });
@@ -770,12 +781,12 @@ elements.healLeaveButton.addEventListener("click", () => {
 });
 elements.rewardClaimButton.addEventListener("click", mapRewards.handleRewardClaim);
 elements.mapDialogOverlay.addEventListener("click", (event) => {
-  if (!state.isDialogTextTyping) {
+  if (event.target.closest?.(".map-dialog-answers button")) {
     return;
   }
   event.preventDefault();
   event.stopPropagation();
-  mapDialog.completeMapDialogTextTyping();
+  mapDialog.advanceMapDialogOnClick();
 });
 
 initDragScroll(elements.mapViewport);

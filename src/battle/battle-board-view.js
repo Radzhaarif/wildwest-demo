@@ -1,5 +1,9 @@
 import { getBattleWallKey } from "./battle-animations.js";
 
+const BATTLE_SWIPE_MIN_DISTANCE_PX = 10;
+const BATTLE_SWIPE_CELL_DISTANCE_RATIO = 0.22;
+const DEFAULT_BATTLE_CONTROL_SCHEME = "swipe-and-click";
+
 export function renderBattleBoard(
   deps,
   boardElement,
@@ -43,6 +47,7 @@ export function renderBattleBoard(
         const icon = document.createElement("img");
         icon.src = deps.resolveAssetPath(item.icon);
         icon.alt = "";
+        icon.draggable = false;
         iconWrap.append(icon);
       } else {
         iconWrap.textContent = itemId || "?";
@@ -58,28 +63,110 @@ export function renderBattleBoard(
         });
       }
 
-      cell.addEventListener("click", async () => {
-        const lifecycleToken = context.battleRenderTargets?.lifecycleToken;
-        const attemptToken = context.battleRenderTargets?.attemptToken;
-        await deps.handleBattleCellClick(context, cellPosition, {
+      const swipeState = {
+        pointerId: null,
+        startX: 0,
+        startY: 0,
+        suppressClick: false,
+      };
+
+      cell.addEventListener("pointerdown", (event) => {
+        if (!canTrackBattleCellPointer(context, event)) {
+          return;
+        }
+        swipeState.pointerId = event.pointerId;
+        swipeState.startX = event.clientX;
+        swipeState.startY = event.clientY;
+        try {
+          cell.setPointerCapture?.(event.pointerId);
+        } catch {
+          // Synthetic events and older pointer implementations may not expose an active pointer to capture.
+        }
+      });
+
+      cell.addEventListener("pointermove", (event) => {
+        if (swipeState.pointerId !== event.pointerId) {
+          return;
+        }
+        const targetCell = getBattleSwipeTarget(
+          cellPosition,
+          event.clientX - swipeState.startX,
+          event.clientY - swipeState.startY,
+          context.battleState.board,
+          getBattleSwipeThreshold(cell),
+        );
+        if (isBattleSwipeEnabled(context)) {
+          updateBattleSwipePreview(boardElement, cellPosition, targetCell);
+        } else {
+          clearBattleSwipePreview(boardElement);
+        }
+        if (targetCell) {
+          event.preventDefault();
+        }
+      });
+
+      cell.addEventListener("pointerup", async (event) => {
+        if (swipeState.pointerId !== event.pointerId) {
+          return;
+        }
+        const targetCell = getBattleSwipeTarget(
+          cellPosition,
+          event.clientX - swipeState.startX,
+          event.clientY - swipeState.startY,
+          context.battleState.board,
+          getBattleSwipeThreshold(cell),
+        );
+        finishBattleCellPointerGesture(cell, boardElement, swipeState, event.pointerId);
+        if (!targetCell) {
+          return;
+        }
+        suppressBattleCellClickOnce(swipeState);
+        event.preventDefault();
+        if (!isBattleSwipeEnabled(context)) {
+          return;
+        }
+        await handleBattleCellSwipe(
+          deps,
+          context,
+          cellPosition,
+          targetCell,
           boardElement,
           statusElement,
           enemyStatsElement,
           playerMetersElement,
           ultimateTextElement,
-          overlay: context.battleRenderTargets?.overlay,
-          resolve: context.battleRenderTargets?.resolve,
-          lifecycleToken,
-          attemptToken,
-        });
-        if (!deps.isBattleLifecycleActive(context, lifecycleToken) || !deps.isBattleAttemptActive(context, attemptToken)) {
+        );
+      });
+
+      cell.addEventListener("pointercancel", (event) => {
+        if (swipeState.pointerId === event.pointerId) {
+          finishBattleCellPointerGesture(cell, boardElement, swipeState, event.pointerId);
+        }
+      });
+
+      cell.addEventListener("lostpointercapture", (event) => {
+        if (swipeState.pointerId === event.pointerId) {
+          finishBattleCellPointerGesture(cell, boardElement, swipeState, event.pointerId);
+        }
+      });
+
+      cell.addEventListener("click", async (event) => {
+        if (swipeState.suppressClick) {
+          swipeState.suppressClick = false;
+          event.preventDefault();
+          event.stopPropagation();
           return;
         }
-        deps.renderBattleStats(enemyStatsElement, playerMetersElement, ultimateTextElement, context);
-        renderBattleBoard(
+        if (!isBattleClickEnabled(context)) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
+        await handleBattleCellClick(
           deps,
-          boardElement,
           context,
+          cellPosition,
+          boardElement,
           statusElement,
           enemyStatsElement,
           playerMetersElement,
@@ -95,6 +182,215 @@ export function renderBattleBoard(
   renderBattleBoxes(deps, boardElement, context);
   renderBattleVines(deps, boardElement, context);
   deps.refreshBattleTutorialUi?.(context, context.battleRenderTargets || {});
+}
+
+export function getBattleSwipeTarget(fromCell, deltaX, deltaY, board, thresholdPx = BATTLE_SWIPE_MIN_DISTANCE_PX) {
+  const horizontalDistance = Math.abs(Number(deltaX) || 0);
+  const verticalDistance = Math.abs(Number(deltaY) || 0);
+  const requiredDistance = Math.max(BATTLE_SWIPE_MIN_DISTANCE_PX, Number(thresholdPx) || 0);
+  if (Math.max(horizontalDistance, verticalDistance) < requiredDistance) {
+    return null;
+  }
+
+  const rowDelta = verticalDistance > horizontalDistance ? Math.sign(deltaY) : 0;
+  const colDelta = horizontalDistance >= verticalDistance ? Math.sign(deltaX) : 0;
+  const target = {
+    row: Number(fromCell?.row) + rowDelta,
+    col: Number(fromCell?.col) + colDelta,
+  };
+  const boardHeight = Array.isArray(board) ? board.length : 0;
+  const boardWidth = Array.isArray(board?.[0]) ? board[0].length : 0;
+  if (target.row < 0 || target.row >= boardHeight || target.col < 0 || target.col >= boardWidth) {
+    return null;
+  }
+  return target;
+}
+
+function canTrackBattleCellPointer(context, event) {
+  return !context.battleState.isResolving
+    && !context.battleState.activeSpecialItemId
+    && event.isPrimary !== false
+    && (event.pointerType !== "mouse" || event.button === 0);
+}
+
+function isBattleSwipeEnabled(context) {
+  return getBattleControlScheme(context) !== "click";
+}
+
+function isBattleClickEnabled(context) {
+  return Boolean(context.battleState.activeSpecialItemId)
+    || getBattleControlScheme(context) !== "swipe";
+}
+
+function getBattleControlScheme(context) {
+  const scheme = context.request?.settings?.controlScheme;
+  return ["swipe", "click", DEFAULT_BATTLE_CONTROL_SCHEME].includes(scheme)
+    ? scheme
+    : DEFAULT_BATTLE_CONTROL_SCHEME;
+}
+
+function getBattleSwipeThreshold(cell) {
+  const rect = cell.getBoundingClientRect();
+  return Math.max(
+    BATTLE_SWIPE_MIN_DISTANCE_PX,
+    Math.min(rect.width, rect.height) * BATTLE_SWIPE_CELL_DISTANCE_RATIO,
+  );
+}
+
+function updateBattleSwipePreview(boardElement, fromCell, targetCell) {
+  clearBattleSwipePreview(boardElement);
+  if (!targetCell) {
+    return;
+  }
+  getBattleBoardCellElement(boardElement, fromCell)?.classList.add("is-swipe-source");
+  getBattleBoardCellElement(boardElement, targetCell)?.classList.add("is-swipe-target");
+}
+
+function clearBattleSwipePreview(boardElement) {
+  for (const cell of boardElement.querySelectorAll(".battle-scaffold-cell.is-swipe-source, .battle-scaffold-cell.is-swipe-target")) {
+    cell.classList.remove("is-swipe-source", "is-swipe-target");
+  }
+}
+
+function getBattleBoardCellElement(boardElement, cell) {
+  return boardElement.querySelector(
+    `.battle-scaffold-cell[data-row="${Number(cell.row)}"][data-col="${Number(cell.col)}"]`,
+  );
+}
+
+function finishBattleCellPointerGesture(cell, boardElement, swipeState, pointerId) {
+  if (cell.hasPointerCapture?.(pointerId)) {
+    cell.releasePointerCapture(pointerId);
+  }
+  swipeState.pointerId = null;
+  clearBattleSwipePreview(boardElement);
+}
+
+function suppressBattleCellClickOnce(swipeState) {
+  swipeState.suppressClick = true;
+  setTimeout(() => {
+    swipeState.suppressClick = false;
+  }, 0);
+}
+
+async function handleBattleCellClick(
+  deps,
+  context,
+  cellPosition,
+  boardElement,
+  statusElement,
+  enemyStatsElement,
+  playerMetersElement,
+  ultimateTextElement,
+) {
+  const renderTargets = createBattleCellRenderTargets(
+    context,
+    boardElement,
+    statusElement,
+    enemyStatsElement,
+    playerMetersElement,
+    ultimateTextElement,
+  );
+  await deps.handleBattleCellClick(context, cellPosition, renderTargets);
+  renderBattleBoardAfterInput(
+    deps,
+    context,
+    renderTargets,
+    boardElement,
+    statusElement,
+    enemyStatsElement,
+    playerMetersElement,
+    ultimateTextElement,
+  );
+}
+
+async function handleBattleCellSwipe(
+  deps,
+  context,
+  fromCell,
+  toCell,
+  boardElement,
+  statusElement,
+  enemyStatsElement,
+  playerMetersElement,
+  ultimateTextElement,
+) {
+  const renderTargets = createBattleCellRenderTargets(
+    context,
+    boardElement,
+    statusElement,
+    enemyStatsElement,
+    playerMetersElement,
+    ultimateTextElement,
+  );
+  context.battleState.selectedCell = null;
+  await deps.handleBattleCellClick(context, fromCell, renderTargets);
+  if (
+    deps.isBattleLifecycleActive(context, renderTargets.lifecycleToken)
+    && deps.isBattleAttemptActive(context, renderTargets.attemptToken)
+    && deps.isSameCell(context.battleState.selectedCell, fromCell)
+  ) {
+    await deps.handleBattleCellClick(context, toCell, renderTargets);
+  }
+  renderBattleBoardAfterInput(
+    deps,
+    context,
+    renderTargets,
+    boardElement,
+    statusElement,
+    enemyStatsElement,
+    playerMetersElement,
+    ultimateTextElement,
+  );
+}
+
+function createBattleCellRenderTargets(
+  context,
+  boardElement,
+  statusElement,
+  enemyStatsElement,
+  playerMetersElement,
+  ultimateTextElement,
+) {
+  return {
+    boardElement,
+    statusElement,
+    enemyStatsElement,
+    playerMetersElement,
+    ultimateTextElement,
+    overlay: context.battleRenderTargets?.overlay,
+    resolve: context.battleRenderTargets?.resolve,
+    lifecycleToken: context.battleRenderTargets?.lifecycleToken,
+    attemptToken: context.battleRenderTargets?.attemptToken,
+  };
+}
+
+function renderBattleBoardAfterInput(
+  deps,
+  context,
+  renderTargets,
+  boardElement,
+  statusElement,
+  enemyStatsElement,
+  playerMetersElement,
+  ultimateTextElement,
+) {
+  if (
+    !deps.isBattleLifecycleActive(context, renderTargets.lifecycleToken)
+    || !deps.isBattleAttemptActive(context, renderTargets.attemptToken)
+  ) {
+    return;
+  }
+  deps.renderBattleStats(enemyStatsElement, playerMetersElement, ultimateTextElement, context);
+  renderBattleBoard(
+    deps,
+    boardElement,
+    context,
+    statusElement,
+    enemyStatsElement,
+    playerMetersElement,
+    ultimateTextElement,
+  );
 }
 
 export function renderBattleWalls(deps, boardElement, context) {

@@ -14,6 +14,7 @@ const formatters = await import(formatterUrl);
 const tutorialSource = readFileSync(resolve(rootDir, "src/battle/battle-tutorial-flow.js"), "utf8");
 const tutorialUrl = `data:text/javascript;base64,${Buffer.from(tutorialSource).toString("base64")}`;
 const tutorialFlow = await import(tutorialUrl);
+const boardView = await import("../src/battle/battle-board-view.js");
 
 const itemCatalog = {
   items: [
@@ -52,6 +53,17 @@ const itemCatalog = {
     { itemId: "gold", category: "currency" },
   ],
 };
+
+run("battle swipe target uses the dominant axis and only adjacent cells", () => {
+  const board = Array.from({ length: 3 }, () => Array(3).fill("bullet"));
+
+  assert.equal(boardView.getBattleSwipeTarget({ row: 1, col: 1 }, 9, 0, board, 10), null);
+  assert.deepEqual(boardView.getBattleSwipeTarget({ row: 1, col: 1 }, 30, 4, board, 10), { row: 1, col: 2 });
+  assert.deepEqual(boardView.getBattleSwipeTarget({ row: 1, col: 1 }, -30, 4, board, 10), { row: 1, col: 0 });
+  assert.deepEqual(boardView.getBattleSwipeTarget({ row: 1, col: 1 }, 4, 30, board, 10), { row: 2, col: 1 });
+  assert.deepEqual(boardView.getBattleSwipeTarget({ row: 1, col: 1 }, 4, -30, board, 10), { row: 0, col: 1 });
+  assert.equal(boardView.getBattleSwipeTarget({ row: 0, col: 0 }, -30, 0, board, 10), null);
+});
 
 run("formatBattleNumber hides floating point tails and floors to tenths", () => {
   assert.equal(formatters.formatBattleNumber(56.199999999999996), "56.2");
@@ -871,6 +883,43 @@ run("clock tutorial consumes one item without restoring it on the next step", ()
   assert.equal(result.advanced, true);
   assert.equal(context.battleState.tutorial.stepIndex, 1);
   assert.equal(context.battleState.playerState.inventory[0].quantity, 4);
+});
+
+run("gold tutorial replacement is deterministic only on its configured target", () => {
+  const context = {
+    request: {
+      tutorial: {
+        enabled: true,
+        steps: [{
+          id: "gold",
+          action: "gold",
+          textKey: "gold",
+          requiredItemId: "gold",
+          replacementItemId: "Bandage",
+          to: { row: 2, col: 3 },
+        }],
+      },
+    },
+    battleState: {
+      tutorial: { active: true, completed: false, stepIndex: 0 },
+    },
+  };
+
+  assert.equal(
+    tutorialFlow.getBattleTutorialGoldReplacementItemId(context, { row: 2, col: 3 }),
+    "Bandage",
+  );
+  assert.equal(
+    tutorialFlow.getBattleTutorialGoldReplacementItemId(context, { row: 2, col: 4 }),
+    null,
+  );
+  assert.equal(tutorialFlow.shouldStopBattleTutorialCascades(context, 0), false);
+  assert.equal(tutorialFlow.shouldStopBattleTutorialCascades(context, 1), true);
+  context.battleState.tutorial.active = false;
+  assert.equal(
+    tutorialFlow.getBattleTutorialGoldReplacementItemId(context, { row: 2, col: 3 }),
+    null,
+  );
 });
 
 run("ultimate HealingEnemyByBoardItems heals enemy by matching item type count", () => {

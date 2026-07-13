@@ -2,6 +2,7 @@
   "musicVolume": 0.5,
   "soundVolume": 1,
   "language": "en",
+  "controlScheme": "swipe-and-click",
   "languages": ["en", "ru", "new_ru"],
   "rewardAnimationMs": {
     "clearMs": 1000,

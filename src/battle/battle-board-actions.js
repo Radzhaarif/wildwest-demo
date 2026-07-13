@@ -51,11 +51,13 @@ export async function handleGoldBoardClick(deps, context, cell, renderTargets) {
     return;
   }
 
-  const nextItemId = context.engine.pickBattleGoldLootItem(context.request.itemCatalog, {
-    sourceItemId: itemId,
-    playerState: context.battleState.playerState,
-    random: deps.getBattleRandom(context),
-  });
+  const tutorialReplacementItemId = deps.getBattleTutorialGoldReplacementItemId?.(context, cell);
+  const nextItemId = tutorialReplacementItemId
+    || context.engine.pickBattleGoldLootItem(context.request.itemCatalog, {
+      sourceItemId: itemId,
+      playerState: context.battleState.playerState,
+      random: deps.getBattleRandom(context),
+    });
   if (!nextItemId) {
     await deps.animateBattleShakeCells(boardElement, [cell], deps.getBattleAnimationConfig(context).invalidShakeMs);
     if (deps.shouldContinueBattle(context, renderTargets)) {

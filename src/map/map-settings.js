@@ -69,7 +69,7 @@ export function createMapSettingsController(deps) {
   function mergeSettings(settings) {
     // Глубоко объединяем вложенные настройки: иначе добавление нового звука или
     // параметра анимации в default-settings.json могло бы потеряться из-за старых сохраненных настроек.
-    return {
+    const mergedSettings = {
       ...structuredClone(state.defaultSettings),
       ...structuredClone(settings),
       audio: {
@@ -82,6 +82,8 @@ export function createMapSettingsController(deps) {
       },
       languages: settings.languages || state.defaultSettings.languages || ["en"],
     };
+    mergedSettings.controlScheme = normalizeControlScheme(mergedSettings.controlScheme);
+    return mergedSettings;
   }
 
   function loadStoredSettings() {
@@ -127,6 +129,12 @@ export function createMapSettingsController(deps) {
     saveSettings();
   }
 
+  function setControlScheme(value) {
+    state.settings.controlScheme = normalizeControlScheme(value);
+    elements.settingsControlSchemeSelect.value = state.settings.controlScheme;
+    saveSettings();
+  }
+
   function applyVisualSettings() {
     const iconSize = Number(state.settings?.inlineItemIconEm);
     const safeIconSize = Number.isFinite(iconSize) && iconSize > 0 ? iconSize : 2.1;
@@ -143,6 +151,12 @@ export function createMapSettingsController(deps) {
     return `${dataRoot}/locales/${language}.json`;
   }
 
+  function normalizeControlScheme(value) {
+    return ["swipe", "click", "swipe-and-click"].includes(value)
+      ? value
+      : "swipe-and-click";
+  }
+
   return {
     setLanguage,
     addLanguageChangeListener,
@@ -151,6 +165,7 @@ export function createMapSettingsController(deps) {
     saveSettings,
     setMusicVolume,
     setSoundVolume,
+    setControlScheme,
     applyVisualSettings,
     getLocaleUrl,
   };

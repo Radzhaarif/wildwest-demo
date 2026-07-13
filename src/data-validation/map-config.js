@@ -528,6 +528,9 @@ function validateBattleTutorialConfig(tutorial, path, issues, requiredItemIds) {
       }
     } else if (step.action === "blockedVine") {
       validateBattleTutorialCell(step.from, `${stepPath}.from`, issues, boardSize);
+      if (step.to !== undefined) {
+        validateBattleTutorialCell(step.to, `${stepPath}.to`, issues, boardSize);
+      }
     } else if (step.action === "skull" || step.action === "gold") {
       validateBattleTutorialCell(step.to, `${stepPath}.to`, issues, boardSize);
     }
@@ -537,6 +540,11 @@ function validateBattleTutorialConfig(tutorial, path, issues, requiredItemIds) {
     if (["freeSwap", "skull", "gold", "clock"].includes(step.action)) {
       if (requireString(step.requiredItemId, `${stepPath}.requiredItemId`, issues)) {
         requiredItemIds.add(step.requiredItemId);
+      }
+    }
+    if (step.action === "gold" && step.replacementItemId !== undefined) {
+      if (requireString(step.replacementItemId, `${stepPath}.replacementItemId`, issues)) {
+        requiredItemIds.add(step.replacementItemId);
       }
     }
   });

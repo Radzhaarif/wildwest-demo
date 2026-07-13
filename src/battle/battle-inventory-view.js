@@ -233,6 +233,7 @@ function createInventorySlot(deps, context, itemId, options = {}) {
   const clockCooldownSeconds = isClock ? getClockCooldownState(context).seconds : 0;
   const isActiveSpecial = activeSpecialItemId === itemId;
   const isBattleActiveItem = deps.ACTIVE_BATTLE_ITEM_IDS.includes(itemId);
+  const isTutorialRequired = deps.isBattleTutorialInventoryItemRequired?.(context, itemId) === true;
   const isTutorialUnavailable = (isBattleActiveItem || itemId === deps.GOLD_ITEM_ID)
     && !deps.isBattleTutorialInventoryItemAllowed(context, itemId);
   const isBlockedByOtherSpecial = Boolean(activeSpecialItemId && activeSpecialItemId !== itemId && isBattleActiveItem);
@@ -246,6 +247,10 @@ function createInventorySlot(deps, context, itemId, options = {}) {
 
   if (isActiveSpecial) {
     slot.classList.add("is-active");
+  }
+
+  if (isTutorialRequired && !isActiveSpecial) {
+    slot.classList.add("is-tutorial-required");
   }
 
   if (isClockUnavailable || isSpecialUnavailable || isTutorialUnavailable) {
@@ -346,11 +351,12 @@ function handleToggleActiveSpecial(deps, context, itemId, slot, renderTargets) {
   deps.resetBattleIdleTimer(context, renderTargets);
   const uiConfig = deps.getBattleUiConfig(context);
   const activeItemId = context.battleState.activeSpecialItemId;
+  const shouldRerenderTutorialBoard = deps.isBattleTutorialInventoryItemRequired?.(context, itemId) === true;
 
   if (activeItemId === itemId) {
     deps.changeInventoryQuantity(context.battleState.playerState, itemId, 1);
     clearActiveBattleSpecial(deps, context);
-    rerenderBattleAfterInventoryAction(deps, context, renderTargets);
+    rerenderBattleAfterInventoryAction(deps, context, renderTargets, { board: shouldRerenderTutorialBoard });
     return;
   }
 
@@ -367,7 +373,7 @@ function handleToggleActiveSpecial(deps, context, itemId, slot, renderTargets) {
   context.battleState.activeSpecialItemId = itemId;
   context.battleState.specialSwapCell = null;
   renderActiveBattleSpecialCursor(deps, context);
-  rerenderBattleAfterInventoryAction(deps, context, renderTargets);
+  rerenderBattleAfterInventoryAction(deps, context, renderTargets, { board: shouldRerenderTutorialBoard });
 }
 
 function handleClockClick(deps, context, slot, renderTargets) {

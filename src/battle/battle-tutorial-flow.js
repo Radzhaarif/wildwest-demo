@@ -2,6 +2,8 @@ const TUTORIAL_CELL_CLASS_NAMES = [
   "is-tutorial-match-cell",
   "is-tutorial-source-cell",
   "is-tutorial-target-cell",
+  "is-tutorial-active-item-target",
+  "is-tutorial-obstacle-target",
 ];
 
 export function isBattleTutorialActive(context) {
@@ -17,8 +19,8 @@ export function shouldStopBattleTutorialCascades(context, resolvedCascades = 0) 
   if (!step || !isBattleTutorialActive(context)) {
     return false;
   }
-  return ["battery", "skull", "gold"].includes(step.action)
-    || (["swap", "freeSwap"].includes(step.action) && resolvedCascades >= 1);
+  return ["battery", "skull"].includes(step.action)
+    || (["swap", "freeSwap", "gold"].includes(step.action) && resolvedCascades >= 1);
 }
 
 export function prepareBattleTutorialAttemptState(context) {
@@ -148,7 +150,18 @@ export function refreshBattleTutorialUi(deps, context, renderTargets = {}) {
   }
   markBattleTutorialCell(boardElement, step.from, "is-tutorial-source-cell");
   markBattleTutorialCell(boardElement, step.to, "is-tutorial-target-cell");
-  renderBattleTutorialArrow(boardElement, step.from, step.to);
+  const activeItemTarget = getBattleTutorialActiveItemTarget(context, step);
+  if (activeItemTarget) {
+    markBattleTutorialCell(boardElement, activeItemTarget, "is-tutorial-active-item-target");
+    renderBattleTutorialCellArrow(boardElement, activeItemTarget);
+  } else if (step.action === "blockedVine" && step.to) {
+    renderBattleTutorialArrow(boardElement, step.from, step.to);
+  } else if (step.action === "blockedVine") {
+    markBattleTutorialCell(boardElement, step.from, "is-tutorial-obstacle-target");
+    renderBattleTutorialCellArrow(boardElement, step.from);
+  } else if (!step.requiredItemId) {
+    renderBattleTutorialArrow(boardElement, step.from, step.to);
+  }
 }
 
 export async function guardBattleTutorialCellClick(deps, context, cell, renderTargets) {
@@ -166,8 +179,9 @@ export async function guardBattleTutorialCellClick(deps, context, cell, renderTa
   }
   if (step.action === "blockedVine") {
     return handleBlockedTutorialAttempt(deps, context, cell, renderTargets, {
-      requiresTarget: false,
-      animationCells: [step.from],
+      requiresTarget: Boolean(step.to),
+      selectBlockedSource: Boolean(step.to),
+      animationCells: [step.from, step.to],
     });
   }
 
@@ -218,6 +232,30 @@ export function isBattleTutorialInventoryItemAllowed(context, itemId) {
     return true;
   }
   return Boolean(step.requiredItemId && step.requiredItemId === itemId);
+}
+
+export function isBattleTutorialInventoryItemRequired(context, itemId) {
+  const step = getCurrentBattleTutorialStep(context);
+  return Boolean(
+    step
+    && isBattleTutorialActive(context)
+    && step.requiredItemId
+    && step.requiredItemId === itemId
+  );
+}
+
+export function getBattleTutorialGoldReplacementItemId(context, cell) {
+  const step = getCurrentBattleTutorialStep(context);
+  if (
+    !step
+    || !isBattleTutorialActive(context)
+    || step.action !== "gold"
+    || !isSameCell(cell, step.to)
+    || typeof step.replacementItemId !== "string"
+  ) {
+    return null;
+  }
+  return step.replacementItemId.trim() || null;
 }
 
 export function advanceBattleTutorialAfterMove(deps, context, renderTargets = {}) {
@@ -396,6 +434,11 @@ async function handleBlockedTutorialAttempt(deps, context, cell, renderTargets, 
   const step = getCurrentBattleTutorialStep(context);
   const selectedCell = context.battleState.selectedCell;
   if (options.requiresTarget && !selectedCell && isSameCell(cell, step.from)) {
+    if (options.selectBlockedSource) {
+      context.battleState.selectedCell = cell;
+      renderBattleTutorialBoard(deps, context, renderTargets);
+      return true;
+    }
     return false;
   }
   const isExpectedAttempt = options.requiresTarget
@@ -427,6 +470,7 @@ async function handleBlockedTutorialAttempt(deps, context, cell, renderTargets, 
   tutorialState.attemptCount = (tutorialState.attemptCount || 0) + 1;
   const requiredAttempts = Math.max(1, Number(step.requiredAttempts) || 1);
   if (tutorialState.attemptCount < requiredAttempts) {
+    renderBattleTutorialBoard(deps, context, renderTargets);
     deps.setBattleStatus(
       context,
       renderTargets.statusElement || renderTargets.status || context.battleRenderTargets?.status,
@@ -440,6 +484,18 @@ async function handleBlockedTutorialAttempt(deps, context, cell, renderTargets, 
   return true;
 }
 
+function renderBattleTutorialBoard(deps, context, renderTargets) {
+  const activeTargets = context.battleRenderTargets || renderTargets;
+  deps.renderBattleBoard(
+    activeTargets.boardElement,
+    context,
+    activeTargets.statusElement || activeTargets.status,
+    activeTargets.enemyStats,
+    activeTargets.playerMeters,
+    activeTargets.ultimateText,
+  );
+}
+
 function clearBattleTutorialBoardGuide(boardElement) {
   if (!boardElement) {
     return;
@@ -450,7 +506,7 @@ function clearBattleTutorialBoardGuide(boardElement) {
       element.removeAttribute("aria-disabled");
     }
   }
-  for (const arrow of boardElement.querySelectorAll(".battle-tutorial-arrow")) {
+  for (const arrow of boardElement.querySelectorAll(".battle-tutorial-arrow, .battle-tutorial-cell-arrow")) {
     arrow.remove();
   }
 }
@@ -485,6 +541,19 @@ function markBattleTutorialCell(boardElement, cell, className) {
   }
 }
 
+function getBattleTutorialActiveItemTarget(context, step) {
+  if (!step?.requiredItemId || context.battleState.activeSpecialItemId !== step.requiredItemId) {
+    return null;
+  }
+  if (step.action === "freeSwap") {
+    return context.battleState.specialSwapCell ? step.to : step.from;
+  }
+  if (["skull", "gold"].includes(step.action)) {
+    return step.to;
+  }
+  return null;
+}
+
 function renderBattleTutorialArrow(boardElement, from, to) {
   const fromElement = getBattleTutorialCellElement(boardElement, from);
   const toElement = getBattleTutorialCellElement(boardElement, to);
@@ -492,17 +561,16 @@ function renderBattleTutorialArrow(boardElement, from, to) {
     return;
   }
 
-  const boardRect = boardElement.getBoundingClientRect();
-  const fromRect = fromElement.getBoundingClientRect();
-  const toRect = toElement.getBoundingClientRect();
-  const x1 = fromRect.left - boardRect.left + fromRect.width / 2;
-  const y1 = fromRect.top - boardRect.top + fromRect.height / 2;
-  const x2 = toRect.left - boardRect.left + toRect.width / 2;
-  const y2 = toRect.top - boardRect.top + toRect.height / 2;
+  const boardWidth = Math.max(1, boardElement.offsetWidth);
+  const boardHeight = Math.max(1, boardElement.offsetHeight);
+  const x1 = fromElement.offsetLeft + fromElement.offsetWidth / 2;
+  const y1 = fromElement.offsetTop + fromElement.offsetHeight / 2;
+  const x2 = toElement.offsetLeft + toElement.offsetWidth / 2;
+  const y2 = toElement.offsetTop + toElement.offsetHeight / 2;
 
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.classList.add("battle-tutorial-arrow");
-  svg.setAttribute("viewBox", `0 0 ${Math.max(1, boardRect.width)} ${Math.max(1, boardRect.height)}`);
+  svg.setAttribute("viewBox", `0 0 ${boardWidth} ${boardHeight}`);
   svg.setAttribute("aria-hidden", "true");
 
   const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
@@ -528,6 +596,21 @@ function renderBattleTutorialArrow(boardElement, from, to) {
 
   svg.append(defs, line);
   boardElement.append(svg);
+}
+
+function renderBattleTutorialCellArrow(boardElement, target) {
+  const targetElement = getBattleTutorialCellElement(boardElement, target);
+  if (!targetElement) {
+    return;
+  }
+
+  const arrow = document.createElement("span");
+  arrow.className = "battle-tutorial-cell-arrow";
+  arrow.setAttribute("aria-hidden", "true");
+  arrow.textContent = "↓";
+  arrow.style.left = `${targetElement.offsetLeft + targetElement.offsetWidth / 2}px`;
+  arrow.style.top = `${targetElement.offsetTop - 3}px`;
+  boardElement.append(arrow);
 }
 
 function getBattleTutorialCellElement(boardElement, cell) {

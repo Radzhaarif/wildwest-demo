@@ -13,11 +13,11 @@
       "stageId": "obstacles_training",
       "nameTextKey": "enemy.Dolly.stage.training.name",
       "appearance": "data/Assets/enemy/Dolly.png",
-      "health": 100,
+      "health": 300,
       "shield": 0,
       "aggression": {
         "threshold": 100,
-        "damage": 5,
+        "damage": 2,
         "resetOnTrigger": true
       },
       "rage": {

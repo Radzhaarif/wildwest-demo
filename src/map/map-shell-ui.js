@@ -51,6 +51,7 @@ export function createMapShellUiController(deps) {
     elements.musicVolumeInput.value = state.settings.musicVolume;
     elements.soundVolumeInput.value = state.settings.soundVolume;
     elements.settingsLanguageSelect.value = state.settings.language;
+    elements.settingsControlSchemeSelect.value = state.settings.controlScheme || "swipe-and-click";
     updateLocalizedUi();
   }
 
@@ -84,6 +85,10 @@ export function createMapShellUiController(deps) {
     elements.musicVolumeLabel.textContent = translate("settings.musicVolume");
     elements.soundVolumeLabel.textContent = translate("settings.soundVolume");
     elements.settingsLanguageLabel.textContent = translate("settings.language");
+    elements.settingsControlSchemeLabel.textContent = translate("settings.controlScheme");
+    elements.settingsControlSchemeSwipeOption.textContent = translate("settings.controlScheme.swipe");
+    elements.settingsControlSchemeClickOption.textContent = translate("settings.controlScheme.click");
+    elements.settingsControlSchemeBothOption.textContent = translate("settings.controlScheme.swipeAndClick");
     elements.resetSettingsButton.textContent = translate("settings.reset");
     elements.backSettingsButton.textContent = translate("ui.back");
     elements.startGameButton.textContent = translate("menu.start");
@@ -93,6 +98,7 @@ export function createMapShellUiController(deps) {
     elements.mainMenuTitle.textContent = translate("menu.title");
     updateSmokeTestButtonVisibility();
     elements.settingsLanguageSelect.value = state.language;
+    elements.settingsControlSchemeSelect.value = state.settings.controlScheme || "swipe-and-click";
     renderMapTopActionButtons();
     elements.eventLogBackButton.textContent = translate("ui.back");
     elements.eventLogTitle.textContent = translate("ui.eventLog");

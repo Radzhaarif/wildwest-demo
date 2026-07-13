@@ -5,6 +5,8 @@
   "soundVolume": 1,
   // Default language key, must exist in data/locales.
   "language": "en",
+  // Ordinary battle-board input: "swipe", "click", or "swipe-and-click".
+  "controlScheme": "swipe-and-click",
   // Active languages.
   // The first language in this list is used as fallback for missing translations.
   "languages": ["en", "ru", "new_ru"],
