@@ -380,13 +380,17 @@ export function createMapRewardsController(deps) {
       return;
     }
     const tutorial = state.activeLevelUp.tutorial;
-    if (tutorial && tutorial.inspectedIndices.size < state.activeLevelUp.rewards.length) {
+    const tutorialWasReady = tutorial
+      && tutorial.inspectedIndices.size >= state.activeLevelUp.rewards.length;
+    if (tutorial) {
       tutorial.inspectedIndices.add(index);
       elements.rewardDialogText.textContent = translate(
         state.activeLevelUp.rewards[index].tutorialTextKey,
       );
       updateLevelUpTutorialState();
-      return;
+      if (!tutorialWasReady) {
+        return;
+      }
     }
     state.activeLevelUp.selectedIndex = index;
     [...elements.rewardItems.children]

@@ -404,6 +404,8 @@ function createBattleBoardViewDeps() {
     isBattleCellVined,
     getItemLabel,
     resolveAssetPath,
+    translate,
+    attachBattleTooltip,
     handleBattleCellClick,
     isBattleLifecycleActive,
     isBattleAttemptActive,

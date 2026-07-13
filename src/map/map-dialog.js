@@ -98,7 +98,7 @@ export function createMapDialogController(deps) {
     }
   }
 
-  function advanceMapDialogOnClick() {
+  function handleMapDialogSceneClick() {
     if (!state.activeDialogNode) {
       return false;
     }
@@ -106,15 +106,7 @@ export function createMapDialogController(deps) {
       completeMapDialogTextTyping();
       return true;
     }
-
-    const step = getDialogStep(state.activeDialogNode.payload, state.activeDialogStepId);
-    const answers = Array.isArray(step?.answers) ? step.answers : [];
-    if (answers.length !== 1) {
-      return false;
-    }
-
-    void handleMapDialogAnswer(answers[0]);
-    return true;
+    return false;
   }
 
   function startMapDialogTextTyping(text) {
@@ -277,7 +269,7 @@ export function createMapDialogController(deps) {
 
   return {
     openMapDialogEvent,
-    advanceMapDialogOnClick,
+    handleMapDialogSceneClick,
     completeMapDialogTextTyping,
     closeMapDialogOverlay,
     finishMapDialogNode,

@@ -786,7 +786,7 @@ elements.mapDialogOverlay.addEventListener("click", (event) => {
   }
   event.preventDefault();
   event.stopPropagation();
-  mapDialog.advanceMapDialogOnClick();
+  mapDialog.handleMapDialogSceneClick();
 });
 
 initDragScroll(elements.mapViewport);

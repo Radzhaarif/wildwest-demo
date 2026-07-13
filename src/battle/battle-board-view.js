@@ -1,4 +1,5 @@
 import { getBattleWallKey } from "./battle-animations.js";
+import { formatText } from "./battle-formatters.js";
 
 const BATTLE_SWIPE_MIN_DISTANCE_PX = 10;
 const BATTLE_SWIPE_CELL_DISTANCE_RATIO = 0.22;
@@ -60,6 +61,13 @@ export function renderBattleBoard(
         });
         cell.addEventListener("mouseleave", () => {
           clearBattleGoldTargetPreview(context);
+        });
+      }
+
+      const tutorialItemHint = getBattleTutorialItemHint(deps, context, item, itemId);
+      if (tutorialItemHint) {
+        deps.attachBattleTooltip(context, cell, {
+          getContent: () => getBattleTutorialItemHint(deps, context, item, itemId) || tutorialItemHint,
         });
       }
 
@@ -182,6 +190,58 @@ export function renderBattleBoard(
   renderBattleBoxes(deps, boardElement, context);
   renderBattleVines(deps, boardElement, context);
   deps.refreshBattleTutorialUi?.(context, context.battleRenderTargets || {});
+}
+
+export function getBattleTutorialItemHint(deps, context, item, itemId) {
+  if (context.request?.tutorial?.enabled !== true || !item) {
+    return null;
+  }
+
+  const stats = typeof context.engine.getBattleEffectiveItemStats === "function"
+    ? context.engine.getBattleEffectiveItemStats(
+      context.request.itemCatalog,
+      itemId,
+      context.battleState.playerState,
+      context.battleState,
+    )
+    : item;
+  let textKey = "";
+  let values = {};
+
+  if (item.battleUse === "battery" || item.itemId === "battary") {
+    textKey = "battle.tutorial.itemHint.generator";
+  } else if (Number(item.dmgperturn) > 0) {
+    textKey = "battle.tutorial.itemHint.barrel";
+    values = { damage: Number(item.dmgperturn) || 0 };
+  } else if (Number(item.damage) > 0) {
+    textKey = "battle.tutorial.itemHint.attack";
+    values = {
+      damage: Number(stats.damage) || 0,
+      aggression: Number(stats.aggression) || 0,
+    };
+  } else if (Number(item.heal) > 0) {
+    textKey = "battle.tutorial.itemHint.bandage";
+    values = {
+      heal: Number(stats.heal) || 0,
+      aggression: Number(stats.aggression) || 0,
+    };
+  } else if (Number(item.calm) > 0) {
+    textKey = "battle.tutorial.itemHint.shield";
+    values = { calm: Number(stats.calm) || 0 };
+  } else if (Number(item.aggression) > 0) {
+    textKey = "battle.tutorial.itemHint.trash";
+    values = { aggression: Number(stats.aggression) || 0 };
+  }
+
+  if (!textKey) {
+    return null;
+  }
+
+  return {
+    name: deps.getItemLabel(context, item, itemId),
+    description: formatText(deps.translate(context.request.locale, textKey), values),
+    icon: item.icon || "",
+  };
 }
 
 export function getBattleSwipeTarget(fromCell, deltaX, deltaY, board, thresholdPx = BATTLE_SWIPE_MIN_DISTANCE_PX) {

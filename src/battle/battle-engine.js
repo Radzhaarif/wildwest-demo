@@ -1692,7 +1692,7 @@ function getBattleInventoryStatModifier(itemCatalog, playerState, statKey) {
   }, 0);
 }
 
-function getBattleEffectiveItemStats(itemCatalog, itemId, playerState, battleState = null) {
+export function getBattleEffectiveItemStats(itemCatalog, itemId, playerState, battleState = null) {
   const item = getBattleItemDefinition(itemCatalog, itemId);
   const stats = {
     damage: getNumber(item?.damage),

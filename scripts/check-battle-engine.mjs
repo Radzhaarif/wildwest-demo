@@ -79,6 +79,60 @@ run("formatText formats numeric values but preserves string values", () => {
   );
 });
 
+run("tutorial board hints explain the effective item action and stay tutorial-only", () => {
+  const hintCatalog = {
+    items: [
+      createMatchItem("hint_attack", "hint_attack", { damage: 7, aggression: 3 }),
+      createMatchItem("hint_bandage", "hint_bandage", { damage: 0, heal: 6, aggression: 2 }),
+      createMatchItem("hint_shield", "hint_shield", { damage: 0, calm: 4 }),
+      createMatchItem("hint_trash", "hint_trash", { damage: 0, aggression: 9 }),
+      createMatchItem("battary", "utility", { category: "rare_match-3", battleUse: "battery", damage: 0 }),
+      createMatchItem("flame", "flame", { category: "rare_match-3", damage: 0, dmgperturn: 5 }),
+    ],
+  };
+  const locale = {
+    "battle.tutorial.itemHint.attack": "damage {damage}; aggression {aggression}",
+    "battle.tutorial.itemHint.bandage": "heal {heal}; aggression {aggression}",
+    "battle.tutorial.itemHint.shield": "calm {calm}",
+    "battle.tutorial.itemHint.trash": "trash {aggression}",
+    "battle.tutorial.itemHint.generator": "mass activation",
+    "battle.tutorial.itemHint.barrel": "turn damage {damage}",
+  };
+  const context = {
+    request: {
+      tutorial: { enabled: true },
+      locale,
+      itemCatalog: hintCatalog,
+    },
+    battleState: {
+      playerState: { inventory: [] },
+      enemyState: {},
+      enemyConfig: {},
+    },
+    engine,
+  };
+  const deps = {
+    translate: formatters.translate,
+    getItemLabel: (_context, _item, itemId) => itemId,
+  };
+  const getHint = (itemId) => boardView.getBattleTutorialItemHint(
+    deps,
+    context,
+    engine.getBattleItemDefinition(hintCatalog, itemId),
+    itemId,
+  );
+
+  assert.equal(getHint("hint_attack").description, "damage 7; aggression 3");
+  assert.equal(getHint("hint_bandage").description, "heal 6; aggression 2");
+  assert.equal(getHint("hint_shield").description, "calm 4");
+  assert.equal(getHint("hint_trash").description, "trash 9");
+  assert.equal(getHint("battary").description, "mass activation");
+  assert.equal(getHint("flame").description, "turn damage 5");
+
+  context.request.tutorial.enabled = false;
+  assert.equal(getHint("hint_attack"), null);
+});
+
 run("createBattleBoard uses configured size and avoids starting matches", () => {
   const board = engine.createBattleBoard(itemCatalog, {
     width: 6,
