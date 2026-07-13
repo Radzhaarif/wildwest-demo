@@ -2,6 +2,23 @@
   "id": "main_campaign",
   "nameTextKey": "campaign.main.name",
   "startMapId": "WildWest",
+  "tutorial": {
+    "enabled": true,
+    "buttonTextKey": "menu.tutorial",
+    "mapId": "Tutorial",
+    "config": "data/maps/Tutorial.jsonc",
+    "startingInventoryQuantities": {
+      "gold": 0,
+      "item_skull": 0,
+      "item_swap": 0,
+      "item_time": 0
+    },
+    "onComplete": {
+      "type": "victory",
+      "titleTextKey": "tutorial.complete.title",
+      "messageTextKey": "tutorial.complete.message"
+    }
+  },
   "maps": [
     {
       "mapId": "WildWest",

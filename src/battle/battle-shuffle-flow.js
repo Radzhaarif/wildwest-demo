@@ -71,6 +71,7 @@ export async function handleManualBattleShuffle(deps, context, renderTargets) {
   if (
     context.battleState.isResolving
     || context.battleState.isComplete
+    || (deps.isBattleTutorialActive?.(context) && !deps.isBattleTutorialShuffleStep?.(context))
     || !deps.shouldContinueBattle(context, renderTargets)
   ) {
     return;
@@ -112,6 +113,7 @@ export async function handleManualBattleShuffle(deps, context, renderTargets) {
     return;
   }
 
+  deps.completeBattleTutorialAfterShuffle?.(context, renderTargets);
   context.battleState.isResolving = false;
   deps.setBattleStatus(context, status, deps.translateBattleText(context, "shuffleBoardDone"));
   updateBattleShuffleButtonState(deps, context);
@@ -231,7 +233,13 @@ export function updateBattleShuffleButtonState(deps, context) {
     return;
   }
 
-  button.disabled = Boolean(context.battleState.isResolving || context.battleState.isComplete);
+  const tutorialBlocksShuffle = deps.isBattleTutorialActive?.(context)
+    && !deps.isBattleTutorialShuffleStep?.(context);
+  button.disabled = Boolean(
+    context.battleState.isResolving
+    || context.battleState.isComplete
+    || tutorialBlocksShuffle
+  );
 }
 
 function recordBattleAction(deps, context, action) {

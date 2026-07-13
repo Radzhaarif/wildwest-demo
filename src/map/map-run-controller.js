@@ -60,6 +60,7 @@ export function createMapRunController(deps) {
       renderMapTopActionButtons();
       await resetPlayerState();
       state.activeTestRun = false;
+      state.activeStandaloneRun = false;
       state.activeMapEntry = null;
       state.hasStartedGame = true;
       state.runNumber += 1;
@@ -100,6 +101,68 @@ export function createMapRunController(deps) {
     }
   }
 
+  async function startTutorial() {
+    const tutorial = state.campaign?.tutorial?.enabled === false ? null : state.campaign?.tutorial;
+    if (!tutorial?.mapId || !tutorial?.config || !tutorial?.onComplete) {
+      showDialog("Tutorial is not configured.");
+      return;
+    }
+
+    elements.tutorialButton.disabled = true;
+    let didShowStartLoading = false;
+    try {
+      if (!isGameDataReady()) {
+        didShowStartLoading = true;
+        showLoadingOverlay({
+          title: translate(tutorial.buttonTextKey || "menu.tutorial"),
+          status: loadingText("loading.validation", "Checking data"),
+        });
+        await loadAndValidateGameData(loadingText("loading.validation", "Checking data"));
+        await preloadGameAssets(loadingText("loading.runAssets", "Preparing run assets"));
+        await preloadBattleCode(loadingText("loading.battleCode", "Preparing battle code"));
+      }
+      renderMapTopActionButtons();
+      await resetPlayerState();
+      applyTutorialStartingInventory(tutorial);
+      state.activeTestRun = false;
+      state.activeStandaloneRun = true;
+      state.activeMapEntry = tutorial;
+      state.hasStartedGame = true;
+      state.runNumber += 1;
+      state.runSeed = getRequestedRunSeed() || createDebugSeed();
+      addRunLogHeader(
+        formatText("log.runStarted", {
+          run: state.runNumber,
+          campaign: translate(`${tutorial.mapId}.name`),
+        }),
+      );
+      addLog(
+        formatText("log.runSeed", {
+          name: "run",
+          seed: state.runSeed,
+        }),
+      );
+      addLog(
+        formatText("log.validationPassed", {
+          maps: state.mapConfigCache.size,
+          languages: state.settings.languages.length,
+        }),
+      );
+      elements.mainMenu.classList.add("hidden");
+      playMusic(resolveAssetPath(state.settings.audio.mapMusic));
+      await startConfiguredMap(tutorial, 0, { standalone: true });
+    } catch (error) {
+      console.error(error);
+      elements.campaignStatus.textContent = error.message;
+      showDialog(`${translate("validation.failed")}\n${error.message}`);
+    } finally {
+      if (didShowStartLoading) {
+        hideLoadingOverlay();
+      }
+      elements.tutorialButton.disabled = false;
+    }
+  }
+
   async function startSmokeTestRun() {
     // SmokeTest - отдельный test-run: не входит в campaign.maps и не должен
     // менять обычный маршрут START, прогресс кампании или стартовый player state.
@@ -125,6 +188,7 @@ export function createMapRunController(deps) {
       renderMapTopActionButtons();
       await resetPlayerState(toProjectUrl(testRun.playerState));
       state.activeTestRun = true;
+      state.activeStandaloneRun = true;
       state.activeMapEntry = createSmokeTestMapEntry(testRun);
       state.hasStartedGame = true;
       state.runNumber += 1;
@@ -149,7 +213,7 @@ export function createMapRunController(deps) {
       );
       elements.mainMenu.classList.add("hidden");
       playMusic(resolveAssetPath(state.settings.audio.mapMusic));
-      await startConfiguredMap(state.activeMapEntry, 0, { testRun: true });
+      await startConfiguredMap(state.activeMapEntry, 0, { testRun: true, standalone: true });
     } catch (error) {
       console.error(error);
       elements.campaignStatus.textContent = error.message;
@@ -167,6 +231,19 @@ export function createMapRunController(deps) {
     normalizePlayerHealthByInventory(state.playerState);
   }
 
+  function applyTutorialStartingInventory(tutorial) {
+    const quantities = tutorial?.startingInventoryQuantities;
+    if (!quantities || typeof quantities !== "object" || Array.isArray(quantities)) {
+      return;
+    }
+    for (const entry of state.playerState?.inventory || []) {
+      if (!entry || typeof entry.itemId !== "string" || quantities[entry.itemId] === undefined) {
+        continue;
+      }
+      entry.quantity = Math.max(0, Number(quantities[entry.itemId]) || 0);
+    }
+  }
+
   async function startCampaignMap(campaignIndex) {
     const campaignEntry = state.campaign.maps[campaignIndex];
     await startConfiguredMap(campaignEntry, campaignIndex, { testRun: false });
@@ -178,6 +255,7 @@ export function createMapRunController(deps) {
     // доступным для первого выбора игрока.
     state.campaignIndex = campaignIndex;
     state.activeTestRun = options.testRun === true;
+    state.activeStandaloneRun = options.standalone === true;
     state.activeMapEntry = mapEntry;
     const mapUrl = toProjectUrl(mapEntry.config);
     state.mapConfig = state.mapConfigCache.get(mapUrl) || (await loadJsonc(mapUrl));
@@ -243,6 +321,7 @@ export function createMapRunController(deps) {
 
   return {
     startGame,
+    startTutorial,
     startSmokeTestRun,
     resetPlayerState,
     startCampaignMap,

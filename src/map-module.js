@@ -104,6 +104,7 @@ const state = {
   pendingMapCompletion: false,
   pendingSurrenderCallbacks: null,
   activeTestRun: false,
+  activeStandaloneRun: false,
   activeMapEntry: null,
   activeDialogNode: null,
   activeDialogStepId: null,
@@ -130,6 +131,7 @@ const elements = {
   gameOrientationRoot: document.querySelector("#gameOrientationRoot"),
   mainMenuTitle: document.querySelector("#mainMenuTitle"),
   startGameButton: document.querySelector("#startGameButton"),
+  tutorialButton: document.querySelector("#tutorialButton"),
   smokeTestButton: document.querySelector("#smokeTestButton"),
   settingsButton: document.querySelector("#settingsButton"),
   mapUiFrame: document.querySelector("#mapUiFrame"),
@@ -646,6 +648,7 @@ const mapRun = createMapRunController({
 
 const {
   startGame,
+  startTutorial,
   startSmokeTestRun,
   resetPlayerState,
   startCampaignMap,
@@ -708,6 +711,10 @@ elements.soundVolumeInput.addEventListener("input", (event) => {
 
 elements.startGameButton.addEventListener("click", async () => {
   await startGame();
+});
+
+elements.tutorialButton.addEventListener("click", async () => {
+  await startTutorial();
 });
 
 elements.smokeTestButton.addEventListener("click", async () => {
@@ -853,11 +860,11 @@ function exposeMapDebugState() {
 }
 
 function getCurrentMapStatusText() {
-  const campaignName = state.activeTestRun
+  const campaignName = state.activeStandaloneRun
     ? translate(state.mapConfig?.nameTextKey || state.activeMapEntry?.mapId || "SmokeTest")
     : translate(state.campaign.nameTextKey);
-  const mapNumber = state.activeTestRun ? 1 : state.campaignIndex + 1;
-  const mapCount = state.activeTestRun ? 1 : state.campaign.maps.length;
+  const mapNumber = state.activeStandaloneRun ? 1 : state.campaignIndex + 1;
+  const mapCount = state.activeStandaloneRun ? 1 : state.campaign.maps.length;
   return `${campaignName} · map ${mapNumber}/${mapCount}`;
 }
 

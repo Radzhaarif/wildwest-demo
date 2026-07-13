@@ -230,6 +230,7 @@ export function showBattleScaffold(deps, context, root) {
     deps.renderBattleStats(enemyStats, playerMeters, ultimateText, context);
     deps.renderBattleInventory(specialItems, handItems, context, renderTargets);
     deps.renderBattleBoard(boardElement, context, status, enemyStats, playerMeters, ultimateText);
+    deps.setupBattleTutorialUi(context, renderTargets);
     deps.startBattleRuntime(context, renderTargets);
     scheduleBattleEnemyTitleFit(renderTargets);
     requestAnimationFrame(alignBattleSideWidgetsToBoardRightEdge);

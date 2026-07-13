@@ -1,5 +1,5 @@
 {
-  "enemyId": "tutorial_Dolly",
+  "enemyId": "tutorial_Dolly_advanced",
   "baseEnemyId": "Dolly",
   "nameTextKey": "enemy.Dolly.name",
   "descriptionTextKey": "enemy.Dolly.description",
@@ -10,10 +10,10 @@
   "vines": 0,
   "stages": [
     {
-      "stageId": "training",
+      "stageId": "advanced_training",
       "nameTextKey": "enemy.Dolly.stage.training.name",
       "appearance": "data/Assets/enemy/Dolly.png",
-      "health": 50,
+      "health": 100,
       "shield": 0,
       "aggression": {
         "threshold": 100,
@@ -33,7 +33,7 @@
   ],
   "reward": {
     "eventImage": "data/Assets/events/reward_gold.png",
-    "dialogTextKey": "battle.reward.tutorial.basic",
+    "dialogTextKey": "battle.reward.tutorial.advanced",
     "itemCount": 1,
     "rewards": [
       {

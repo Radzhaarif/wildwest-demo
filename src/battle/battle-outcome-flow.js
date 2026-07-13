@@ -153,6 +153,7 @@ export function restartCurrentBattle(deps, context, renderTargets, banner) {
     activeRenderTargets.playerMeters,
     activeRenderTargets.ultimateText,
   );
+  deps.setupBattleTutorialUi(context, activeRenderTargets);
   deps.startBattleRuntime(context, activeRenderTargets);
 }
 

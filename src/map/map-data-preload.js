@@ -32,8 +32,8 @@ export function createMapDataPreloadController(deps) {
     const itemCatalog = await loadJsonc(itemCatalogUrl);
     const experienceTable = await loadJsonc(experienceTableUrl);
     const cheatConfig = await loadJson(cheatConfigUrl);
-    // Validation возвращает уже прогретые cache-объекты: обычные campaign maps,
-    // enabled SmokeTest map, battle configs, item lookup и UI config.
+    // Validation возвращает уже прогретые cache-объекты: campaign maps,
+    // tutorial, enabled SmokeTest map, battle configs, item lookup и UI config.
     const validation = await validateGameData(campaign, itemCatalog, experienceTable, {
       cheatConfig,
       languages: state.settings?.languages || state.defaultSettings?.languages || ["en"],

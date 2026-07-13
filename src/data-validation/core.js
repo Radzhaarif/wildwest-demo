@@ -112,6 +112,10 @@ export async function validateGameData(campaign, itemCatalog, experienceTable, o
   const battleEnemyIds = new Set();
   const campaignMaps = Array.isArray(campaign?.maps) ? campaign.maps : [];
   const uniqueMapUrls = new Set(campaignMaps.map((entry) => toProjectUrl(entry.config || "")));
+  const tutorial = campaign?.tutorial?.enabled === false ? null : campaign?.tutorial;
+  if (tutorial?.config) {
+    uniqueMapUrls.add(toProjectUrl(tutorial.config));
+  }
   const testRun = getEnabledTestRunConfig(options.cheatConfig);
   // SmokeTest не входит в campaign.maps, но валидируется тем же путем: карта,
   // враги, ассеты, локали и player state должны ломать сборку при ошибке.
@@ -135,6 +139,12 @@ export async function validateGameData(campaign, itemCatalog, experienceTable, o
     const mapConfig = mapConfigCache.get(toProjectUrl(entry.config || ""));
     if (mapConfig && mapConfig.id !== entry.mapId) {
       issues.push(`${entry.config}: map id "${mapConfig.id}" does not match campaign mapId "${entry.mapId}"`);
+    }
+  }
+  if (tutorial?.config) {
+    const mapConfig = mapConfigCache.get(toProjectUrl(tutorial.config));
+    if (mapConfig && mapConfig.id !== tutorial.mapId) {
+      issues.push(`${tutorial.config}: map id "${mapConfig.id}" does not match tutorial mapId "${tutorial.mapId}"`);
     }
   }
   if (testRun?.config) {

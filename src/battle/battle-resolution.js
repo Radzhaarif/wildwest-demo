@@ -28,6 +28,9 @@ export async function resolveBattleCascades(deps, board, context, renderTargets)
   });
 
   while (cascades < deps.MAX_CASCADE_STEPS) {
+    if (deps.shouldStopBattleTutorialCascades?.(context, cascades)) {
+      break;
+    }
     if (!deps.shouldContinueBattle(context, renderTargets)) {
       return makeResult(true);
     }
@@ -103,7 +106,6 @@ export async function resolveBattleCascades(deps, board, context, renderTargets)
     if (!deps.shouldContinueBattle(context, renderTargets)) {
       return makeResult(true);
     }
-
     if (
       cascadeStepMs > 0
       && context.engine.findBattleMatches(currentBoard, context.request.itemCatalog, {

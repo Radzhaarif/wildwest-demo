@@ -5,6 +5,29 @@
   "nameTextKey": "campaign.main.name",
   // Идентификатор карты, с которой начинается новая игра.
   "startMapId": "forest_map",
+  // Необязательный отдельный пользовательский run обучения. Он не входит в maps.
+  "tutorial": {
+    // false скрывает кнопку и исключает карту обучения из валидации/предзагрузки.
+    "enabled": true,
+    // Ключ подписи кнопки в главном меню.
+    "buttonTextKey": "menu.tutorial",
+    // Идентификатор и путь к карте обучения.
+    "mapId": "Tutorial",
+    "config": "data/maps/Tutorial.jsonc",
+    // Количество стартовых ресурсов только в отдельном run обучения.
+    "startingInventoryQuantities": {
+      "gold": 0,
+      "item_skull": 0,
+      "item_swap": 0,
+      "item_time": 0
+    },
+    // Обучение завершается собственным victory-сообщением.
+    "onComplete": {
+      "type": "victory",
+      "titleTextKey": "tutorial.complete.title",
+      "messageTextKey": "tutorial.complete.message"
+    }
+  },
   // Список всех карт, которые входят в кампанию.
   "maps": [
     // Первая карта кампании.

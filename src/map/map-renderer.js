@@ -98,6 +98,13 @@ export function createMapRenderer(deps) {
         void activateNode(node);
       });
 
+      if (shouldShowFirstNodeArrow(node)) {
+        const arrow = document.createElement("span");
+        arrow.className = "tutorial-node-arrow";
+        arrow.setAttribute("aria-hidden", "true");
+        button.append(arrow);
+      }
+
       if (isAvailable && nodeVisualConfig.activeLightIcon) {
         const activeLight = document.createElement("img");
         activeLight.className = "node-active-light";
@@ -123,6 +130,15 @@ export function createMapRenderer(deps) {
       button.append(icon);
       elements.mapBoard.append(button);
     }
+  }
+
+  function shouldShowFirstNodeArrow(node) {
+    const firstNode = state.generatedMap?.levels?.[0]?.nodes?.[0];
+    return state.mapConfig?.firstNodeArrow === true
+      && state.currentNodeId === null
+      && state.activeDialogNode === null
+      && state.availableNodeIds.has(node.id)
+      && node.id === firstNode?.id;
   }
 
   function getNodeClassName(node) {

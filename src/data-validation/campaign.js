@@ -17,6 +17,7 @@ export function validateCampaign(campaign, issues, requiredTextKeys) {
   requireString(campaign.id, "campaign.id", issues);
   requireString(campaign.nameTextKey, "campaign.nameTextKey", issues);
   collectTextKeys(campaign, requiredTextKeys);
+  validateTutorialEntry(campaign.tutorial, issues);
 
   if (!Array.isArray(campaign.maps) || campaign.maps.length === 0) {
     issues.push("campaign.maps: must contain at least one map");
@@ -48,6 +49,50 @@ export function validateCampaign(campaign, issues, requiredTextKeys) {
       issues.push(`${prefix}.onComplete.type: expected "nextMap" or "victory"`);
     }
   });
+}
+
+function validateTutorialEntry(tutorial, issues) {
+  if (tutorial === undefined) {
+    return;
+  }
+  if (!tutorial || typeof tutorial !== "object" || Array.isArray(tutorial)) {
+    issues.push("campaign.tutorial: must be an object when present");
+    return;
+  }
+  if (tutorial.enabled !== undefined && typeof tutorial.enabled !== "boolean") {
+    issues.push("campaign.tutorial.enabled: expected boolean");
+  }
+  if (tutorial.enabled === false) {
+    return;
+  }
+  requireString(tutorial.buttonTextKey, "campaign.tutorial.buttonTextKey", issues);
+  requireString(tutorial.mapId, "campaign.tutorial.mapId", issues);
+  requireString(tutorial.config, "campaign.tutorial.config", issues);
+  validateTutorialStartingInventory(tutorial.startingInventoryQuantities, issues);
+  if (!tutorial.onComplete || typeof tutorial.onComplete !== "object") {
+    issues.push("campaign.tutorial.onComplete: must be an object");
+    return;
+  }
+  if (tutorial.onComplete.type !== "victory") {
+    issues.push('campaign.tutorial.onComplete.type: expected "victory"');
+    return;
+  }
+  requireString(tutorial.onComplete.titleTextKey, "campaign.tutorial.onComplete.titleTextKey", issues);
+  requireString(tutorial.onComplete.messageTextKey, "campaign.tutorial.onComplete.messageTextKey", issues);
+}
+
+function validateTutorialStartingInventory(quantities, issues) {
+  if (quantities === undefined) {
+    return;
+  }
+  if (!quantities || typeof quantities !== "object" || Array.isArray(quantities)) {
+    issues.push("campaign.tutorial.startingInventoryQuantities: must be an object when present");
+    return;
+  }
+  for (const [itemId, quantity] of Object.entries(quantities)) {
+    requireString(itemId, "campaign.tutorial.startingInventoryQuantities: itemId", issues);
+    requireNumberInRange(quantity, `campaign.tutorial.startingInventoryQuantities.${itemId}`, 0, Infinity, issues);
+  }
 }
 
 export function validateExperienceTable(experienceTable, issues, requiredTextKeys, requiredItemIds) {

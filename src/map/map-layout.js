@@ -6,19 +6,20 @@ export function createMapLayoutController(deps) {
   } = deps;
 
   function getMapHeight() {
-    const levelCount = state.generatedMap.levels.length;
-    return Math.max(980, levelCount * 170);
+    return getMapVerticalLayout().height;
   }
 
   function getNodePositions() {
     // Карта вертикальная: уровень 1 визуально ниже, босс выше. Координаты в
     // процентах, чтобы SVG-линии и кнопки точек совпадали при изменении размера.
     const positions = new Map();
-    const levelCount = state.generatedMap.levels.length;
+    const verticalLayout = getMapVerticalLayout();
     const orderedLevels = getMapLayoutOrderedLevels();
 
     for (const level of orderedLevels) {
-      const y = 92 - (level.level / (levelCount + 1)) * 82;
+      const levelCenterPx = verticalLayout.firstLevelCenterPx
+        - (level.level - 1) * verticalLayout.levelGapPx;
+      const y = levelCenterPx / verticalLayout.height * 100;
       level.nodes.forEach((node, index) => {
         const baseX = ((index + 1) / (level.nodes.length + 1)) * 78 + 11;
         const jitter = getStableNodeJitter(node);
@@ -29,6 +30,22 @@ export function createMapLayoutController(deps) {
     }
 
     return positions;
+  }
+
+  function getMapVerticalLayout() {
+    const levelCount = state.generatedMap.levels.length;
+    const previousHeight = Math.max(980, levelCount * 170);
+    const previousLevelGapPx = previousHeight * 0.82 / (levelCount + 1);
+    const previousFirstLevelCenterPx = previousHeight * (0.92 - 0.82 / (levelCount + 1));
+    const bottomMarginPx = previousHeight - previousFirstLevelCenterPx;
+    const topMarginPx = previousFirstLevelCenterPx - (levelCount - 1) * previousLevelGapPx;
+    const levelGapPx = previousLevelGapPx * 3;
+    const height = Math.ceil(topMarginPx + bottomMarginPx + (levelCount - 1) * levelGapPx);
+    return {
+      height,
+      levelGapPx,
+      firstLevelCenterPx: height - bottomMarginPx,
+    };
   }
 
   function getMapLayoutOrderedLevels() {

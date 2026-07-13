@@ -8,6 +8,18 @@ export function isBattleTutorialActive(context) {
   return Boolean(getBattleTutorialState(context)?.active && getCurrentBattleTutorialStep(context));
 }
 
+export function isBattleTutorialShuffleStep(context) {
+  return isBattleTutorialActive(context) && getCurrentBattleTutorialStep(context)?.action === "shuffle";
+}
+
+export function shouldStopBattleTutorialCascades(context, resolvedCascades = 0) {
+  const step = getCurrentBattleTutorialStep(context);
+  if (!step || !isBattleTutorialActive(context)) {
+    return false;
+  }
+  return step.action === "battery" || (step.action === "swap" && resolvedCascades >= 1);
+}
+
 export function prepareBattleTutorialAttemptState(context) {
   const tutorial = getBattleTutorialConfig(context);
   const steps = getBattleTutorialSteps(context);
@@ -20,6 +32,7 @@ export function prepareBattleTutorialAttemptState(context) {
 
   context.battleState.tutorial = {
     active: true,
+    completed: false,
     stepIndex: 0,
   };
   return applyBattleTutorialStepBoard(context);
@@ -78,7 +91,7 @@ export function setupBattleTutorialUi(deps, context, renderTargets) {
 
   callout.append(title, progress, text);
   layer.append(shade, teacher, callout);
-  renderTargets.panel.append(layer);
+  (renderTargets.enemyVisual || renderTargets.panel).append(layer);
 
   context.battleTutorialUi = {
     layer,
@@ -98,6 +111,10 @@ export function refreshBattleTutorialUi(deps, context, renderTargets = {}) {
 
   if (!ui || !boardElement || !step || !isBattleTutorialActive(context)) {
     boardElement?.classList.remove("is-tutorial-active");
+    if (boardElement) {
+      delete boardElement.dataset.tutorialAction;
+    }
+    renderTargets.shuffleButton?.classList.remove("is-tutorial-required");
     if (ui?.layer) {
       ui.layer.hidden = true;
     }
@@ -111,8 +128,11 @@ export function refreshBattleTutorialUi(deps, context, renderTargets = {}) {
   ui.title.textContent = deps.translate(context.request.locale, tutorial.titleTextKey || "battle.tutorial.title");
   ui.progress.textContent = `${getBattleTutorialState(context).stepIndex + 1}/${steps.length}`;
   ui.text.textContent = deps.translate(context.request.locale, step.textKey);
+  renderTargets.shuffleButton?.classList.toggle("is-tutorial-required", step.action === "shuffle");
 
   boardElement.classList.add("is-tutorial-active");
+  boardElement.dataset.tutorialAction = step.action || "swap";
+  markBattleTutorialLockedCells(boardElement, step);
   for (const cell of step.matchCells || []) {
     markBattleTutorialCell(boardElement, cell, "is-tutorial-match-cell");
   }
@@ -128,9 +148,10 @@ export async function guardBattleTutorialCellClick(deps, context, cell, renderTa
   }
 
   const selectedCell = context.battleState.selectedCell;
+  const expectsDirectBoardAction = step.action === "swap" || step.action === "battery";
   const isAllowed = selectedCell
-    ? isSameCell(selectedCell, step.from) && isSameCell(cell, step.to)
-    : isSameCell(cell, step.from);
+    ? expectsDirectBoardAction && isSameCell(selectedCell, step.from) && isSameCell(cell, step.to)
+    : expectsDirectBoardAction && isSameCell(cell, step.from);
 
   if (isAllowed) {
     return false;
@@ -138,7 +159,9 @@ export async function guardBattleTutorialCellClick(deps, context, cell, renderTa
 
   const boardElement = renderTargets.boardElement || context.battleRenderTargets?.boardElement;
   const statusElement = renderTargets.statusElement || renderTargets.status || context.battleRenderTargets?.status;
-  const wrongTextKey = getBattleTutorialConfig(context).wrongMoveTextKey || "battle.tutorial.wrongMove";
+  const wrongTextKey = step.wrongTextKey
+    || getBattleTutorialConfig(context).wrongMoveTextKey
+    || "battle.tutorial.wrongMove";
   deps.setBattleStatus(context, statusElement, deps.translate(context.request.locale, wrongTextKey));
   await deps.animateBattleShakeCells(
     boardElement,
@@ -150,7 +173,13 @@ export async function guardBattleTutorialCellClick(deps, context, cell, renderTa
 
 export function advanceBattleTutorialAfterMove(deps, context, renderTargets = {}) {
   const tutorialState = getBattleTutorialState(context);
-  if (!tutorialState?.active || !getCurrentBattleTutorialStep(context)) {
+  const currentStep = getCurrentBattleTutorialStep(context);
+  if (
+    !tutorialState?.active
+    || !currentStep
+    || !["swap", "battery"].includes(currentStep.action)
+    || !context.battleState.lastMoveSummary
+  ) {
     return { advanced: false, finished: false };
   }
 
@@ -158,12 +187,7 @@ export function advanceBattleTutorialAfterMove(deps, context, renderTargets = {}
   const nextStepIndex = tutorialState.stepIndex + 1;
   if (nextStepIndex >= steps.length) {
     tutorialState.active = false;
-    if (context.battleState.enemyState?.health) {
-      context.battleState.enemyState.health.current = 0;
-    }
-    if (context.battleState.enemyState) {
-      context.battleState.enemyState.isDefeated = true;
-    }
+    tutorialState.completed = true;
     context.battleTutorialUi?.layer?.remove();
     context.battleTutorialUi = null;
     return { advanced: false, finished: true };
@@ -191,6 +215,26 @@ export function advanceBattleTutorialAfterMove(deps, context, renderTargets = {}
   return { advanced: true, finished: false };
 }
 
+export function completeBattleTutorialAfterShuffle(context, renderTargets = {}) {
+  const tutorialState = getBattleTutorialState(context);
+  if (!tutorialState?.active || !isBattleTutorialShuffleStep(context)) {
+    return false;
+  }
+
+  tutorialState.active = false;
+  tutorialState.completed = true;
+  context.battleTutorialUi?.layer?.remove();
+  context.battleTutorialUi = null;
+  const activeTargets = context.battleRenderTargets || renderTargets;
+  activeTargets.shuffleButton?.classList.remove("is-tutorial-required");
+  clearBattleTutorialBoardGuide(activeTargets.boardElement);
+  activeTargets.boardElement?.classList.remove("is-tutorial-active");
+  if (activeTargets.boardElement) {
+    delete activeTargets.boardElement.dataset.tutorialAction;
+  }
+  return true;
+}
+
 function getBattleTutorialConfig(context) {
   const tutorial = context?.request?.tutorial;
   return tutorial && tutorial.enabled !== false ? tutorial : null;
@@ -212,6 +256,11 @@ function getCurrentBattleTutorialStep(context) {
 }
 
 function applyBattleTutorialStepStateOverrides(context, step) {
+  const enemyHealth = context.battleState.enemyState?.health;
+  if (enemyHealth && Number.isFinite(Number(step.enemyHealthCurrent))) {
+    enemyHealth.current = clampNumber(Number(step.enemyHealthCurrent), 0, Number(enemyHealth.max) || 0);
+    context.battleState.enemyState.isDefeated = enemyHealth.current <= 0;
+  }
   const enemyAggression = context.battleState.enemyState?.aggression;
   if (enemyAggression && Number.isFinite(Number(step.enemyAggressionCurrent))) {
     enemyAggression.current = clampNumber(Number(step.enemyAggressionCurrent), 0, Number(enemyAggression.max) || 0);
@@ -224,6 +273,24 @@ function applyBattleTutorialStepStateOverrides(context, step) {
   if (playerHeal && Number.isFinite(Number(step.playerHealCurrent))) {
     playerHeal.current = clampNumber(Number(step.playerHealCurrent), 0, Number(playerHeal.max) || 0);
   }
+  applyBattleTutorialInventoryQuantities(context);
+}
+
+function applyBattleTutorialInventoryQuantities(context) {
+  const quantities = getBattleTutorialConfig(context)?.playerInventoryQuantities;
+  if (!quantities || typeof quantities !== "object" || Array.isArray(quantities)) {
+    return;
+  }
+  const inventory = context.battleState.playerState?.inventory;
+  if (!Array.isArray(inventory)) {
+    return;
+  }
+  for (const entry of inventory) {
+    if (!entry || typeof entry.itemId !== "string" || quantities[entry.itemId] === undefined) {
+      continue;
+    }
+    entry.quantity = Math.max(0, Number(quantities[entry.itemId]) || 0);
+  }
 }
 
 function cloneTutorialBoard(board) {
@@ -235,10 +302,32 @@ function clearBattleTutorialBoardGuide(boardElement) {
     return;
   }
   for (const element of boardElement.querySelectorAll(".battle-scaffold-cell, .battle-cell-icon")) {
-    element.classList.remove(...TUTORIAL_CELL_CLASS_NAMES);
+    element.classList.remove(...TUTORIAL_CELL_CLASS_NAMES, "is-tutorial-locked");
+    if (element.classList.contains("battle-scaffold-cell")) {
+      element.removeAttribute("aria-disabled");
+    }
   }
   for (const arrow of boardElement.querySelectorAll(".battle-tutorial-arrow")) {
     arrow.remove();
+  }
+}
+
+function markBattleTutorialLockedCells(boardElement, step) {
+  const allowedCells = [
+    ...(Array.isArray(step.matchCells) ? step.matchCells : []),
+    step.from,
+    step.to,
+  ].filter(Boolean);
+  const allowedKeys = new Set(allowedCells.map((cell) => `${Number(cell.row)}:${Number(cell.col)}`));
+
+  for (const element of boardElement.querySelectorAll(".battle-scaffold-cell, .battle-cell-icon")) {
+    const key = `${Number(element.dataset.row)}:${Number(element.dataset.col)}`;
+    if (!allowedKeys.has(key)) {
+      element.classList.add("is-tutorial-locked");
+      if (element.classList.contains("battle-scaffold-cell")) {
+        element.setAttribute("aria-disabled", "true");
+      }
+    }
   }
 }
 

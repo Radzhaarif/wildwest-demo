@@ -335,6 +335,7 @@ function validateEventVariants(config, source, issues, requiredItemIds, eventCat
         if (variant.background !== undefined) {
           validateBattleBackgroundField(variant.background, `${prefix}.background`, issues);
         }
+        validateBattleTutorialConfig(variant.tutorial, `${prefix}.tutorial`, issues, requiredItemIds);
       } else if (eventType === "reward") {
         validateRewardConfig(variant, prefix, issues, requiredItemIds);
       } else if (eventType === "dialog") {
@@ -342,6 +343,126 @@ function validateEventVariants(config, source, issues, requiredItemIds, eventCat
       }
     });
   }
+}
+
+function validateBattleTutorialConfig(tutorial, path, issues, requiredItemIds) {
+  if (tutorial === undefined) {
+    return;
+  }
+  if (!tutorial || typeof tutorial !== "object" || Array.isArray(tutorial)) {
+    issues.push(`${path}: must be an object when present`);
+    return;
+  }
+  if (tutorial.enabled !== undefined && typeof tutorial.enabled !== "boolean") {
+    issues.push(`${path}.enabled: expected boolean`);
+  }
+  requireString(tutorial.titleTextKey, `${path}.titleTextKey`, issues);
+  requireString(tutorial.wrongMoveTextKey, `${path}.wrongMoveTextKey`, issues);
+  if (requireString(tutorial.teacherImage, `${path}.teacherImage`, issues)) {
+    validateCatalogAssetPath(tutorial.teacherImage, "data/Assets/enemy/", `${path}.teacherImage`, issues);
+  }
+  validateBattleTutorialInventoryQuantities(
+    tutorial.playerInventoryQuantities,
+    `${path}.playerInventoryQuantities`,
+    issues,
+    requiredItemIds,
+  );
+  if (!Array.isArray(tutorial.steps) || tutorial.steps.length === 0) {
+    issues.push(`${path}.steps: must contain at least one tutorial step`);
+    return;
+  }
+
+  const stepIds = new Set();
+  tutorial.steps.forEach((step, stepIndex) => {
+    const stepPath = `${path}.steps[${stepIndex}]`;
+    if (!step || typeof step !== "object" || Array.isArray(step)) {
+      issues.push(`${stepPath}: must be an object`);
+      return;
+    }
+    if (requireString(step.id, `${stepPath}.id`, issues)) {
+      if (stepIds.has(step.id)) {
+        issues.push(`${stepPath}.id: duplicate step "${step.id}"`);
+      }
+      stepIds.add(step.id);
+    }
+    requireString(step.textKey, `${stepPath}.textKey`, issues);
+    if (!["swap", "battery", "shuffle"].includes(step.action)) {
+      issues.push(`${stepPath}.action: expected one of swap, battery, shuffle`);
+    }
+    if (step.wrongTextKey !== undefined) {
+      requireString(step.wrongTextKey, `${stepPath}.wrongTextKey`, issues);
+    }
+
+    const boardSize = validateBattleTutorialBoard(step.board, `${stepPath}.board`, issues, requiredItemIds);
+    for (const field of [
+      "playerHealthCurrent",
+      "playerHealCurrent",
+      "enemyHealthCurrent",
+      "enemyAggressionCurrent",
+    ]) {
+      if (step[field] !== undefined) {
+        requireNumberInRange(step[field], `${stepPath}.${field}`, 0, Infinity, issues);
+      }
+    }
+    if (step.action === "swap" || step.action === "battery") {
+      validateBattleTutorialCell(step.from, `${stepPath}.from`, issues, boardSize);
+      validateBattleTutorialCell(step.to, `${stepPath}.to`, issues, boardSize);
+      const minMatchCells = step.action === "swap" ? 3 : 2;
+      if (!Array.isArray(step.matchCells) || step.matchCells.length < minMatchCells) {
+        issues.push(`${stepPath}.matchCells: ${step.action} steps must contain at least ${minMatchCells} cells`);
+      } else {
+        step.matchCells.forEach((cell, cellIndex) => {
+          validateBattleTutorialCell(cell, `${stepPath}.matchCells[${cellIndex}]`, issues, boardSize);
+        });
+      }
+    }
+  });
+}
+
+function validateBattleTutorialInventoryQuantities(quantities, path, issues, requiredItemIds) {
+  if (quantities === undefined) {
+    return;
+  }
+  if (!quantities || typeof quantities !== "object" || Array.isArray(quantities)) {
+    issues.push(`${path}: must be an object when present`);
+    return;
+  }
+  for (const [itemId, quantity] of Object.entries(quantities)) {
+    requireString(itemId, `${path}: itemId`, issues);
+    requireNumberInRange(quantity, `${path}.${itemId}`, 0, Infinity, issues);
+    requiredItemIds.add(itemId);
+  }
+}
+
+function validateBattleTutorialBoard(board, path, issues, requiredItemIds) {
+  if (!Array.isArray(board) || board.length === 0 || !Array.isArray(board[0]) || board[0].length === 0) {
+    issues.push(`${path}: must be a non-empty rectangular matrix`);
+    return null;
+  }
+  const width = board[0].length;
+  board.forEach((row, rowIndex) => {
+    if (!Array.isArray(row) || row.length !== width) {
+      issues.push(`${path}[${rowIndex}]: expected ${width} cells`);
+      return;
+    }
+    row.forEach((itemId, colIndex) => {
+      if (requireString(itemId, `${path}[${rowIndex}][${colIndex}]`, issues)) {
+        requiredItemIds.add(itemId);
+      }
+    });
+  });
+  return { width, height: board.length };
+}
+
+function validateBattleTutorialCell(cell, path, issues, boardSize) {
+  if (!cell || typeof cell !== "object" || Array.isArray(cell)) {
+    issues.push(`${path}: must be an object with row and col`);
+    return;
+  }
+  const maxRow = boardSize ? boardSize.height - 1 : Infinity;
+  const maxCol = boardSize ? boardSize.width - 1 : Infinity;
+  requireIntegerInRange(cell.row, `${path}.row`, 0, maxRow, issues);
+  requireIntegerInRange(cell.col, `${path}.col`, 0, maxCol, issues);
 }
 
 function validateDialogConfig(dialogConfig, path, issues, eventCatalog) {

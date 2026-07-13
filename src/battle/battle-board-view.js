@@ -94,6 +94,7 @@ export function renderBattleBoard(
   renderBattleWalls(deps, boardElement, context);
   renderBattleBoxes(deps, boardElement, context);
   renderBattleVines(deps, boardElement, context);
+  deps.refreshBattleTutorialUi?.(context, context.battleRenderTargets || {});
 }
 
 export function renderBattleWalls(deps, boardElement, context) {

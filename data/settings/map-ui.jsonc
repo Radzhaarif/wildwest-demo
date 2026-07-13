@@ -42,9 +42,9 @@
   "nodes": {
     "hoverScale": 2.5,
     "activeLightIcon": "data/Assets/icons/light_white.png",
-    "activeLightSizePx": 160,
+    "activeLightSizePx": 214,
     "hoverLightIcon": "data/Assets/icons/light_gold.png",
-    "hoverLightSizePx": 240,
+    "hoverLightSizePx": 480,
     "positionJitterPct": {
       "x": {
         "min": -6.0,

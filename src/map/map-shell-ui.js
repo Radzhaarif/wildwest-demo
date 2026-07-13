@@ -43,6 +43,7 @@ export function createMapShellUiController(deps) {
     renderLanguageOptions();
     elements.mainMenuTitle.textContent = translate("menu.title");
     elements.startGameButton.textContent = translate("menu.start");
+    renderTutorialButton();
     elements.smokeTestButton.textContent = translate(getSmokeTestButtonTextKey());
     elements.settingsButton.textContent = translate("menu.settings");
     updateSmokeTestButtonVisibility();
@@ -86,6 +87,7 @@ export function createMapShellUiController(deps) {
     elements.resetSettingsButton.textContent = translate("settings.reset");
     elements.backSettingsButton.textContent = translate("ui.back");
     elements.startGameButton.textContent = translate("menu.start");
+    renderTutorialButton();
     elements.smokeTestButton.textContent = translate(getSmokeTestButtonTextKey());
     elements.settingsButton.textContent = translate("menu.settings");
     elements.mainMenuTitle.textContent = translate("menu.title");
@@ -99,6 +101,15 @@ export function createMapShellUiController(deps) {
     elements.surrenderText.textContent = translate("surrender.question");
     elements.surrenderConfirmButton.textContent = translate("surrender.confirm");
     elements.surrenderCancelButton.textContent = translate("surrender.cancel");
+  }
+
+  function renderTutorialButton() {
+    if (!elements.tutorialButton) {
+      return;
+    }
+    const tutorial = state.campaign?.tutorial;
+    elements.tutorialButton.textContent = translate(tutorial?.buttonTextKey || "menu.tutorial");
+    elements.tutorialButton.classList.toggle("hidden", !tutorial || tutorial.enabled === false);
   }
 
   function getMapTopActionButtonConfig(actionId) {

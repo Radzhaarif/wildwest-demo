@@ -843,8 +843,8 @@ button:disabled {
 .map-node {
   /* left/top ставятся в процентах из JS, translate центрирует иконку в точке. */
   position: absolute;
-  width: 62px;
-  height: 62px;
+  width: 124px;
+  height: 124px;
   border: 0;
   border-radius: 50%;
   background: transparent;
@@ -881,8 +881,8 @@ button:disabled {
 }
 
 .map-node.boss {
-  width: 76px;
-  height: 76px;
+  width: 152px;
+  height: 152px;
   border-radius: 8px;
   background: transparent;
 }
@@ -905,6 +905,42 @@ button:disabled {
   transform: translate(-50%, -50%) scale(1);
 }
 
+.tutorial-node-arrow {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  z-index: 3;
+  width: 78px;
+  height: 144px;
+  pointer-events: none;
+  filter: drop-shadow(0 0 12px #ffe36b) drop-shadow(0 0 30px #ffb300);
+  transform: translateX(-50%);
+  animation: tutorialNodeArrowPulse 850ms ease-in-out infinite alternate;
+}
+
+.tutorial-node-arrow::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 30px;
+  width: 18px;
+  height: 87px;
+  border-radius: 12px;
+  background: #ffd83d;
+}
+
+.tutorial-node-arrow::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-right: 33px solid transparent;
+  border-left: 33px solid transparent;
+  border-top: 51px solid #ffd83d;
+}
+
 .node-hover-light {
   width: var(--map-node-hover-light-size, 88px);
   height: var(--map-node-hover-light-size, 88px);
@@ -917,8 +953,8 @@ button:disabled {
   top: 50%;
   left: 50%;
   z-index: 1;
-  width: 40px;
-  height: 40px;
+  width: 80px;
+  height: 80px;
   object-fit: contain;
   pointer-events: none;
   transform: translate(-50%, -50%);
@@ -926,8 +962,8 @@ button:disabled {
 }
 
 .map-node.boss .node-icon {
-  width: 52px;
-  height: 52px;
+  width: 104px;
+  height: 104px;
 }
 
 .map-node.available:hover .node-active-light,
@@ -945,6 +981,17 @@ button:disabled {
 .map-node.available:hover .node-icon,
 .map-node.available:focus-visible .node-icon {
   transform: translate(-50%, -50%) scale(var(--map-node-hover-scale, 1.5));
+}
+
+@keyframes tutorialNodeArrowPulse {
+  from {
+    opacity: 0.78;
+    transform: translate(-50%, -3px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 4px) scale(1.06);
+  }
 }
 
 .event-log {
@@ -2430,6 +2477,74 @@ button.reward-item {
   pointer-events: none;
 }
 
+.battle-tutorial-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+}
+
+.battle-tutorial-shade {
+  position: absolute;
+  top: 118px;
+  right: 22px;
+  bottom: 72px;
+  width: 520px;
+  border: 1px solid rgba(255, 220, 146, 0.2);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(8, 5, 5, 0.7), rgba(8, 5, 5, 0.9)),
+    radial-gradient(circle at 60% 30%, rgba(132, 64, 34, 0.28), transparent 60%);
+  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.48);
+  backdrop-filter: blur(4px) brightness(0.58);
+}
+
+.battle-tutorial-teacher {
+  display: none;
+}
+
+.battle-tutorial-callout {
+  position: absolute;
+  top: 180px;
+  right: 62px;
+  z-index: 1;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px 18px;
+  width: 440px;
+  padding: 22px 24px;
+  border: 1px solid rgba(255, 226, 164, 0.36);
+  border-radius: 14px;
+  background: rgba(18, 10, 9, 0.78);
+  color: #fff2d3;
+  box-shadow:
+    0 16px 38px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.85);
+}
+
+.battle-tutorial-title {
+  font-size: 27px;
+  line-height: 1;
+  color: #ffd061;
+}
+
+.battle-tutorial-progress {
+  align-self: center;
+  color: #e9ba64;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.battle-tutorial-text {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.32;
+}
+
 .battle-scaffold-enemy-meter-overlay {
   position: absolute;
   z-index: 4;
@@ -2865,6 +2980,81 @@ button.reward-item {
 
 .battle-scaffold-cell.is-vined {
   cursor: var(--cursor-active), not-allowed;
+}
+
+.battle-scaffold-board.is-tutorial-active .battle-scaffold-cell.is-tutorial-locked {
+  cursor: var(--cursor-active), not-allowed;
+}
+
+.battle-scaffold-board.is-tutorial-active .battle-scaffold-cell.is-tutorial-locked::before {
+  border-color: rgba(44, 35, 31, 0.38);
+  background: rgba(3, 3, 5, 0.86);
+  box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.82);
+}
+
+.battle-scaffold-board.is-tutorial-active .battle-cell-icon.is-tutorial-locked {
+  opacity: 0.14;
+  filter: grayscale(0.85) brightness(0.3);
+}
+
+.battle-scaffold-board.is-tutorial-active .battle-scaffold-cell:is(
+  .is-tutorial-match-cell,
+  .is-tutorial-source-cell,
+  .is-tutorial-target-cell
+)::before {
+  border-color: rgba(255, 218, 78, 0.96);
+  background: rgba(255, 194, 50, 0.2);
+  box-shadow:
+    inset 0 0 0 3px rgba(255, 224, 103, 0.58),
+    0 0 18px rgba(255, 190, 35, 0.78);
+}
+
+.battle-scaffold-board.is-tutorial-active .battle-cell-icon:is(
+  .is-tutorial-match-cell,
+  .is-tutorial-source-cell,
+  .is-tutorial-target-cell
+) {
+  opacity: 1;
+  filter: drop-shadow(0 0 9px rgba(255, 210, 65, 0.88));
+}
+
+.battle-tutorial-arrow {
+  position: absolute;
+  inset: 0;
+  z-index: 9400;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.battle-tutorial-arrow line {
+  stroke: #ffd437;
+  stroke-width: 7;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 7px rgba(255, 196, 28, 0.95));
+}
+
+.battle-tutorial-arrow marker path {
+  fill: #ffd437;
+}
+
+.battle-scaffold-shuffle-button.is-tutorial-required {
+  animation: battleTutorialShufflePulse 780ms ease-in-out infinite alternate;
+  box-shadow:
+    0 0 0 4px rgba(255, 218, 72, 0.72),
+    0 0 28px rgba(255, 177, 24, 0.9);
+}
+
+@keyframes battleTutorialShufflePulse {
+  from {
+    filter: brightness(0.95);
+    transform: scale(0.96);
+  }
+  to {
+    filter: brightness(1.3);
+    transform: scale(1.08);
+  }
 }
 
 .battle-cell-icon img {

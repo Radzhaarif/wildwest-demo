@@ -146,6 +146,7 @@ export function createMapBattleController(deps) {
       cheats: createBattleCheatState(),
       seed: battleSeed.seed,
       seedName: battleSeed.name,
+      tutorial: node.payload?.tutorial || null,
     };
   }
 

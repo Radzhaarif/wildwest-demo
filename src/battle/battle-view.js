@@ -159,6 +159,17 @@ import {
   updateBattleShuffleButtonState as updateBattleShuffleButtonStateFlow,
 } from "./battle-shuffle-flow.js";
 import {
+  advanceBattleTutorialAfterMove,
+  completeBattleTutorialAfterShuffle,
+  guardBattleTutorialCellClick,
+  isBattleTutorialActive,
+  isBattleTutorialShuffleStep,
+  prepareBattleTutorialAttemptState,
+  refreshBattleTutorialUi as refreshBattleTutorialUiFlow,
+  shouldStopBattleTutorialCascades,
+  setupBattleTutorialUi as setupBattleTutorialUiFlow,
+} from "./battle-tutorial-flow.js";
+import {
   closeScaffold as closeScaffoldOutcome,
   completeBattleVictory as completeBattleVictoryOutcome,
   createBattleOutcomeElement as createBattleOutcomeElementOutcome,
@@ -236,7 +247,7 @@ import {
   getBattleGenerationConfig,
   getBattleRandom,
   getCurrentBattleStageIndex,
-  prepareBattleAttemptState,
+  prepareBattleAttemptState as prepareBattleAttemptStateBase,
   syncBattleBoxesWithStage,
   syncBattleVinesWithStage,
   syncBattleWallsWithStage,
@@ -341,6 +352,7 @@ function createBattleScaffoldViewDeps() {
     shouldContinueBattle,
     ensureBattleStateShape,
     prepareBattleAttemptState,
+    setupBattleTutorialUi,
     createBattleTrace,
     createBattleRuntimeHandlers,
     renderBattleBoard,
@@ -390,6 +402,7 @@ function createBattleBoardViewDeps() {
     handleBattleCellClick,
     isBattleLifecycleActive,
     isBattleAttemptActive,
+    refreshBattleTutorialUi,
     renderBattleStats,
   }));
 }
@@ -572,6 +585,7 @@ function createBattleShuffleFlowDeps() {
     animateBattleShakeCells,
     clearActiveBattleSpecial,
     clearBattleBoardMessage,
+    completeBattleTutorialAfterShuffle,
     createBattleReserveBoardForCurrentStage,
     finishBattleMoveIfNeeded,
     recordBattleTraceMove,
@@ -579,6 +593,8 @@ function createBattleShuffleFlowDeps() {
     getBattleRandom,
     getBattlePlayerHealthSourceElements,
     getBattleUiConfig,
+    isBattleTutorialActive,
+    isBattleTutorialShuffleStep,
     isBattlePlayerDefeated,
     renderBattleBoard,
     renderBattleInventory,
@@ -613,6 +629,7 @@ function createBattleOutcomeFlowDeps() {
     normalizeBattleRenderTargets,
     pauseBattleRuntime,
     prepareBattleAttemptState,
+    setupBattleTutorialUi,
     renderBattleBoard,
     renderBattleInventory,
     renderBattleStats,
@@ -637,6 +654,7 @@ function createBattleResolutionDeps() {
     getBattleAnimationConfig,
     getBattleGenerationConfig,
     getCurrentBattleStageIndex,
+    shouldStopBattleTutorialCascades,
     ensureBattleReserveBoardForCurrentStage,
     setMatchFeedbackForBattleChange,
     renderBattleStats,
@@ -707,6 +725,27 @@ function createBattleBoardActionsDeps() {
     createTraceCells,
     summarizeMoveResult,
   }));
+}
+
+function createBattleTutorialDeps() {
+  return getCachedBattleDeps("tutorialFlow", () => ({
+    animateBattleShakeCells,
+    getBattleAnimationConfig,
+    renderBattleBoard,
+    renderBattleInventory,
+    renderBattleStats,
+    resolveAssetPath,
+    setBattleStatus,
+    translate,
+  }));
+}
+
+function setupBattleTutorialUi(context, renderTargets) {
+  return setupBattleTutorialUiFlow(createBattleTutorialDeps(), context, renderTargets);
+}
+
+function refreshBattleTutorialUi(context, renderTargets) {
+  return refreshBattleTutorialUiFlow(createBattleTutorialDeps(), context, renderTargets);
 }
 
 function showBattleScaffold(context, root) {
@@ -1285,6 +1324,9 @@ async function handleBattleVinedCellClick(context, cell, renderTargets) {
 }
 
 async function handleBattleCellClick(context, cell, renderTargets) {
+  if (await guardBattleTutorialCellClick(createBattleTutorialDeps(), context, cell, renderTargets)) {
+    return;
+  }
   return handleBattleCellClickAction(createBattleBoardActionsDeps(), context, cell, renderTargets);
 }
 
@@ -1454,6 +1496,15 @@ function isBattleCellVined(context, cell) {
 }
 
 async function finishBattleMoveIfNeeded(context, renderTargets) {
+  const tutorialProgress = advanceBattleTutorialAfterMove(
+    createBattleTutorialDeps(),
+    context,
+    normalizeBattleRenderTargets(context, renderTargets),
+  );
+  if (tutorialProgress.advanced) {
+    resetBattleIdleTimer(context, context.battleRenderTargets || renderTargets);
+    return false;
+  }
   if (isBattlePlayerDefeated(context)) {
     showBattleDefeat(context, renderTargets);
     return true;
@@ -1471,6 +1522,11 @@ async function finishBattleMoveIfNeeded(context, renderTargets) {
   }
   resetBattleIdleTimer(context, context.battleRenderTargets || renderTargets);
   return false;
+}
+
+function prepareBattleAttemptState(context) {
+  prepareBattleAttemptStateBase(context);
+  prepareBattleTutorialAttemptState(context);
 }
 
 function getBattleAreaCells(board, centerCell, radius) {
