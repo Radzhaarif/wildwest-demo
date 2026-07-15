@@ -12,7 +12,7 @@ import {
   validateRewardConfig,
 } from "./common.js";
 
-const MAP_EVENT_TYPES = ["battle", "reward", "heal", "shop", "skip", "dialog"];
+const MAP_EVENT_TYPES = ["battle", "reward", "heal", "shop", "skip", "dialog", "lockpick"];
 
 export function collectBattleEnemyIds(mapConfig, battleEnemyIds) {
   if (!mapConfig || typeof mapConfig !== "object") {
@@ -362,8 +362,35 @@ function validateEventVariants(config, source, issues, requiredItemIds, eventCat
         validateRewardConfig(variant, prefix, issues, requiredItemIds);
       } else if (eventType === "dialog") {
         validateDialogConfig(variant, prefix, issues, eventCatalog);
+      } else if (eventType === "lockpick") {
+        validateLockpickConfig(variant, prefix, issues, requiredItemIds);
       }
     });
+  }
+}
+
+function validateLockpickConfig(lockpickConfig, path, issues, requiredItemIds) {
+  validateRewardConfig(lockpickConfig, path, issues, requiredItemIds);
+  if (requireString(lockpickConfig.keyItemId, `${path}.keyItemId`, issues)) {
+    requiredItemIds.add(lockpickConfig.keyItemId);
+  }
+  if (requireString(lockpickConfig.lockpickImage, `${path}.lockpickImage`, issues)) {
+    validateCatalogAssetPath(
+      lockpickConfig.lockpickImage,
+      "data/Assets/item/",
+      `${path}.lockpickImage`,
+      issues,
+    );
+  }
+  if (!lockpickConfig.sounds || typeof lockpickConfig.sounds !== "object" || Array.isArray(lockpickConfig.sounds)) {
+    issues.push(`${path}.sounds: must be an object`);
+    return;
+  }
+  for (const soundId of ["move", "break", "open"]) {
+    const soundPath = lockpickConfig.sounds[soundId];
+    if (requireString(soundPath, `${path}.sounds.${soundId}`, issues)) {
+      validateCatalogAssetPath(soundPath, "data/Assets/sound/", `${path}.sounds.${soundId}`, issues);
+    }
   }
 }
 

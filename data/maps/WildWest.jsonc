@@ -536,6 +536,7 @@
     }
   ],
   "skip": [],
+  "lockpick": [],
   "dialog": [
     {
       "eventName": "opening_dialog",

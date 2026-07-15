@@ -51,6 +51,10 @@ const smokeTestNodeEvents = [
   "battle_test",
   "boss",
 ];
+const smokeTestGeneratedNodeEvents = [
+  ...smokeTestNodeEvents,
+  "dialog_lockpick_smoke",
+];
 const expectedFirstShopOffers = new Map([
   ["item_Knife", 50],
   ["item_bullet", 50],
@@ -164,6 +168,11 @@ async function runSmoke(page, tracker, options) {
     );
     await evaluate(page, "document.querySelector('#smokeTestButton').click()", { userGesture: true });
     const smokeTestSummary = await runSmokeTestMapSmoke(page, { expectedVersion, timeoutMs });
+    await restartSmokeTestMap(page, { expectedVersion, pageUrl, timeoutMs });
+    smokeTestSummary.smokeTest.lockpick = await runSmokeTestLockpickSmoke(page, {
+      expectedVersion,
+      timeoutMs,
+    });
     await finishSmoke(page, tracker, {
       expectedVersion,
       origin,
@@ -761,7 +770,7 @@ async function runSmokeTestMapSmoke(page, options) {
   // end-to-end поведение активностей, а не просто проверка открытия overlay.
   const { expectedVersion, timeoutMs } = options;
   await waitForExpression(page, "globalThis.__wildwestDebug?.map?.state?.mapConfig?.id === 'SmokeTest'", timeoutMs);
-  await waitForExpression(page, "document.querySelectorAll('#mapBoard .map-node').length === 7", timeoutMs);
+  await waitForExpression(page, "document.querySelectorAll('#mapBoard .map-node').length === 8", timeoutMs);
 
   const initialSnapshot = await assertSmokeTestMapReady(page, expectedVersion);
   const steps = [];
@@ -840,6 +849,205 @@ async function runSmokeTestMapSmoke(page, options) {
   };
 }
 
+async function restartSmokeTestMap(page, options) {
+  const { expectedVersion, pageUrl, timeoutMs } = options;
+  await page.send("Page.navigate", { url: pageUrl });
+  await waitForExpression(page, "document.readyState !== 'loading'", timeoutMs);
+  await waitForExpression(
+    page,
+    `globalThis.__ROGUELITE_MATCH3_VERSION__ === ${JSON.stringify(expectedVersion)}`,
+    timeoutMs,
+  );
+  await waitForExpression(
+    page,
+    "Boolean(document.querySelector('#smokeTestButton'))"
+      + " && document.querySelector('#loadingOverlay')?.classList.contains('hidden')",
+    timeoutMs,
+  );
+  await typeText(page, "iddqd");
+  await waitForExpression(
+    page,
+    "!document.querySelector('#smokeTestButton')?.classList.contains('hidden')"
+      + " && !document.querySelector('#smokeTestButton')?.disabled",
+    timeoutMs,
+  );
+  await evaluate(page, "document.querySelector('#smokeTestButton').click()", { userGesture: true });
+}
+
+async function runSmokeTestLockpickSmoke(page, options) {
+  const { expectedVersion, timeoutMs } = options;
+  await waitForExpression(page, "globalThis.__wildwestDebug?.map?.state?.mapConfig?.id === 'SmokeTest'", timeoutMs);
+  await waitForExpression(page, "document.querySelectorAll('#mapBoard .map-node').length === 8", timeoutMs);
+  const initialSnapshot = await assertSmokeTestMapReady(page, expectedVersion);
+  const initialKeyQuantity = getSnapshotQuantity(initialSnapshot, "item_key");
+  assert(initialKeyQuantity === 5, `Expected five SmokeTest keys, got ${initialKeyQuantity}.`);
+
+  const dialogNode = await clickNextSmokeTestNode(page, "dialog_lockpick_smoke", timeoutMs);
+  await waitForExpression(page, "!document.querySelector('#mapDialogOverlay')?.classList.contains('hidden')", timeoutMs);
+  await evaluate(page, "document.querySelector('#mapDialogOverlay')?.click()", { userGesture: true });
+  await waitForExpression(
+    page,
+    "document.querySelector('#mapDialogAnswers')?.classList.contains('is-visible')"
+      + " && document.querySelector('#mapDialogAnswers button[data-dialog-event-name=\"lockpick_smoke\"]')",
+    timeoutMs,
+  );
+  const dialogAnswer = await evaluateJson(page, `(() => {
+    const button = document.querySelector('#mapDialogAnswers button[data-dialog-event-name="lockpick_smoke"]');
+    if (!button) {
+      return null;
+    }
+    const result = {
+      text: button.textContent?.trim() || "",
+      eventName: button.dataset.dialogEventName || "",
+    };
+    button.click();
+    return result;
+  })()`, { userGesture: true });
+  assert(dialogAnswer?.eventName === "lockpick_smoke", "Expected dialog to launch lockpick_smoke.");
+
+  await waitForExpression(
+    page,
+    "!document.querySelector('#lockpickOverlay')?.classList.contains('hidden')"
+      + " && document.querySelectorAll('#lockpickRings .lockpick-ring').length === 5",
+    timeoutMs,
+  );
+  const opened = await evaluateJson(page, `(() => {
+    const state = globalThis.__wildwestDebug?.map?.state;
+    const session = state?.activeLockpickSession;
+    return {
+      ringCount: document.querySelectorAll("#lockpickRings .lockpick-ring").length,
+      lives: document.querySelectorAll("#lockpickLives .lockpick-life").length,
+      ringSizes: [...document.querySelectorAll("#lockpickRings .lockpick-ring")]
+        .map((ring) => ring.style.getPropertyValue("--lockpick-ring-size")),
+      selectorButtons: document.querySelectorAll("#lockpickSelectOuterButton, #lockpickSelectInnerButton").length,
+      outerDisabled: document.querySelector("#lockpickSelectOuterButton")?.disabled === true,
+      innerDisabled: document.querySelector("#lockpickSelectInnerButton")?.disabled === true,
+      settingsPresent: Boolean(document.querySelector("#lockpickSettingsButton")),
+      surrenderPresent: Boolean(document.querySelector("#lockpickSurrenderButton")),
+      keyQuantity: Number((state?.playerState?.inventory || [])
+        .find((entry) => entry.itemId === "item_key")?.quantity || 0),
+      keyEnabled: !document.querySelector("#lockpickUseKeyButton")?.disabled,
+      scrambleMoveCount: Number(session?.puzzle?.scrambleMoveCount || 0),
+      shortestSolutionMoves: Number(session?.puzzle?.shortestSolutionMoves || 0),
+      solutionExposed: Object.hasOwn(session?.puzzle || {}, "solutionActions"),
+    };
+  })()`);
+  assert(opened.ringCount === 5, `Expected five lockpick rings, got ${opened.ringCount}.`);
+  assert(opened.lives === 4, `Expected four reserve lockpicks, got ${opened.lives}.`);
+  assert(opened.ringSizes.join("|") === "100%|85%|70%|55%|40%", `Unexpected lockpick ring sizes: ${opened.ringSizes.join(", ")}.`);
+  assert(opened.selectorButtons === 2, `Expected two ring selector buttons, got ${opened.selectorButtons}.`);
+  assert(opened.outerDisabled === true, "Outer selector must be disabled on the outermost ring.");
+  assert(opened.innerDisabled === false, "Inner selector must be enabled on the outermost ring.");
+  assert(opened.settingsPresent === false, "Lockpick overlay must not contain a settings button.");
+  assert(opened.surrenderPresent === false, "Lockpick overlay must not contain a surrender button.");
+  assert(opened.keyQuantity === initialKeyQuantity, "Opening lockpick must not consume a key.");
+  assert(opened.keyEnabled === true, "Expected key button to be enabled.");
+  assert(opened.scrambleMoveCount >= 9 && opened.scrambleMoveCount <= 18, "Unexpected lockpick scramble length.");
+  assert(opened.shortestSolutionMoves >= 6, "Lockpick solution must require at least six safe moves.");
+  assert(opened.solutionExposed === false, "Lockpick UI session must not expose the test solution.");
+
+  const hitZones = await evaluateJson(page, `(() => {
+    const state = globalThis.__wildwestDebug?.map?.state;
+    const stage = document.querySelector("#lockpickRingStage");
+    const rings = document.querySelector("#lockpickRings");
+    const rect = rings.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const radius = Math.min(rect.width, rect.height) / 2;
+    return [0.925, 0.775, 0.625, 0.475, 0.2].map((normalizedRadius) => {
+      stage.dispatchEvent(new MouseEvent("click", {
+        bubbles: true,
+        clientX: centerX + radius * normalizedRadius,
+        clientY: centerY,
+      }));
+      return state?.activeLockpickSession?.selectedRingIndex ?? -1;
+    });
+  })()`);
+  assert(hitZones.join("|") === "0|1|2|3|4", `Lockpick hit zones selected unexpected rings: ${hitZones.join(", ")}.`);
+
+  const selectionControls = await evaluateJson(page, `(() => {
+    const session = globalThis.__wildwestDebug?.map?.state?.activeLockpickSession;
+    const result = { buttons: [], keyboard: [] };
+    document.querySelector("#lockpickSelectOuterButton")?.click();
+    result.buttons.push(session?.selectedRingIndex ?? -1);
+    document.querySelector("#lockpickSelectInnerButton")?.click();
+    result.buttons.push(session?.selectedRingIndex ?? -1);
+    document.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, code: "KeyW", key: "w" }));
+    result.keyboard.push(session?.selectedRingIndex ?? -1);
+    document.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, code: "KeyS", key: "s" }));
+    result.keyboard.push(session?.selectedRingIndex ?? -1);
+    result.outerDisabled = document.querySelector("#lockpickSelectOuterButton")?.disabled === true;
+    result.innerDisabled = document.querySelector("#lockpickSelectInnerButton")?.disabled === true;
+    return result;
+  })()`, { userGesture: true });
+  assert(selectionControls.buttons.join("|") === "3|4", `Selector buttons chose unexpected rings: ${selectionControls.buttons.join(", ")}.`);
+  assert(selectionControls.keyboard.join("|") === "3|4", `W/S chose unexpected rings: ${selectionControls.keyboard.join(", ")}.`);
+  assert(selectionControls.outerDisabled === false, "Outer selector must be enabled on the innermost ring.");
+  assert(selectionControls.innerDisabled === true, "Inner selector must be disabled on the innermost ring.");
+
+  const clockwiseKeyboard = await evaluateJson(page, `(() => {
+    const session = globalThis.__wildwestDebug?.map?.state?.activeLockpickSession;
+    const before = [...(session?.positions || [])];
+    document.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, code: "KeyD", key: "d" }));
+    return { before, after: [...(session?.positions || [])], animating: session?.isAnimating === true };
+  })()`, { userGesture: true });
+  assert(clockwiseKeyboard.before.join("|") !== clockwiseKeyboard.after.join("|"), "D did not rotate the selected ring.");
+  assert(clockwiseKeyboard.animating === true, "D rotation did not enter animation state.");
+  await waitForExpression(
+    page,
+    "globalThis.__wildwestDebug?.map?.state?.activeLockpickSession?.isAnimating === false",
+    timeoutMs,
+  );
+
+  const counterclockwiseKeyboard = await evaluateJson(page, `(() => {
+    const session = globalThis.__wildwestDebug?.map?.state?.activeLockpickSession;
+    const before = [...(session?.positions || [])];
+    document.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, code: "KeyA", key: "a" }));
+    return { before, after: [...(session?.positions || [])], animating: session?.isAnimating === true };
+  })()`, { userGesture: true });
+  assert(counterclockwiseKeyboard.before.join("|") !== counterclockwiseKeyboard.after.join("|"), "A did not rotate the selected ring.");
+  assert(counterclockwiseKeyboard.animating === true, "A rotation did not enter animation state.");
+  await waitForExpression(
+    page,
+    "globalThis.__wildwestDebug?.map?.state?.activeLockpickSession?.isAnimating === false",
+    timeoutMs,
+  );
+
+  await evaluate(page, "document.querySelector('#lockpickUseKeyButton')?.click()", { userGesture: true });
+  await waitForExpression(
+    page,
+    "document.querySelector('#lockpickOverlay')?.classList.contains('hidden')"
+      + " && !document.querySelector('#rewardOverlay')?.classList.contains('hidden')"
+      + ` && globalThis.__wildwestDebug?.map?.state?.completedNodeIds?.has(${JSON.stringify(dialogNode.id)}) === false`,
+    timeoutMs,
+  );
+  const beforeClaim = await readMapActivitySnapshot(page);
+  assert(getSnapshotQuantity(beforeClaim, "item_key") === initialKeyQuantity - 1, "Lockpick key was not consumed before reward claim.");
+  assert(beforeClaim.availableNodeIds.includes(dialogNode.id), "Lockpick dialog node must remain available before reward claim.");
+  const rewardItemCount = await evaluateJson(
+    page,
+    "document.querySelectorAll('#rewardItems .reward-item').length",
+  );
+  assert(rewardItemCount === 3, `Expected three lockpick reward entries, got ${rewardItemCount}.`);
+
+  await evaluate(page, "document.querySelector('#rewardClaimButton')?.click()", { userGesture: true });
+  const afterClaim = await waitForSmokeNodeCompleted(page, dialogNode.id, timeoutMs);
+  assert(afterClaim.overlays.rewardHidden === true, "Lockpick reward overlay must close after claim.");
+  assert(afterClaim.availableNodeIds.length === 1, `Expected one next node after lockpick claim, got ${afterClaim.availableNodeIds.length}.`);
+
+  return {
+    dialogNodeId: dialogNode.id,
+    dialogAnswer,
+    opened,
+    hitZones,
+    selectionControls,
+    clockwiseKeyboard,
+    counterclockwiseKeyboard,
+    beforeClaim: summarizeMapSnapshot(beforeClaim),
+    afterClaim: summarizeMapSnapshot(afterClaim),
+  };
+}
+
 async function assertSmokeTestMapReady(page, expectedVersion) {
   const snapshot = await readMapActivitySnapshot(page);
   assert(snapshot.appVersion === expectedVersion, `Expected app version ${expectedVersion}, got ${snapshot.appVersion}.`);
@@ -848,14 +1056,22 @@ async function assertSmokeTestMapReady(page, expectedVersion) {
   assert(snapshot.activeTestRun === true, "Expected SmokeTest to run as a test-run.");
   assert(snapshot.legacyContextExposed === false, "Legacy window.context/window.contex must not be exposed.");
   assert(snapshot.mapId === "SmokeTest", `Expected SmokeTest map id, got ${snapshot.mapId}.`);
-  assert(snapshot.generatedNodes.length === smokeTestNodeEvents.length, `Expected ${smokeTestNodeEvents.length} SmokeTest nodes, got ${snapshot.generatedNodes.length}.`);
+  assert(snapshot.generatedNodes.length === smokeTestGeneratedNodeEvents.length, `Expected ${smokeTestGeneratedNodeEvents.length} SmokeTest nodes, got ${snapshot.generatedNodes.length}.`);
   const actualEvents = snapshot.generatedNodes.map((node) => node.eventName);
+  const expectedEvents = [...smokeTestGeneratedNodeEvents].sort();
   assert(
-    actualEvents.join("|") === smokeTestNodeEvents.join("|"),
-    `Unexpected SmokeTest node order: ${actualEvents.join(", ")}.`,
+    [...actualEvents].sort().join("|") === expectedEvents.join("|"),
+    `Unexpected SmokeTest node set: ${actualEvents.join(", ")}.`,
   );
-  assert(snapshot.availableNodeIds.length === 1, `Expected one initial SmokeTest node, got ${snapshot.availableNodeIds.length}.`);
-  assert(snapshot.generatedNodes[0]?.id === snapshot.availableNodeIds[0], "Expected SmokeTest first node to be available.");
+  assert(snapshot.availableNodeIds.length === 2, `Expected two initial SmokeTest nodes, got ${snapshot.availableNodeIds.length}.`);
+  const availableEvents = snapshot.generatedNodes
+    .filter((node) => snapshot.availableNodeIds.includes(node.id))
+    .map((node) => node.eventName)
+    .sort();
+  assert(
+    availableEvents.join("|") === ["dialog_lockpick_smoke", "dialog_smoke"].sort().join("|"),
+    `Unexpected SmokeTest starting events: ${availableEvents.join(", ")}.`,
+  );
   return snapshot;
 }
 
@@ -865,7 +1081,7 @@ async function clickNextSmokeTestNode(page, expectedEventName, timeoutMs) {
     const state = globalThis.__wildwestDebug?.map?.state;
     const availableIds = [...(state?.availableNodeIds || [])];
     const nodes = (state?.generatedMap?.levels || []).flatMap((level) => level.nodes || []);
-    const node = nodes.find((item) => availableIds.includes(item.id));
+    const node = nodes.find((item) => availableIds.includes(item.id) && item.eventName === ${JSON.stringify(expectedEventName)});
     if (!node) {
       return null;
     }

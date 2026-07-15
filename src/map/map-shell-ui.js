@@ -30,6 +30,7 @@ export function createMapShellUiController(deps) {
     closeHeal,
     closeReward,
     closeMapDialogOverlay,
+    closeLockpick,
   } = deps;
 
   function startMenuMusicAfterInteraction() {
@@ -194,6 +195,7 @@ export function createMapShellUiController(deps) {
     closeHeal({ complete: false });
     closeReward({ scrollToNext: false });
     closeMapDialogOverlay();
+    closeLockpick();
     hideEventLogOverlay();
     hideSettingsPanel();
     hideSurrenderDialog();

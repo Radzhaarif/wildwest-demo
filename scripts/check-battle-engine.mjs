@@ -620,6 +620,93 @@ run("gold loot never returns the source item id", () => {
   );
 });
 
+run("gold loot uses nearby cells as weighted type candidates", () => {
+  const localCatalog = {
+    items: [
+      createMatchItem("Knife", "Knife", { goldloot: 1 }),
+      createMatchItem("Knife_power", "Knife", { category: "rare_match-3" }),
+      createMatchItem("Shield", "Shield", { goldloot: 1 }),
+      createMatchItem("trash_1", "trash_1"),
+      createMatchItem("radioactive", "radioactive", { category: "rare_match-3" }),
+    ],
+  };
+  const board = [
+    ["Knife_power", "Shield", "radioactive"],
+    ["radioactive", "trash_1", "Shield"],
+    ["radioactive", "Shield", "radioactive"],
+  ];
+
+  assert.equal(
+    engine.pickBattleGoldLootItem(localCatalog, {
+      sourceItemId: "trash_1",
+      board,
+      targetCell: { row: 1, col: 1 },
+      random: createSequenceRandom([0]),
+    }),
+    "Knife",
+  );
+  assert.equal(
+    engine.pickBattleGoldLootItem(localCatalog, {
+      sourceItemId: "trash_1",
+      board,
+      targetCell: { row: 1, col: 1 },
+      random: createSequenceRandom([0.5]),
+    }),
+    "Shield",
+  );
+});
+
+run("gold loot corner uses only its three real neighboring cells", () => {
+  const localCatalog = {
+    items: [
+      createMatchItem("Knife", "Knife", { goldloot: 1 }),
+      createMatchItem("Shield", "Shield", { goldloot: 1 }),
+      createMatchItem("trash_1", "trash_1"),
+      createMatchItem("radioactive", "radioactive", { category: "rare_match-3" }),
+    ],
+  };
+  const board = [
+    ["trash_1", "Shield"],
+    ["Knife", "radioactive"],
+  ];
+
+  assert.equal(
+    engine.pickBattleGoldLootItem(localCatalog, {
+      sourceItemId: "trash_1",
+      board,
+      targetCell: { row: 0, col: 0 },
+      random: createSequenceRandom([0.75]),
+    }),
+    "Knife",
+  );
+});
+
+run("gold loot ignores boxed neighbors and falls back to the global pool", () => {
+  const localCatalog = {
+    items: [
+      createMatchItem("Knife", "Knife", { goldloot: 1 }),
+      createMatchItem("Shield", "Shield", { goldloot: 1 }),
+      createMatchItem("trash_1", "trash_1"),
+      createMatchItem("radioactive", "radioactive", { category: "rare_match-3" }),
+    ],
+  };
+  const board = [
+    ["trash_1", "Shield"],
+    ["radioactive", "radioactive"],
+  ];
+
+  assert.equal(
+    engine.pickBattleGoldLootItem(localCatalog, {
+      sourceItemId: "trash_1",
+      board,
+      targetCell: { row: 0, col: 0 },
+      boxes: [{ row: 0, col: 1 }],
+      random: createSequenceRandom([0]),
+    }),
+    "Knife",
+  );
+});
+
 run("enemy convert chance transforms newly generated drops by exact itemId", () => {
   const localCatalog = {
     items: [

@@ -28,6 +28,10 @@
     {
       "itemId": "item_time",
       "quantity": 2
+    },
+    {
+      "itemId": "item_key",
+      "quantity": 5
     }
   ]
 }

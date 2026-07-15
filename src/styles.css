@@ -70,6 +70,7 @@ html.is-forced-landscape .modal-overlay,
 html.is-forced-landscape .shop-overlay,
 html.is-forced-landscape .reward-overlay,
 html.is-forced-landscape .map-dialog-overlay,
+html.is-forced-landscape .lockpick-overlay,
 html.is-forced-landscape .battle-scaffold-overlay {
   inset: 0;
   width: 100%;
@@ -1579,6 +1580,515 @@ button:disabled {
 
 .map-dialog-overlay.hidden {
   display: none;
+}
+
+.lockpick-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 34;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: rgba(5, 4, 3, 0.92);
+  backdrop-filter: blur(5px);
+}
+
+.lockpick-overlay.hidden {
+  display: none;
+}
+
+.lockpick-scene {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1420px;
+  height: 810px;
+  overflow: hidden;
+  pointer-events: auto;
+  transform: translate(-50%, -50%);
+  border: 4px solid #493b2b;
+  border-radius: 28px;
+  background: #120f0c;
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.82),
+    inset 0 0 0 2px rgba(220, 173, 88, 0.12);
+  color: #f5ead4;
+}
+
+.lockpick-scene::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(7, 5, 3, 0.78), rgba(7, 5, 3, 0.2) 30%, rgba(7, 5, 3, 0.18) 70%, rgba(7, 5, 3, 0.78)),
+    linear-gradient(180deg, rgba(7, 5, 3, 0.58), transparent 26%, transparent 72%, rgba(7, 5, 3, 0.76));
+}
+
+.lockpick-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-position: center;
+  background-size: cover;
+  filter: brightness(0.42) saturate(0.74) contrast(1.08);
+  transform: scale(1.04);
+}
+
+.lockpick-header,
+.lockpick-workbench,
+.lockpick-footer {
+  position: absolute;
+  z-index: 2;
+}
+
+.lockpick-header {
+  top: 20px;
+  left: 28px;
+  right: 28px;
+  display: grid;
+  grid-template-columns: 310px 1fr 310px;
+  align-items: start;
+  gap: 18px;
+}
+
+.lockpick-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.lockpick-header-actions button,
+.lockpick-use-key,
+.lockpick-confirm-panel button {
+  min-height: 48px;
+  padding: 10px 18px;
+  border: 2px solid #6e5a3b;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(69, 58, 44, 0.96), rgba(25, 21, 17, 0.98));
+  color: #fff0ca;
+  font: inherit;
+  font-weight: 800;
+  text-transform: uppercase;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.12), 0 6px 18px rgba(0, 0, 0, 0.42);
+  cursor: var(--cursor-active), pointer;
+}
+
+.lockpick-header-actions button:hover:not(:disabled),
+.lockpick-header-actions button:focus-visible,
+.lockpick-use-key:hover:not(:disabled),
+.lockpick-use-key:focus-visible,
+.lockpick-confirm-panel button:hover:not(:disabled),
+.lockpick-confirm-panel button:focus-visible {
+  border-color: #e0b85e;
+  color: #fff8df;
+  box-shadow: 0 0 20px rgba(233, 184, 76, 0.35);
+}
+
+.lockpick-heading {
+  text-align: center;
+  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.88);
+}
+
+.lockpick-heading h2 {
+  margin: 0;
+  color: #f3cf78;
+  font-size: 38px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.lockpick-heading p {
+  max-width: 650px;
+  margin: 8px auto 0;
+  color: #e8dbc4;
+  font-size: 17px;
+  line-height: 1.35;
+}
+
+.lockpick-lives {
+  display: flex;
+  min-height: 74px;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+}
+
+.lockpick-life {
+  display: block;
+  width: 46px;
+  height: 68px;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.8));
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.lockpick-workbench {
+  top: 138px;
+  left: 50%;
+  display: grid;
+  grid-template-columns: 150px 560px 150px;
+  align-items: center;
+  gap: 20px;
+  transform: translateX(-50%);
+}
+
+.lockpick-ring-selectors {
+  position: absolute;
+  top: 50%;
+  left: -92px;
+  z-index: 4;
+  display: grid;
+  gap: 14px;
+  transform: translateY(-50%);
+}
+
+.lockpick-ring-selectors button {
+  width: 78px;
+  height: 78px;
+  border: 4px solid #5e4c35;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(79, 67, 50, 0.98), rgba(27, 23, 18, 0.98));
+  color: #f4cf74;
+  font: inherit;
+  font-size: 48px;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 3px 4px #000;
+  box-shadow:
+    inset 0 0 0 3px rgba(8, 7, 6, 0.58),
+    0 8px 22px rgba(0, 0, 0, 0.62);
+  cursor: var(--cursor-active), pointer;
+}
+
+.lockpick-ring-selectors button:hover:not(:disabled),
+.lockpick-ring-selectors button:focus-visible {
+  border-color: #d9ad52;
+  color: #fff2ad;
+  box-shadow: 0 0 24px rgba(237, 183, 65, 0.42), inset 0 0 12px rgba(0, 0, 0, 0.68);
+}
+
+.lockpick-rotate-button {
+  position: relative;
+  z-index: 4;
+  width: 118px;
+  height: 118px;
+  justify-self: center;
+  border: 5px solid #5e4c35;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 36% 30%, #8c795c 0 8%, #493d2e 34%, #1c1814 74%),
+    #252019;
+  color: #f4cf74;
+  font-size: 78px;
+  line-height: 1;
+  text-shadow: 0 3px 4px #000;
+  box-shadow:
+    inset 0 0 0 5px rgba(8, 7, 6, 0.68),
+    inset 0 0 20px rgba(0, 0, 0, 0.72),
+    0 10px 28px rgba(0, 0, 0, 0.7);
+  cursor: var(--cursor-active), pointer;
+}
+
+.lockpick-rotate-button:hover:not(:disabled),
+.lockpick-rotate-button:focus-visible {
+  border-color: #d9ad52;
+  color: #fff2ad;
+  box-shadow: 0 0 26px rgba(237, 183, 65, 0.46), inset 0 0 18px rgba(0, 0, 0, 0.72);
+}
+
+.lockpick-rotate-button:disabled,
+.lockpick-ring-selectors button:disabled,
+.lockpick-header-actions button:disabled,
+.lockpick-use-key:disabled {
+  opacity: 0.42;
+  cursor: var(--cursor-active), not-allowed;
+}
+
+.lockpick-ring-stage {
+  position: relative;
+  width: 560px;
+  height: 560px;
+  border: 12px solid #30281f;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(10, 9, 8, 0.98) 0 10%, rgba(30, 26, 21, 0.98) 60%, rgba(10, 9, 7, 0.98) 100%);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.78),
+    inset 0 0 0 5px #756044,
+    inset 0 0 48px rgba(0, 0, 0, 0.9);
+  cursor: var(--cursor-active), pointer;
+  touch-action: manipulation;
+}
+
+.lockpick-ring-stage.is-disabled {
+  cursor: var(--cursor-active), wait;
+}
+
+.lockpick-rings {
+  position: absolute;
+  inset: 20px;
+  border-radius: 50%;
+}
+
+.lockpick-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--lockpick-ring-size);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) rotate(var(--lockpick-ring-rotation));
+  transition-property: transform;
+  transition-duration: var(--lockpick-ring-transition-ms, 200ms);
+  transition-timing-function: cubic-bezier(0.22, 0.76, 0.24, 1);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.lockpick-ring-surface {
+  position: absolute;
+  inset: 0;
+  border: clamp(3px, 0.7vw, 8px) solid #17130f;
+  border-radius: 50%;
+  background:
+    repeating-conic-gradient(from 4deg, rgba(225, 188, 116, 0.12) 0 2deg, transparent 2deg 15deg),
+    radial-gradient(circle at 38% 31%, #78654b 0 5%, #4a4034 28%, #29241e 62%, #14110e 100%);
+  box-shadow:
+    inset 0 0 0 clamp(3px, 0.5vw, 6px) rgba(138, 112, 71, 0.42),
+    inset 0 0 24px rgba(0, 0, 0, 0.9),
+    0 0 0 2px rgba(10, 8, 6, 0.92),
+    0 8px 18px rgba(0, 0, 0, 0.68);
+  transition: border-color 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+}
+
+.lockpick-ring:nth-child(even) .lockpick-ring-surface {
+  background:
+    repeating-conic-gradient(from 11deg, rgba(230, 178, 84, 0.11) 0 2deg, transparent 2deg 15deg),
+    radial-gradient(circle at 41% 34%, #655846 0 4%, #3c352c 30%, #211d18 66%, #100e0c 100%);
+}
+
+.lockpick-ring.is-selected .lockpick-ring-surface {
+  border-color: #ffcf5c;
+  filter: brightness(1.28);
+  box-shadow:
+    inset 0 0 20px rgba(255, 198, 66, 0.3),
+    0 0 10px #ffd46c,
+    0 0 30px rgba(255, 190, 54, 0.8);
+}
+
+.lockpick-ring.is-same .lockpick-ring-surface {
+  border-color: #60e083;
+  filter: brightness(1.16);
+  box-shadow: inset 0 0 20px rgba(54, 212, 104, 0.28), 0 0 24px rgba(66, 236, 116, 0.78);
+}
+
+.lockpick-ring.is-opposite .lockpick-ring-surface {
+  border-color: #ef5d52;
+  filter: brightness(1.14);
+  box-shadow: inset 0 0 20px rgba(235, 62, 48, 0.3), 0 0 24px rgba(255, 72, 58, 0.78);
+}
+
+.lockpick-ring-gap {
+  position: absolute;
+  top: -2%;
+  left: 50%;
+  z-index: 3;
+  width: 13%;
+  height: 14%;
+  transform: translateX(-50%);
+  border-inline: 2px solid rgba(226, 184, 103, 0.58);
+  background: linear-gradient(90deg, #080706, #17130f 48%, #080706);
+  box-shadow: 0 4px 7px rgba(0, 0, 0, 0.78);
+}
+
+.lockpick-ring-bump-anchor {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  transform: rotate(var(--lockpick-bump-rotation));
+  pointer-events: none;
+}
+
+.lockpick-ring-bump {
+  position: absolute;
+  top: -4%;
+  left: 50%;
+  width: 12%;
+  height: 13%;
+  transform: translateX(-50%);
+  clip-path: polygon(18% 100%, 32% 18%, 50% 0, 68% 18%, 82% 100%);
+  background: linear-gradient(90deg, #7f2e20, #ec7a42 48%, #711f18);
+  box-shadow: 0 -3px 8px rgba(255, 102, 54, 0.48);
+}
+
+.lockpick-top-marker {
+  position: absolute;
+  top: -27px;
+  left: 50%;
+  z-index: 8;
+  width: 0;
+  height: 0;
+  transform: translateX(-50%);
+  border-right: 20px solid transparent;
+  border-left: 20px solid transparent;
+  border-top: 0;
+  border-bottom: 34px solid #ffd36a;
+  filter: drop-shadow(0 0 8px rgba(255, 199, 73, 0.84));
+}
+
+.lockpick-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 6;
+  width: 64px;
+  height: 64px;
+  transform: translate(-50%, -50%);
+  border: 4px solid #8b714a;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, #8b7659, #2b241c 54%, #0c0a08 100%);
+  box-shadow: inset 0 0 14px #000, 0 0 12px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+}
+
+.lockpick-pick-image {
+  position: absolute;
+  right: -66px;
+  bottom: -86px;
+  z-index: 9;
+  display: block;
+  width: 245px;
+  height: 245px;
+  object-fit: contain;
+  transform: rotate(-13deg);
+  transform-origin: 35% 30%;
+  filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.86));
+  pointer-events: none;
+}
+
+.lockpick-overlay.is-moving .lockpick-pick-image {
+  animation: lockpickToolMove 200ms ease-in-out both;
+}
+
+.lockpick-overlay.is-breaking .lockpick-pick-image {
+  animation: lockpickToolBreak 500ms ease-in both;
+}
+
+.lockpick-overlay.is-breaking .lockpick-ring-stage {
+  animation: lockpickMachineBreak 500ms ease-in-out both;
+}
+
+.lockpick-overlay.is-opening .lockpick-ring-stage {
+  animation: lockpickMachineOpen 700ms ease-in-out both;
+}
+
+.lockpick-overlay.is-opening .lockpick-ring-surface {
+  border-color: #ffe58b;
+  box-shadow: inset 0 0 24px rgba(255, 216, 104, 0.4), 0 0 30px rgba(255, 210, 94, 0.82);
+}
+
+.lockpick-footer {
+  right: 40px;
+  bottom: 24px;
+  left: 40px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 20px;
+}
+
+.lockpick-status {
+  grid-column: 2;
+  min-width: 420px;
+  margin: 0;
+  padding: 12px 24px;
+  border: 1px solid rgba(211, 174, 103, 0.4);
+  border-radius: 12px;
+  background: rgba(10, 8, 6, 0.78);
+  color: #f4dfb5;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  text-shadow: 0 2px 5px #000;
+}
+
+.lockpick-use-key {
+  grid-column: 3;
+  display: inline-flex;
+  justify-self: end;
+  align-items: center;
+  gap: 10px;
+  min-width: 260px;
+}
+
+.lockpick-use-key img {
+  display: block;
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+}
+
+.lockpick-confirm {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  background: rgba(2, 2, 2, 0.74);
+  backdrop-filter: blur(4px);
+}
+
+.lockpick-confirm.hidden {
+  display: none;
+}
+
+.lockpick-confirm-panel {
+  width: 560px;
+  padding: 34px;
+  border: 3px solid #7d6542;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #342a20, #17130f);
+  box-shadow: 0 20px 64px rgba(0, 0, 0, 0.82);
+  text-align: center;
+}
+
+.lockpick-confirm-panel p {
+  margin: 0 0 26px;
+  font-size: 24px;
+  line-height: 1.4;
+}
+
+.lockpick-confirm-panel > div {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+}
+
+@keyframes lockpickToolMove {
+  0% { transform: rotate(-13deg); }
+  46% { transform: rotate(-7deg) translate(-4px, -3px); }
+  100% { transform: rotate(-13deg); }
+}
+
+@keyframes lockpickToolBreak {
+  0% { opacity: 1; transform: rotate(-13deg); }
+  36% { transform: rotate(-27deg) translate(-8px, 4px); filter: drop-shadow(0 0 14px #ff5538); }
+  100% { opacity: 0.18; transform: rotate(20deg) translate(38px, 42px) scale(0.82); }
+}
+
+@keyframes lockpickMachineBreak {
+  0%, 100% { translate: 0 0; }
+  18% { translate: -7px 2px; }
+  40% { translate: 8px -2px; }
+  66% { translate: -5px 1px; }
+}
+
+@keyframes lockpickMachineOpen {
+  0% { filter: brightness(1); transform: scale(1); }
+  55% { filter: brightness(1.72) saturate(1.35); transform: scale(1.025); }
+  100% { filter: brightness(2.1) saturate(0.72); transform: scale(1.12); opacity: 0; }
 }
 
 .map-dialog-scene {

@@ -39,6 +39,7 @@ export function createMapRunController(deps) {
     closeMapDialogOverlay,
     closeShop,
     hideRewardOverlay,
+    closeLockpick,
   } = deps;
 
   async function startGame() {
@@ -271,6 +272,9 @@ export function createMapRunController(deps) {
     state.currentNodeId = null;
     state.activeShopNode = null;
     state.activeHealNode = null;
+    state.activeLockpickNode = null;
+    state.activeLockpickSession = null;
+    state.activeLockpickCompletion = null;
     state.shopSelection = new Map();
     state.pendingReward = null;
     state.pendingLevelUps = [];
@@ -280,6 +284,7 @@ export function createMapRunController(deps) {
     closeMapDialogOverlay();
     closeShop({ complete: false });
     hideRewardOverlay();
+    closeLockpick();
     const levelSummary = getMapLevelSummary(state.mapConfig);
     addLog(
       formatText("log.mapGenerated", {

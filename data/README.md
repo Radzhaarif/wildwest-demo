@@ -26,9 +26,9 @@
 - Генерация карты: отдельный модуль `src/map/map-generation.js`, который строит уровни, точки, payload событий и дороги.
 - Бой: отдельный match-3 модуль. Карта передает ему `BattleRequest`, получает `BattleResult` и сама решает прогресс маршрута.
 - Магазин: событие торговца с покупкой предметов за золото.
-- Лечение и награды: события, которые меняют состояние игрока.
+- Лечение, награды и взлом: события, которые меняют состояние игрока или открывают отдельную мини-игру.
 
-Сейчас главный рабочий модуль - карта с событиями `skip`, `shop`, `heal`, `reward` и боевыми вариантами `battle`, включая boss-события как именованные battle-точки.
+Сейчас главный рабочий модуль - карта с событиями `skip`, `shop`, `heal`, `reward`, `dialog`, `lockpick` и боевыми вариантами `battle`, включая boss-события как именованные battle-точки.
 
 ## Главные файлы
 
@@ -42,7 +42,8 @@
 - `src/map/map-items.js`, `src/map/map-dom.js`, `src/map/map-media.js`, `src/map/map-tooltips.js` - helper/controller-модули карты для item/inventory lookup, DOM-адаптера, event images и item tooltip. Внутри `src/map/*` только `map-dom.js` должен искать DOM через `querySelector`.
 - `src/map/map-ui-scale.js`, `src/map/map-loading-ui.js`, `src/map/map-data-preload.js`, `src/map/map-boot-controller.js` - инфраструктура запуска карты: масштабирование UI, loading-screen, загрузка/валидация данных, preload ассетов и boot/reload flow.
 - `src/map/map-shell-ui.js`, `src/map/map-cheats.js`, `src/map/map-audio.js`, `src/map/map-settings.js`, `src/map/map-layout.js`, `src/map/map-renderer.js`, `src/map/map-scroll.js`, `src/map/map-animations.js` - shell и визуальный слой карты: меню/настройки/audio/surrender/log, typed-sequence cheats, позиции узлов, дороги, кнопки, прокрутка и декоративные эффекты.
-- `src/map/map-rewards.js`, `src/map/map-shop-heal.js`, `src/map/map-dialog.js`, `src/map/map-hud.js`, `src/map/map-battle-controller.js`, `src/map/map-node-flow.js`, `src/map/map-run-controller.js`, `src/map/map-completion.js` - внутренние controller-модули карты для reward/level-up, shop/heal, dialog, HUD, battle entry, flow узлов, старта run и завершения карты. Они получают runtime state, DOM-ссылки и helpers явно из фасада, а не читают глобальный state сами.
+- `src/map/map-rewards.js`, `src/map/map-shop-heal.js`, `src/map/map-dialog.js`, `src/map/map-lockpick.js`, `src/map/map-hud.js`, `src/map/map-battle-controller.js`, `src/map/map-node-flow.js`, `src/map/map-run-controller.js`, `src/map/map-completion.js` - внутренние controller-модули карты для reward/level-up, shop/heal, dialog, lockpick, HUD, battle entry, flow узлов, старта run и завершения карты. Они получают runtime state, DOM-ссылки и helpers явно из фасада, а не читают глобальный state сами.
+- `src/map/map-lockpick-engine.js` - чистая дискретная логика взлома: граф прямых связей колец, безопасное перемешивание, проверка выпуклостей и поиск кратчайшего безопасного решения.
 - `src/seeded-random.js` - общий debug-инструмент для 16-символьных seed, производных domain seed и детерминированного RNG; используется генерацией карты и игровым RNG боя.
 - `src/debug-hooks.js` - явный dev/debug-хук `window.__wildwestDebug`; старые глобальные `window.context` и `window.contex` не используются.
 - `scripts/check-project.mjs` - общий локальный чекер проекта: синтаксис JS, JSON/JSONC, валидатор игровых данных, ссылки на ассеты, активные локали, CSS-скобки, боевые engine-проверки и проверка кодировки.
@@ -134,7 +135,7 @@
 node scripts/check-project.mjs
 ```
 
-Скрипт выполняет набор быстрых локальных проверок без запуска браузера: `node --check` для JS/MJS-файлов из `src` и `scripts`, парсинг всех `data/**/*.json` и `data/**/*.jsonc`, `validateGameData()` через локальный `fetch`, проверку существования ссылок на `data/Assets`, равенство ключей активных локалей, баланс CSS-скобок, `scripts/check-battle-engine.mjs` и `scripts/check-encoding.mjs`.
+Скрипт выполняет набор быстрых локальных проверок без запуска браузера: `node --check` для JS/MJS-файлов из `src` и `scripts`, парсинг всех `data/**/*.json` и `data/**/*.jsonc`, `validateGameData()` через локальный `fetch`, проверку существования ссылок на `data/Assets`, равенство ключей активных локалей, баланс CSS-скобок, `scripts/check-lockpick.mjs`, `scripts/check-battle-engine.mjs` и `scripts/check-encoding.mjs`.
 
 Для основного UI-сценария есть отдельный browser-smoke:
 
@@ -148,7 +149,7 @@ node scripts/browser-smoke.mjs
 node scripts/check-project.mjs --with-smoke
 ```
 
-Без флага `check-project` не запускает браузер намеренно: он остается быстрым структурным чекером. С `--with-smoke` он после структурных проверок запускает `scripts/browser-smoke.mjs --start=smoke-test`. Сам полный smoke поднимает временный static server, открывает Chrome/Edge через DevTools Protocol, вводит `iddqd`, запускает скрытую SmokeTest-карту и линейно проходит все основные активности карты.
+Без флага `check-project` не запускает браузер намеренно: он остается быстрым структурным чекером. С `--with-smoke` он после структурных проверок запускает `scripts/browser-smoke.mjs --start=smoke-test`. Сам полный smoke поднимает временный static server, открывает Chrome/Edge через DevTools Protocol, вводит `iddqd` и дважды запускает скрытую SmokeTest-карту: сначала проходит прежнюю линейную ветку всех основных активностей, затем на свежем run выбирает альтернативный dialog -> lockpick, расходует ключ и проверяет pending reward/claim.
 
 ## Экран загрузки
 
@@ -198,7 +199,7 @@ node scripts/check-project.mjs --with-smoke
 
 ## Карта
 
-Основная карта описывается в `data/maps/WildWest.jsonc`. Служебная `data/maps/SmokeTest.jsonc` использует тот же контракт карты, но содержит короткий линейный QA-маршрут: `dialog`, `skip`, магазин со всеми безопасными предметами категории `item`, платное лечение, смешанную reward-награду, бой с врагом `test` и финальный boss-бой. Для удобства полного smoke-run магазин SmokeTest продает предметы пачками по 10 за цену одной позиции, а лекарь полностью восстанавливает HP.
+Основная карта описывается в `data/maps/WildWest.jsonc`. Служебная `data/maps/SmokeTest.jsonc` использует тот же контракт карты, но содержит короткий QA-маршрут: на первом уровне игрок выбирает либо прежний `dialog`, либо отдельный диалог, запускающий `lockpick`; обе ветки ведут к общей линейной последовательности `skip`, магазина, лечения, смешанной reward-награды, боя с врагом `test` и финального boss-боя. Полный browser-smoke проходит обе альтернативы в двух независимых run, а ограничения генератора lockpick дополнительно проверяются отдельным engine-чекером. Для удобства полного smoke-run магазин SmokeTest продает предметы пачками по 10 за цену одной позиции, а лекарь полностью восстанавливает HP.
 
 Основные поля:
 
@@ -215,7 +216,7 @@ node scripts/check-project.mjs --with-smoke
 - `levels[].paths` - правила генерации дорог от этого уровня к следующему.
 - `levels[].events` - ссылки на события уровня. У каждой записи есть `name` из общего каталога, `weight` для случайного выбора и `guaranteed` для обязательной точки.
 - `battle[].background` - конкретный задник боя для отдельного battle-варианта. Общий список `battleBackgrounds` больше не является стандартом.
-- `battle`, `reward`, `heal`, `shop`, `skip`, `dialog` - payload-варианты конкретных событий. Каждый вариант должен иметь `eventName`, который ссылается на `events[].name` с таким же `type`.
+- `battle`, `reward`, `heal`, `shop`, `skip`, `dialog`, `lockpick` - payload-варианты конкретных событий. Каждый вариант должен иметь `eventName`, который ссылается на `events[].name` с таким же `type`.
 - Финальная точка карты задается обычным событием в `levels[]`; отдельный объект `boss` больше не обязателен.
 
 Пути к ассетам в карте пишутся прямым путем от папки `data`, например:
@@ -228,6 +229,26 @@ node scripts/check-project.mjs --with-smoke
 - `data/Assets/item/item_gold.png`
 
 Короткий формат `assets/...` больше не является стандартом для карт. Если в JSON добавить новую папку внутри `data/Assets`, код не нужно менять: достаточно указать полный путь от `data/`.
+
+## Событие `lockpick`
+
+`lockpick` можно поставить на карту напрямую или запустить ответом `dialog` через обычный `eventName`. В связанном сценарии завершается исходная dialog-точка, отдельный скрытый узел не создаётся.
+
+Payload `lockpick[]` использует общий reward-контракт (`nodeTitleTextKey`, `dialogTextKey`, `eventImage`, `itemCount`, `rewards`) и дополнительно требует:
+
+- `lockpickImage` - изображение отмычки из `data/Assets/item/`; оно используется для активной отмычки в механизме, простой анимации и четырёх индикаторов запаса;
+- `keyItemId` - расходуемый предмет из `data/settings/items.jsonc`, которым можно автоматически открыть замок;
+- `sounds.move`, `sounds.break`, `sounds.open` - локальные звуки движения кольца, поломки отмычки и финального открытия из `data/Assets/sound/`.
+
+Головоломка всегда содержит пять колец и двенадцать положений с шагом 30 градусов. У каждого кольца одна позиция отверстия и одна позиция выпуклости; между ними остаётся минимум одна обычная позиция. Игрок выбирает кольцо кликом по его фактической видимой полосе, вертикальными кнопками `↑`/`↓` слева или клавишами `W`/`S`: вверх выбирается следующее внешнее кольцо, вниз — следующее внутреннее. Левую и правую кнопки вращения дублируют `A`/`D`: `A` вращает выбранное кольцо против часовой стрелки, `D` — по часовой. На крайнем внешнем или внутреннем кольце соответствующая кнопка выбора блокируется. Прямые подчинённые выбранного кольца двигаются ровно один раз: зелёные в ту же сторону, красные в противоположную. Каскадного запуска связей подчинённого нет.
+
+Граф связей генерируется заново для каждого события: он слабо связный, у мастера не больше двух подчинённых, один или два мастера имеют ровно двух подчинённых, существует хотя бы одно кольцо без мастера и другое кольцо без подчинённых. Взаимные связи разрешены, их направления независимы. Полная схема не показывается заранее: при выборе видны только прямые зависимости этого кольца.
+
+Стартовая позиция строится скрытым безопасным перемешиванием решения на 9-18 принятых ходов. Перемешивание не допускает немедленную отмену предыдущего хода, промежуточное решение, повтор позиции или выпуклость сверху. Финал обязательно не решён, а длина кратчайшего безопасного решения не меньше шести ходов. При неудачной попытке генерации связи и позиции выпуклостей создаются заново. Обратная последовательность существует только в engine-тесте и не хранится в UI-сессии.
+
+После каждого 200-миллисекундного движения сначала завершают анимацию все затронутые кольца, затем проверяется опасность. Одна или несколько выпуклостей сверху ломают только одну из пяти локальных отмычек; после 500-миллисекундной анимации кольца за 300 мс возвращаются в ту же стартовую позицию без смены связей. В механизме видна активная отмычка, а справа сверху показываются только четыре запасные. После поломки следующая запасная становится активной и исчезает из запаса; когда запас пуст, у игрока остаётся последняя пятая попытка. Только пятая поломка завершает событие неудачей. Добровольный выход требует подтверждения и имеет тот же результат: точка считается пройденной, следующие точки открываются, награда не выдаётся.
+
+Если все отверстия направлены вверх или игрок расходует один `keyItemId`, проигрывается 700-миллисекундное открытие, затем появляется общий reward overlay. Награда начисляется и точка завершается только после кнопки получения. `item_key` хранится в обычном инвентаре и стартует в количестве 5; пять отмычек, включая активную и четыре запасные, являются только локальными жизнями события и в player-state не сохраняются. В самом lockpick overlay остаётся только кнопка добровольного выхода; локальные кнопки настроек и глобальной сдачи там не показываются.
 
 ## Каталог предметов
 
@@ -980,7 +1001,7 @@ This is UI feedback only and must not change combat math.
 
 `item_skull` activates the clicked board cell and the eight neighboring cells. These cells apply their normal effects except `aggression`, then disappear and trigger gravity/refill/cascades. `item_swap` lets the player select any two board cells and swap them freely, even when the swap does not create a match. New cells produced by refill are filled from lower rows upward, so the visual refill reads from bottom to top.
 
-`gold` is also an active-use battle tool. Clicking the gold slot takes gold "in hand" without spending it yet. While gold is active, hovering a board item shows its `goldprice`; if the item has no valid `goldprice`, the hover marker shows a red `X` and the item cannot be changed. Clicking a valid target spends that `goldprice`, replaces the item with a random item from `data/settings/items.jsonc` where `goldloot: 1`, then applies the same player inventory `transform_chance` rules used by ordinary battle drops. The final result must differ from the source `itemId`: using gold on `granate` cannot leave `granate` in the same cell, even if `granate` itself has `goldloot: 1`. This keeps upgrades such as normal knife -> powered knife consistent with the rest of battle generation without making gold feel like a paid no-op.
+`gold` is also an active-use battle tool. Clicking the gold slot takes gold "in hand" without spending it yet. While gold is active, hovering a board item shows its `goldprice`; if the item has no valid `goldprice`, the hover marker shows a red `X` and the item cannot be changed. Clicking a valid target spends that `goldprice` and builds a weighted replacement pool from the surrounding eight cells. Each visible neighboring cell contributes one candidate by its match-3 `type`: a powered knife therefore contributes the basic `Knife` whose config has `goldloot: 1`, while batteries, hazards, trash without a corresponding gold-loot type, and cells hidden by boxes contribute nothing. A corner uses its three real neighbors and an edge uses five; the board does not wrap. If no valid local candidates remain, selection falls back to the full `goldloot: 1` pool. After selection, gold applies the same player inventory `transform_chance` rules used by ordinary battle drops. The final result must differ from the source `itemId`: using gold on `granate` cannot leave `granate` in the same cell, even if `granate` itself has `goldloot: 1`. Tutorial `replacementItemId` remains an explicit override for its configured target.
 
 ## Map UI Config
 

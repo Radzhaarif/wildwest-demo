@@ -1301,16 +1301,81 @@ export function pickBattleGoldLootItem(itemCatalog, options = {}) {
   }
 
   const random = typeof options.random === "function" ? options.random : Math.random;
-  const maxAttempts = Math.max(8, lootPool.length * 3);
-  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
-    const itemId = pickRandomItem(lootPool, random);
-    const transformedItemId = applyBattleInventoryTransforms(itemCatalog, itemId, options.playerState, random);
-    if (transformedItemId !== excludedItemId) {
-      return transformedItemId;
+  const nearbyLootPool = getBattleNearbyGoldLootPool(itemCatalog, lootPool, options);
+  const candidatePools = nearbyLootPool.length > 0
+    ? [nearbyLootPool, lootPool]
+    : [lootPool];
+
+  for (const candidatePool of candidatePools) {
+    const maxAttempts = Math.max(8, candidatePool.length * 3);
+    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+      const itemId = pickRandomItem(candidatePool, random);
+      const transformedItemId = applyBattleInventoryTransforms(itemCatalog, itemId, options.playerState, random);
+      if (transformedItemId !== excludedItemId) {
+        return transformedItemId;
+      }
     }
   }
 
   return null;
+}
+
+function getBattleNearbyGoldLootPool(itemCatalog, lootPool, options) {
+  const board = options.board;
+  const targetCell = options.targetCell;
+  if (
+    !Array.isArray(board)
+    || board.length === 0
+    || !targetCell
+    || !Number.isInteger(targetCell.row)
+    || !Number.isInteger(targetCell.col)
+  ) {
+    return [];
+  }
+
+  const height = board.length;
+  const width = Array.isArray(board[0]) ? board[0].length : 0;
+  if (
+    width === 0
+    || targetCell.row < 0
+    || targetCell.row >= height
+    || targetCell.col < 0
+    || targetCell.col >= width
+  ) {
+    return [];
+  }
+
+  const lootItemIdByType = new Map();
+  for (const itemId of lootPool) {
+    const type = getBattleMatchType(itemId, itemCatalog);
+    if (type && !lootItemIdByType.has(type)) {
+      lootItemIdByType.set(type, itemId);
+    }
+  }
+
+  const nearbyLootPool = [];
+  for (let row = targetCell.row - 1; row <= targetCell.row + 1; row += 1) {
+    for (let col = targetCell.col - 1; col <= targetCell.col + 1; col += 1) {
+      if (
+        row < 0
+        || row >= height
+        || col < 0
+        || col >= width
+        || row === targetCell.row && col === targetCell.col
+        || hasBattleBoxAt(options.boxes, { row, col })
+      ) {
+        continue;
+      }
+
+      const type = getBattleMatchType(board[row]?.[col], itemCatalog);
+      const lootItemId = lootItemIdByType.get(type);
+      if (lootItemId) {
+        nearbyLootPool.push(lootItemId);
+      }
+    }
+  }
+
+  return nearbyLootPool;
 }
 
 function getBattleGoldLootPool(itemCatalog) {

@@ -64,6 +64,16 @@
       "hudOrder": 50
     },
     {
+      "itemId": "item_key",
+      "category": "item",
+      "nameTextKey": "items.item_key.name",
+      "descriptionTextKey": "items.item_key.description",
+      "icon": "data/Assets/item/postapoc-key.png",
+      "bigIcon": "data/Assets/big_icon/postapoc-key.png",
+      "showInHudAlways": true,
+      "hudOrder": 55
+    },
+    {
       "itemId": "red",
       "category": "item",
       "limitByInventory": true,

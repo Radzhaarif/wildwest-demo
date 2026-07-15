@@ -40,6 +40,11 @@
     {
       "itemId": "item_time",
       "quantity": 1
+    },
+    {
+      // Keys are consumed by the map lockpick event to open a lock immediately.
+      "itemId": "item_key",
+      "quantity": 5
     }
   ]
 }

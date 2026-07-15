@@ -16,6 +16,8 @@
 - `src/map/map-rewards.js` - activity-контроллер reward/level-up: выбор наград по gameplay RNG, pending reward, начисление золота/опыта/HP/предметов, level-up выбор и reward overlay.
 - `src/map/map-shop-heal.js` - activity-контроллер shop/heal: оверлеи магазина и лекаря, выбор товаров, подтверждение покупки, проверка золота, лечение и inventory view внутри магазина.
 - `src/map/map-dialog.js` - activity-контроллер dialog: печать текста, ответы, переходы в linked events и возврат завершения dialog-точки в фасад карты.
+- `src/map/map-lockpick.js` - activity-контроллер lockpick: DOM-сессия пяти колец, выбор и вращение, локальные отмычки, ключ, звуки, анимации и success/failure callbacks в flow карты.
+- `src/map/map-lockpick-engine.js` - чистый lockpick engine: генерация ограниченного ориентированного графа, прямые same/opposite движения, безопасное перемешивание и BFS-проверка минимального решения.
 - `src/map/map-hud.js` - DOM-рендер HUD карты: здоровье, опыт и предметы из текущего playerState и каталога предметов.
 - `src/map/map-battle-controller.js`, `src/map/map-node-flow.js`, `src/map/map-run-controller.js`, `src/map/map-completion.js` - orchestration карты: BattleRequest и результат боя, маршрутизация типов узлов, завершение карты, старт обычного run и SmokeTest run.
 - `src/seeded-random.js` - общий deterministic RNG для debug-воспроизводимости. Карта получает производный `map:<mapId>:<campaignIndex>` seed, а бой - `battle:<mapId>:<nodeId>:data/enemy/<enemyId>.jsonc:<attempt>`; оба значения идут в лог и передаются в gameplay RNG.

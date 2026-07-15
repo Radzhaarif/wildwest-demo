@@ -56,6 +56,9 @@ export async function handleGoldBoardClick(deps, context, cell, renderTargets) {
     || context.engine.pickBattleGoldLootItem(context.request.itemCatalog, {
       sourceItemId: itemId,
       playerState: context.battleState.playerState,
+      board: context.battleState.board,
+      targetCell: cell,
+      boxes: context.battleState.boxes,
       random: deps.getBattleRandom(context),
     });
   if (!nextItemId) {

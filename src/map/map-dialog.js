@@ -15,6 +15,7 @@ export function createMapDialogController(deps) {
     resolveReward,
     openShop,
     openHeal,
+    openLockpick,
     showDialog,
     completeMapNode,
     addLog,
@@ -222,6 +223,16 @@ export function createMapDialogController(deps) {
     } else if (linkedNode.eventType === "heal") {
       openHeal(linkedNode, {
         onClose: () => finishMapDialogNode(dialogNode),
+      });
+    } else if (linkedNode.eventType === "lockpick") {
+      openLockpick(linkedNode, {
+        onSuccess: () => {
+          resolveReward(linkedNode, {
+            source: "dialog-lockpick-success",
+            onApplied: () => finishMapDialogNode(dialogNode),
+          });
+        },
+        onFailure: () => finishMapDialogNode(dialogNode),
       });
     } else if (linkedNode.eventType === "skip") {
       const message = translate(linkedNode.payload.textKey);

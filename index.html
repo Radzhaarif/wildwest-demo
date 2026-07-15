@@ -87,6 +87,70 @@
         </div>
       </section>
 
+      <!-- Взлом замка: пять дискретных колец, локальные отмычки и расходуемый ключ. -->
+      <section id="lockpickOverlay" class="lockpick-overlay hidden" aria-label="Lockpick">
+        <div class="map-ui-overlay-frame">
+          <div class="map-ui-overlay-panel">
+            <div class="lockpick-scene">
+              <div id="lockpickBackdrop" class="lockpick-backdrop" aria-hidden="true"></div>
+              <header class="lockpick-header">
+                <div class="lockpick-header-actions">
+                  <button id="lockpickLeaveButton" type="button"></button>
+                </div>
+                <div class="lockpick-heading">
+                  <h2 id="lockpickTitle"></h2>
+                  <p id="lockpickInstructions"></p>
+                </div>
+                <div id="lockpickLives" class="lockpick-lives" role="status"></div>
+              </header>
+
+              <div class="lockpick-workbench">
+                <div class="lockpick-ring-selectors">
+                  <button id="lockpickSelectOuterButton" type="button">↑</button>
+                  <button id="lockpickSelectInnerButton" type="button">↓</button>
+                </div>
+                <button
+                  id="lockpickRotateCounterclockwiseButton"
+                  class="lockpick-rotate-button lockpick-rotate-button--counterclockwise"
+                  type="button"
+                  data-skip-global-click-sound="true"
+                >↶</button>
+                <div id="lockpickRingStage" class="lockpick-ring-stage" role="group">
+                  <div class="lockpick-top-marker" aria-hidden="true"></div>
+                  <div id="lockpickRings" class="lockpick-rings"></div>
+                  <div class="lockpick-core" aria-hidden="true"></div>
+                  <img id="lockpickPickImage" class="lockpick-pick-image" alt="" />
+                </div>
+                <button
+                  id="lockpickRotateClockwiseButton"
+                  class="lockpick-rotate-button lockpick-rotate-button--clockwise"
+                  type="button"
+                  data-skip-global-click-sound="true"
+                >↷</button>
+              </div>
+
+              <footer class="lockpick-footer">
+                <p id="lockpickStatus" class="lockpick-status" role="status"></p>
+                <button id="lockpickUseKeyButton" class="lockpick-use-key" type="button">
+                  <img id="lockpickUseKeyImage" alt="" />
+                  <span id="lockpickUseKeyText"></span>
+                </button>
+              </footer>
+
+              <div id="lockpickConfirm" class="lockpick-confirm hidden" role="alertdialog" aria-modal="true">
+                <div class="lockpick-confirm-panel">
+                  <p id="lockpickConfirmText"></p>
+                  <div>
+                    <button id="lockpickConfirmYesButton" type="button"></button>
+                    <button id="lockpickConfirmNoButton" type="button"></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Магазин использует payload выбранной точки shop из JSONC карты. -->
       <section id="shopOverlay" class="shop-overlay hidden" aria-label="Trader shop">
         <div class="map-ui-overlay-frame">
@@ -296,6 +360,8 @@
         "./src/map/map-items.js",
         "./src/map/map-layout.js",
         "./src/map/map-loading-ui.js",
+        "./src/map/map-lockpick-engine.js",
+        "./src/map/map-lockpick.js",
         "./src/map/map-media.js",
         "./src/map/map-node-flow.js",
         "./src/map/map-renderer.js",

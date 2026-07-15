@@ -89,6 +89,7 @@ export function createMapCheatsController(deps) {
       && elements.healOverlay.classList.contains("hidden")
       && elements.rewardOverlay.classList.contains("hidden")
       && elements.mapDialogOverlay.classList.contains("hidden")
+      && elements.lockpickOverlay.classList.contains("hidden")
       && elements.eventLogOverlay.classList.contains("hidden")
       && elements.surrenderOverlay.classList.contains("hidden");
   }

@@ -18,6 +18,16 @@
       "icon": "data/Assets/icons/dialog.png"
     },
     {
+      "name": "dialog_lockpick_smoke",
+      "type": "dialog",
+      "icon": "data/Assets/icons/dialog.png"
+    },
+    {
+      "name": "lockpick_smoke",
+      "type": "lockpick",
+      "icon": "data/Assets/icons/lockpick.png"
+    },
+    {
       "name": "skip_smoke",
       "type": "skip",
       "icon": "data/Assets/icons/skip.png"
@@ -52,7 +62,7 @@
     {
       "level": 1,
       "nodes": {
-        "count": 1
+        "count": 2
       },
       "paths": {
         "minConnectionsFromNode": 1,
@@ -62,6 +72,11 @@
       "events": [
         {
           "name": "dialog_smoke",
+          "weight": 100,
+          "guaranteed": true
+        },
+        {
+          "name": "dialog_lockpick_smoke",
           "weight": 100,
           "guaranteed": true
         }
@@ -334,6 +349,44 @@
       "textKey": "WildWest_skip"
     }
   ],
+  "lockpick": [
+    {
+      "eventName": "lockpick_smoke",
+      "minLevel": 1,
+      "maxLevel": 1,
+      "weight": 100,
+      "nodeTitleTextKey": "lockpick.nodeTitle",
+      "dialogTextKey": "lockpick.reward",
+      "eventImage": "data/Assets/events/reward_safe.png",
+      "lockpickImage": "data/Assets/item/lockpick.png",
+      "keyItemId": "item_key",
+      "sounds": {
+        "move": "data/Assets/sound/lock_movement.mp3",
+        "break": "data/Assets/sound/lock_crush.mp3",
+        "open": "data/Assets/sound/lock_open.mp3"
+      },
+      "itemCount": 3,
+      "rewards": [
+        {
+          "type": "gold",
+          "amount": 25
+        },
+        {
+          "type": "experience",
+          "amount": 20
+        },
+        {
+          "type": "health",
+          "amount": 15
+        },
+        {
+          "type": "item",
+          "itemId": "item_key",
+          "amount": 1
+        }
+      ]
+    }
+  ],
   "dialog": [
     {
       "eventName": "dialog_smoke",
@@ -354,6 +407,30 @@
             {
               "textKey": "dialog.sweety.answer.end",
               "end": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eventName": "dialog_lockpick_smoke",
+      "minLevel": 1,
+      "maxLevel": 1,
+      "weight": 100,
+      "characterImage": "data/Assets/enemy/Sweety.png",
+      "characterNameTextKey": "sweety.name",
+      "characterWidthPct": 58,
+      "characterCenterXPct": 50,
+      "characterCenterYPct": 48,
+      "initialStepId": "lockpick_offer",
+      "steps": [
+        {
+          "stepId": "lockpick_offer",
+          "textKey": "dialog.lockpickSmoke.offer",
+          "answers": [
+            {
+              "textKey": "dialog.lockpickSmoke.answer",
+              "eventName": "lockpick_smoke"
             }
           ]
         }

@@ -991,6 +991,7 @@
     }
   ],
   "skip": [],
+  "lockpick": [],
   "dialog": [
     {
       "eventName": "tutorial_intro",

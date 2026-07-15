@@ -17,6 +17,7 @@ import { createMapHudRenderer } from "./map/map-hud.js";
 import { createMapItemsController } from "./map/map-items.js";
 import { createMapLayoutController } from "./map/map-layout.js";
 import { createMapLoadingUiController, DEFAULT_LOAD_UI_CONFIG } from "./map/map-loading-ui.js";
+import { createMapLockpickController } from "./map/map-lockpick.js";
 import { createMapMediaHelpers } from "./map/map-media.js";
 import { createMapNodeFlowController } from "./map/map-node-flow.js";
 import { createMapRenderer } from "./map/map-renderer.js";
@@ -114,6 +115,9 @@ const state = {
   isDialogTextTyping: false,
   activeShopCompletion: null,
   activeHealCompletion: null,
+  activeLockpickNode: null,
+  activeLockpickSession: null,
+  activeLockpickCompletion: null,
 };
 
 // Единственная карта DOM-ссылок для JS. id/class в index.html являются частью
@@ -200,6 +204,27 @@ const elements = {
   mapDialogCharacter: document.querySelector("#mapDialogCharacter"),
   mapDialogText: document.querySelector("#mapDialogText"),
   mapDialogAnswers: document.querySelector("#mapDialogAnswers"),
+  lockpickOverlay: document.querySelector("#lockpickOverlay"),
+  lockpickBackdrop: document.querySelector("#lockpickBackdrop"),
+  lockpickTitle: document.querySelector("#lockpickTitle"),
+  lockpickInstructions: document.querySelector("#lockpickInstructions"),
+  lockpickLives: document.querySelector("#lockpickLives"),
+  lockpickLeaveButton: document.querySelector("#lockpickLeaveButton"),
+  lockpickRingStage: document.querySelector("#lockpickRingStage"),
+  lockpickRings: document.querySelector("#lockpickRings"),
+  lockpickPickImage: document.querySelector("#lockpickPickImage"),
+  lockpickSelectOuterButton: document.querySelector("#lockpickSelectOuterButton"),
+  lockpickSelectInnerButton: document.querySelector("#lockpickSelectInnerButton"),
+  lockpickRotateCounterclockwiseButton: document.querySelector("#lockpickRotateCounterclockwiseButton"),
+  lockpickRotateClockwiseButton: document.querySelector("#lockpickRotateClockwiseButton"),
+  lockpickStatus: document.querySelector("#lockpickStatus"),
+  lockpickUseKeyButton: document.querySelector("#lockpickUseKeyButton"),
+  lockpickUseKeyImage: document.querySelector("#lockpickUseKeyImage"),
+  lockpickUseKeyText: document.querySelector("#lockpickUseKeyText"),
+  lockpickConfirm: document.querySelector("#lockpickConfirm"),
+  lockpickConfirmText: document.querySelector("#lockpickConfirmText"),
+  lockpickConfirmYesButton: document.querySelector("#lockpickConfirmYesButton"),
+  lockpickConfirmNoButton: document.querySelector("#lockpickConfirmNoButton"),
   rewardOverlay: document.querySelector("#rewardOverlay"),
   rewardBackdrop: document.querySelector("#rewardBackdrop"),
   rewardItems: document.querySelector("#rewardItems"),
@@ -393,6 +418,7 @@ const mapNodeFlow = createMapNodeFlowController({
   getEdgeId,
   openBattleModule: (node) => mapBattle.openBattleModule(node),
   openMapDialogEvent: (node) => mapDialog.openMapDialogEvent(node),
+  openLockpick: (node, completion) => mapLockpick.openLockpick(node, completion),
   resolveReward: (node, options) => mapRewards.resolveReward(node, options),
   openShop: (node, options) => mapShopHeal.openShop(node, options),
   openHeal: (node, options) => mapShopHeal.openHeal(node, options),
@@ -437,6 +463,7 @@ const mapShellUi = createMapShellUiController({
   closeHeal: (options) => mapShopHeal.closeHeal(options),
   closeReward: (options) => mapRewards.closeReward(options),
   closeMapDialogOverlay: () => mapDialog.closeMapDialogOverlay(),
+  closeLockpick: () => mapLockpick.closeLockpick(),
 });
 
 const {
@@ -506,6 +533,23 @@ const mapRewards = createMapRewardsController({
   scrollAvailableNodesIntoActionZone,
   completePendingMapIfReady,
 });
+
+const mapLockpick = createMapLockpickController({
+  state,
+  elements,
+  translate,
+  formatText,
+  resolveAssetPath,
+  createMapGameplayRandom,
+  getInventoryQuantity,
+  changeInventoryQuantity,
+  getItemImagePath,
+  playSoundEffect,
+  addLog,
+  render,
+});
+
+addLanguageChangeListener(mapLockpick.refreshLockpickUi);
 
 const mapCheats = createMapCheatsController({
   state,
@@ -594,6 +638,7 @@ const mapDialog = createMapDialogController({
   resolveReward: mapRewards.resolveReward,
   openShop: mapShopHeal.openShop,
   openHeal: mapShopHeal.openHeal,
+  openLockpick: mapLockpick.openLockpick,
   showDialog,
   completeMapNode,
   addLog,
@@ -651,6 +696,7 @@ const mapRun = createMapRunController({
   closeMapDialogOverlay: () => mapDialog.closeMapDialogOverlay(),
   closeShop: (options) => mapShopHeal.closeShop(options),
   hideRewardOverlay: () => mapRewards.hideRewardOverlay(),
+  closeLockpick: () => mapLockpick.closeLockpick(),
 });
 
 const {
@@ -735,6 +781,7 @@ elements.smokeTestButton.addEventListener("click", async () => {
 });
 
 document.addEventListener("keydown", handleCheatKeydown);
+document.addEventListener("keydown", mapLockpick.handleKeydown);
 
 elements.settingsButton.addEventListener("click", () => {
   showSettingsPanel("menu");
@@ -780,6 +827,23 @@ elements.healLeaveButton.addEventListener("click", () => {
   mapShopHeal.closeHeal({ scrollToNext: true });
 });
 elements.rewardClaimButton.addEventListener("click", mapRewards.handleRewardClaim);
+elements.lockpickRingStage.addEventListener("click", mapLockpick.handleRingStageClick);
+elements.lockpickSelectOuterButton.addEventListener("click", () => {
+  mapLockpick.selectAdjacentRing(-1);
+});
+elements.lockpickSelectInnerButton.addEventListener("click", () => {
+  mapLockpick.selectAdjacentRing(1);
+});
+elements.lockpickRotateCounterclockwiseButton.addEventListener("click", () => {
+  mapLockpick.rotateSelectedRing(-1);
+});
+elements.lockpickRotateClockwiseButton.addEventListener("click", () => {
+  mapLockpick.rotateSelectedRing(1);
+});
+elements.lockpickUseKeyButton.addEventListener("click", mapLockpick.useKey);
+elements.lockpickLeaveButton.addEventListener("click", mapLockpick.requestLeave);
+elements.lockpickConfirmYesButton.addEventListener("click", mapLockpick.confirmLeave);
+elements.lockpickConfirmNoButton.addEventListener("click", mapLockpick.cancelLeave);
 elements.mapDialogOverlay.addEventListener("click", (event) => {
   if (event.target.closest?.(".map-dialog-answers button")) {
     return;
@@ -795,7 +859,10 @@ setupMapUiViewportScale();
 // Общий звук клика висит на document, чтобы не дублировать playClickSound на
 // каждой активной кнопке. Первый клик также помогает браузеру разрешить музыку.
 document.addEventListener("click", (event) => {
-  if (event.target.closest("button:not(:disabled)")) {
+  if (
+    event.target.closest("button:not(:disabled)")
+    && !event.target.closest("[data-skip-global-click-sound='true']")
+  ) {
     playClickSound();
     startMenuMusicAfterInteraction();
   }

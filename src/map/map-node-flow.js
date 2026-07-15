@@ -11,6 +11,7 @@ export function createMapNodeFlowController(deps) {
     getEdgeId,
     openBattleModule,
     openMapDialogEvent,
+    openLockpick,
     resolveReward,
     openShop,
     openHeal,
@@ -28,6 +29,20 @@ export function createMapNodeFlowController(deps) {
     }
     if (node.eventType === "dialog") {
       openMapDialogEvent(node);
+      elements.selectionStatus.textContent = `${node.id} · ${node.eventType}`;
+      render();
+      return;
+    }
+    if (node.eventType === "lockpick") {
+      openLockpick(node, {
+        onSuccess: () => {
+          resolveReward(node, {
+            source: "lockpick-success",
+            onApplied: () => completeMapNode(node, "lockpick"),
+          });
+        },
+        onFailure: () => completeMapNode(node, "lockpick"),
+      });
       elements.selectionStatus.textContent = `${node.id} · ${node.eventType}`;
       render();
       return;

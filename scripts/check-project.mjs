@@ -34,6 +34,7 @@ const checks = [
   ["asset references", checkAssetReferences],
   ["active locale parity", checkLocaleParity],
   ["CSS brace balance", checkCssBraces],
+  ["lockpick generator checks", () => runNodeScript("scripts/check-lockpick.mjs")],
   ["battle engine checks", () => runNodeScript("scripts/check-battle-engine.mjs")],
   ["encoding check", () => runNodeScript("scripts/check-encoding.mjs")],
 ];

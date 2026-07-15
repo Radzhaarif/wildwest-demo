@@ -31,6 +31,10 @@
     {
       "itemId": "item_time",
       "quantity": 10
+    },
+    {
+      "itemId": "item_key",
+      "quantity": 5
     }
   ]
 }
