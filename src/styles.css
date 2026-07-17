@@ -3668,7 +3668,6 @@ button.reward-item {
   z-index: 100;
   place-items: center;
   padding: 4px;
-  will-change: transform, opacity;
   pointer-events: none;
   overflow: hidden;
 }
@@ -4069,7 +4068,10 @@ button.reward-item {
 .battle-cell-icon.is-swapping {
   z-index: 200;
   backface-visibility: hidden;
-  animation: battleSwap var(--battle-animation-ms, 1000ms) ease-in-out both;
+}
+
+.battle-cell-icon:is(.is-swapping, .is-shaking, .is-dying, .is-moving, .is-shuffling) {
+  will-change: transform, opacity;
 }
 
 .battle-cell-icon.is-shaking {
@@ -4078,7 +4080,6 @@ button.reward-item {
 
 .battle-cell-icon.is-dying {
   z-index: 200;
-  animation: battleItemDeath var(--battle-animation-ms, 500ms) ease-in forwards;
 }
 
 .battle-cell-icon.is-moving {
@@ -4122,16 +4123,6 @@ button.reward-item {
 .battle-scaffold-board-message span {
   font-size: clamp(0.8rem, 1.6vw, 1.1rem);
   line-height: 1.25;
-}
-
-@keyframes battleSwap {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-
-  to {
-    transform: translate3d(var(--battle-swap-x, 0), var(--battle-swap-y, 0), 0);
-  }
 }
 
 @keyframes battleShake {
@@ -4188,18 +4179,6 @@ button.reward-item {
 
   100% {
     transform: translate(-50%, -50%) rotate(360deg) scale(0.92);
-  }
-}
-
-@keyframes battleItemDeath {
-  from {
-    opacity: 1;
-    transform: translate(0, 0) scale(1);
-  }
-
-  to {
-    opacity: 0;
-    transform: translate(var(--battle-death-x, 0), var(--battle-death-y, -96px)) scale(2);
   }
 }
 

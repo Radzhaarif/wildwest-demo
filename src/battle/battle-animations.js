@@ -14,9 +14,16 @@ export async function animateBattleSwap(boardElement, firstCell, secondCell, dur
   const firstDelta = getBattleCellLocalDelta(firstCellElement, secondCellElement);
   const secondDelta = getBattleCellLocalDelta(secondCellElement, firstCellElement);
 
-  runCellAnimation(firstElement, "is-swapping", durationMs, firstDelta);
-  runCellAnimation(secondElement, "is-swapping", durationMs, secondDelta);
-  await wait(durationMs);
+  await Promise.all([
+    runBattleFrameAnimation(firstElement, "is-swapping", durationMs, (progress) => {
+      const easedProgress = easeInOutCubic(progress);
+      firstElement.style.transform = `translate3d(${firstDelta.x * easedProgress}px, ${firstDelta.y * easedProgress}px, 0)`;
+    }),
+    runBattleFrameAnimation(secondElement, "is-swapping", durationMs, (progress) => {
+      const easedProgress = easeInOutCubic(progress);
+      secondElement.style.transform = `translate3d(${secondDelta.x * easedProgress}px, ${secondDelta.y * easedProgress}px, 0)`;
+    }),
+  ]);
 }
 
 export async function animateBattleShakeCells(boardElement, cells, durationMs) {
@@ -266,6 +273,78 @@ export function runCellAnimation(element, className, durationMs, delta = null, d
   animationState.timeoutId = window.setTimeout(clearAnimation, clearMs);
 }
 
+export function animateBattleCellDeath(element, durationMs, delta) {
+  const targetX = Number(delta?.x) || 0;
+  const targetY = Number(delta?.y) || 0;
+  return runBattleFrameAnimation(element, "is-dying", durationMs, (progress) => {
+    const easedProgress = progress * progress;
+    element.style.opacity = String(1 - easedProgress);
+    element.style.transform = [
+      `translate3d(${targetX * easedProgress}px, ${targetY * easedProgress}px, 0)`,
+      `scale(${1 + easedProgress})`,
+    ].join(" ");
+  });
+}
+
+function runBattleFrameAnimation(element, className, durationMs, renderFrame) {
+  const safeDurationMs = Math.max(0, Number(durationMs) || 0);
+  const previousStyles = {
+    opacity: element.style.opacity,
+    transform: element.style.transform,
+    willChange: element.style.willChange,
+  };
+  element.classList.add(className);
+  element.style.willChange = "transform, opacity";
+
+  return new Promise((resolve) => {
+    let startTimestamp = null;
+    let cleanupFrameId = null;
+
+    const cleanup = () => {
+      if (cleanupFrameId !== null) {
+        window.cancelAnimationFrame(cleanupFrameId);
+      }
+      restoreInlineStyle(element, "opacity", previousStyles.opacity);
+      restoreInlineStyle(element, "transform", previousStyles.transform);
+      restoreInlineStyle(element, "will-change", previousStyles.willChange);
+      element.classList.remove(className);
+      resolve();
+    };
+
+    const runFrame = (timestamp) => {
+      if (!element.isConnected) {
+        cleanup();
+        return;
+      }
+      if (startTimestamp === null) {
+        startTimestamp = timestamp;
+      }
+      const progress = safeDurationMs === 0
+        ? 1
+        : Math.min(1, (timestamp - startTimestamp) / safeDurationMs);
+      renderFrame(progress);
+
+      if (progress < 1) {
+        window.requestAnimationFrame(runFrame);
+        return;
+      }
+
+      // Keep the final state for one real paint before the caller replaces board DOM.
+      cleanupFrameId = window.requestAnimationFrame(cleanup);
+    };
+
+    window.requestAnimationFrame(runFrame);
+  });
+}
+
+function restoreInlineStyle(element, propertyName, value) {
+  if (value) {
+    element.style.setProperty(propertyName, value);
+  } else {
+    element.style.removeProperty(propertyName);
+  }
+}
+
 export function getBattleElementAnimationState(element, className) {
   let elementAnimationState = battleCellAnimationState.get(element);
   if (!elementAnimationState) {
@@ -418,6 +497,12 @@ function getCubicBezierPoint(startPoint, firstControl, secondControl, endPoint, 
 
 function easeOutCubic(progress) {
   return 1 - ((1 - progress) ** 3);
+}
+
+function easeInOutCubic(progress) {
+  return progress < 0.5
+    ? 4 * (progress ** 3)
+    : 1 - (((-2 * progress) + 2) ** 3) / 2;
 }
 
 function getBattleShufflePathPoint(delta, perpendicular, progress, sideOffset) {

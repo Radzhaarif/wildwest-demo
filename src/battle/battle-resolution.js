@@ -1,4 +1,5 @@
 import {
+  animateBattleCellDeath,
   animateBattleShakeCells,
   getBattleCellElement,
   getBattleCellIconElement,
@@ -137,8 +138,8 @@ export async function resolveBattleCascades(deps, board, context, renderTargets)
 }
 
 export async function animateBattleDeaths(deps, boardElement, board, cells, context) {
-  let maxDurationMs = 0;
   const flightPx = deps.getBattleAnimationConfig(context).deathFlightPx;
+  const animations = [];
 
   for (const cell of cells) {
     const element = getBattleCellIconElement(boardElement, cell);
@@ -150,13 +151,13 @@ export async function animateBattleDeaths(deps, boardElement, board, cells, cont
     const durationMs = Math.max(0, Number(item.death_time) || 0.5) * 1000;
     const angle = normalizeDegrees(Number(item.Leave_side) || 0);
     const radians = (angle * Math.PI) / 180;
-    element.style.setProperty("--battle-death-x", `${Math.sin(radians) * flightPx}px`);
-    element.style.setProperty("--battle-death-y", `${-Math.cos(radians) * flightPx}px`);
-    runCellAnimation(element, "is-dying", durationMs);
-    maxDurationMs = Math.max(maxDurationMs, durationMs);
+    animations.push(animateBattleCellDeath(element, durationMs, {
+      x: Math.sin(radians) * flightPx,
+      y: -Math.cos(radians) * flightPx,
+    }));
   }
 
-  await deps.wait(maxDurationMs);
+  await Promise.all(animations);
 }
 
 export function playBattleItemActivationSounds(deps, context, board, cells) {

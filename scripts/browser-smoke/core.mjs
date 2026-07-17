@@ -674,6 +674,9 @@ async function runSmoke(page, tracker, options) {
       clientY: targetPoint.y,
     }));
     await Promise.resolve();
+    const swappingIconsAfterClick = [...document.querySelectorAll(".battle-cell-icon.is-swapping")];
+    const transformsAfterClick = swappingIconsAfterClick.map((element) => getComputedStyle(element).transform);
+    await new Promise((resolve) => setTimeout(resolve, 100));
     const swappingIcons = [...document.querySelectorAll(".battle-cell-icon.is-swapping")];
     const overlayStyle = getComputedStyle(document.querySelector(".battle-scaffold-overlay"));
     return {
@@ -683,8 +686,11 @@ async function runSmoke(page, tracker, options) {
       triggered: true,
       activeBeforeSyntheticClick,
       activeSwapIcons: swappingIcons.length,
-      swapAnimationNames: swappingIcons.map((element) => getComputedStyle(element).animationName),
-      swapAnimationDurations: swappingIcons.map((element) => getComputedStyle(element).animationDuration),
+      activeSwapWillChange: swappingIcons.map((element) => getComputedStyle(element).willChange),
+      inactivePromotedIcons: [...document.querySelectorAll(".battle-cell-icon:not(.is-swapping)")]
+        .filter((element) => getComputedStyle(element).willChange !== "auto")
+        .length,
+      transformsAfterClick,
       swapTransforms: swappingIcons.map((element) => getComputedStyle(element).transform),
       coarsePointer: matchMedia("(pointer: coarse)").matches,
       overlayBackdropFilter: overlayStyle.backdropFilter || overlayStyle.webkitBackdropFilter || "",
@@ -698,12 +704,18 @@ async function runSmoke(page, tracker, options) {
   );
   assert(playedTraceMove.activeSwapIcons === 2, `Expected two actively swapping icons, got ${playedTraceMove.activeSwapIcons}.`);
   assert(
-    playedTraceMove.swapAnimationNames.every((name) => name === "battleSwap"),
-    `Unexpected swap animation names: ${playedTraceMove.swapAnimationNames.join(", ")}.`,
+    playedTraceMove.activeSwapWillChange.every((value) => value.includes("transform")),
+    `Active swap icons were not promoted: ${playedTraceMove.activeSwapWillChange.join(", ")}.`,
   );
   assert(
-    playedTraceMove.swapAnimationDurations.every((duration) => duration !== "0s"),
-    `Swap animation has zero duration: ${playedTraceMove.swapAnimationDurations.join(", ")}.`,
+    playedTraceMove.inactivePromotedIcons === 0,
+    `Expected no inactive promoted board icons, got ${playedTraceMove.inactivePromotedIcons}.`,
+  );
+  assert(
+    playedTraceMove.swapTransforms.some(
+      (transform, index) => transform !== playedTraceMove.transformsAfterClick[index],
+    ),
+    `Swap transform did not progress between rendered frames: ${playedTraceMove.swapTransforms.join(", ")}.`,
   );
   assert(
     playedTraceMove.swapTransforms.every((transform) => transform && transform !== "none"),
@@ -715,6 +727,37 @@ async function runSmoke(page, tracker, options) {
       `Expected mobile battle backdrop filter to be disabled, got ${playedTraceMove.overlayBackdropFilter}.`,
     );
   }
+  await waitForExpression(
+    page,
+    "document.querySelectorAll('.battle-cell-icon.is-dying').length >= 3",
+    timeoutMs,
+  );
+  const deathAnimationProgress = await evaluateJson(page, `(async () => {
+    const icons = [...document.querySelectorAll(".battle-cell-icon.is-dying")];
+    const before = icons.map((element) => ({
+      opacity: Number(getComputedStyle(element).opacity),
+      transform: getComputedStyle(element).transform,
+    }));
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    const after = icons.map((element) => ({
+      connected: element.isConnected,
+      opacity: Number(getComputedStyle(element).opacity),
+      transform: getComputedStyle(element).transform,
+    }));
+    return { count: icons.length, before, after };
+  })()`);
+  assert(
+    deathAnimationProgress.count >= 3,
+    `Expected at least three dying icons, got ${deathAnimationProgress.count}.`,
+  );
+  assert(
+    deathAnimationProgress.after.some((frame, index) => (
+      frame.connected
+      && frame.opacity < deathAnimationProgress.before[index].opacity
+      && frame.transform !== deathAnimationProgress.before[index].transform
+    )),
+    `Death animation did not progress between rendered frames: ${JSON.stringify(deathAnimationProgress)}.`,
+  );
   await waitForExpression(
     page,
     "(globalThis.__wildwestDebug?.battle?.context?.battleTrace?.moves?.length || 0) >= 1"
