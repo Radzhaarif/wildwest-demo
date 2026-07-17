@@ -2181,8 +2181,8 @@ button:disabled {
   position: absolute;
   left: 50%;
   bottom: 34px;
-  width: min(780px, calc(100vw - 32px));
-  max-height: calc(100vh - 68px);
+  width: min(780px, calc(var(--map-ui-design-width, 1500px) - 32px));
+  max-height: calc(var(--map-ui-design-height, 860px) - 68px);
   min-width: 0;
   min-height: 0;
   box-sizing: border-box;
