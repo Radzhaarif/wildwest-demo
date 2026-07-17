@@ -350,13 +350,13 @@ export function setupBattleViewportScale(deps, context, overlay, frame, panel, r
     const viewport = getBattleViewportSize(deps);
     const availableWidth = Math.max(1, viewport.width - layout.viewportPaddingPx * 2);
     const availableHeight = Math.max(1, viewport.height - layout.viewportPaddingPx * 2);
-    const coverScale = Math.max(
+    const fitScale = Math.min(
       availableWidth / layout.designWidthPx,
       availableHeight / layout.designHeightPx,
     );
-    const scale = coverScale > 1
-      ? (layout.allowUpscale ? 1 + (coverScale - 1) * layout.upscaleFactor : 1)
-      : Math.max(coverScale, layout.minScale);
+    const scale = fitScale > 1
+      ? (layout.allowUpscale ? 1 + (fitScale - 1) * layout.upscaleFactor : 1)
+      : Math.max(fitScale, layout.minScale);
 
     overlay.style.setProperty("--battle-viewport-padding", `${layout.viewportPaddingPx}px`);
     frame.style.width = `${layout.designWidthPx * scale}px`;

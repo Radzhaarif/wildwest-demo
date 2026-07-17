@@ -518,6 +518,7 @@ async function runSmoke(page, tracker, options) {
 
   const summary = await evaluateJson(page, `(() => {
     const board = document.querySelector(".battle-scaffold-board");
+    const battleFrameRect = document.querySelector(".battle-scaffold-frame")?.getBoundingClientRect();
     const context = globalThis.__wildwestDebug?.battle?.context || {};
     const request = context.request || {};
     const inventorySlots = [...document.querySelectorAll('.battle-scaffold-inventory-slot:not([data-item-id="bag"])')];
@@ -552,6 +553,17 @@ async function runSmoke(page, tracker, options) {
         missingSlots: missingSlots.length,
         missingIconImages,
         shieldCountText: document.querySelector(".battle-scaffold-meter-shield-count")?.textContent?.trim() || "",
+        frameFitsViewport: Boolean(
+          battleFrameRect
+            && battleFrameRect.left >= -0.5
+            && battleFrameRect.top >= -0.5
+            && battleFrameRect.right <= innerWidth + 0.5
+            && battleFrameRect.bottom <= innerHeight + 0.5
+        ),
+        frameWidth: Math.round(battleFrameRect?.width || 0),
+        frameHeight: Math.round(battleFrameRect?.height || 0),
+        viewportWidth: innerWidth,
+        viewportHeight: innerHeight,
       },
     };
   })()`);
@@ -581,6 +593,10 @@ async function runSmoke(page, tracker, options) {
   assert(summary.battle.iconImages === 72, `Expected 72 battle icon images, got ${summary.battle.iconImages}.`);
   assert(summary.battle.ariaColCount === "9", `Expected board aria-colcount 9, got ${summary.battle.ariaColCount}.`);
   assert(summary.battle.ariaRowCount === "8", `Expected board aria-rowcount 8, got ${summary.battle.ariaRowCount}.`);
+  assert(
+    summary.battle.frameFitsViewport === true,
+    `Battle frame ${summary.battle.frameWidth}x${summary.battle.frameHeight} does not fit viewport ${summary.battle.viewportWidth}x${summary.battle.viewportHeight}.`,
+  );
   if (expectedEnemyId === "test") {
     assert(summary.battle.shieldCountText === "10", `Expected test enemy shield count 10, got "${summary.battle.shieldCountText}".`);
   }
