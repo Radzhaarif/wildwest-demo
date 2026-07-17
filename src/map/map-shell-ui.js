@@ -47,6 +47,7 @@ export function createMapShellUiController(deps) {
     renderTutorialButton();
     elements.smokeTestButton.textContent = translate(getSmokeTestButtonTextKey());
     elements.settingsButton.textContent = translate("menu.settings");
+    syncFullscreenButton();
     updateSmokeTestButtonVisibility();
     renderMapTopActionButtons();
     elements.musicVolumeInput.value = state.settings.musicVolume;
@@ -97,6 +98,7 @@ export function createMapShellUiController(deps) {
     elements.smokeTestButton.textContent = translate(getSmokeTestButtonTextKey());
     elements.settingsButton.textContent = translate("menu.settings");
     elements.mainMenuTitle.textContent = translate("menu.title");
+    syncFullscreenButton();
     updateSmokeTestButtonVisibility();
     elements.settingsLanguageSelect.value = state.language;
     elements.settingsControlSchemeSelect.value = state.settings.controlScheme || "swipe-and-click";
@@ -117,6 +119,69 @@ export function createMapShellUiController(deps) {
     const tutorial = state.campaign?.tutorial;
     elements.tutorialButton.textContent = translate(tutorial?.buttonTextKey || "menu.tutorial");
     elements.tutorialButton.classList.toggle("hidden", !tutorial || tutorial.enabled === false);
+  }
+
+  function setupFullscreenButton() {
+    const button = elements.fullscreenButton;
+    if (!button || button.dataset.fullscreenReady === "true") {
+      return;
+    }
+    button.dataset.fullscreenReady = "true";
+    button.addEventListener("click", toggleFullscreen);
+    document.addEventListener("fullscreenchange", syncFullscreenButton);
+    document.addEventListener("webkitfullscreenchange", syncFullscreenButton);
+    document.addEventListener("fullscreenerror", syncFullscreenButton);
+    document.addEventListener("webkitfullscreenerror", syncFullscreenButton);
+    button.classList.add("is-ready");
+    syncFullscreenButton();
+  }
+
+  async function toggleFullscreen() {
+    try {
+      if (getFullscreenElement()) {
+        await exitFullscreen();
+      } else {
+        await enterFullscreen();
+      }
+    } catch (error) {
+      console.warn("Fullscreen mode is unavailable.", error);
+    } finally {
+      syncFullscreenButton();
+    }
+  }
+
+  async function enterFullscreen() {
+    const target = elements.gameOrientationRoot || document.documentElement;
+    const requestFullscreen = target?.requestFullscreen || target?.webkitRequestFullscreen;
+    if (typeof requestFullscreen !== "function") {
+      throw new Error("Fullscreen API is not supported by this browser.");
+    }
+    await requestFullscreen.call(target);
+  }
+
+  async function exitFullscreen() {
+    const exit = document.exitFullscreen || document.webkitExitFullscreen;
+    if (typeof exit !== "function") {
+      throw new Error("Fullscreen exit is not supported by this browser.");
+    }
+    await exit.call(document);
+  }
+
+  function getFullscreenElement() {
+    return document.fullscreenElement || document.webkitFullscreenElement || null;
+  }
+
+  function syncFullscreenButton() {
+    const button = elements.fullscreenButton;
+    if (!button) {
+      return;
+    }
+    const isFullscreen = Boolean(getFullscreenElement());
+    const label = translate(isFullscreen ? "ui.exitFullscreen" : "ui.enterFullscreen");
+    button.classList.toggle("is-fullscreen-active", isFullscreen);
+    button.setAttribute("aria-pressed", String(isFullscreen));
+    button.setAttribute("aria-label", label);
+    button.title = label;
   }
 
   function getMapTopActionButtonConfig(actionId) {
@@ -286,6 +351,7 @@ export function createMapShellUiController(deps) {
 
   return {
     startMenuMusicAfterInteraction,
+    setupFullscreenButton,
     renderMenu,
     getLocaleUrl,
     updateLocalizedUi,

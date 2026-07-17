@@ -69,6 +69,11 @@
       "name": "opening_dialog",
       "type": "dialog",
       "icon": "data/Assets/icons/dialog.png"
+    },
+    {
+      "name": "lockpick_stash",
+      "type": "lockpick",
+      "icon": "data/Assets/icons/lockpick.png"
     }
   ],
   "levels": [
@@ -536,7 +541,44 @@
     }
   ],
   "skip": [],
-  "lockpick": [],
+  "lockpick": [
+    {
+      "eventName": "lockpick_stash",
+      "minLevel": 1,
+      "maxLevel": 1,
+      "weight": 100,
+      "nodeTitleTextKey": "lockpick.nodeTitle",
+      "dialogTextKey": "lockpick.reward",
+      "eventImage": "data/Assets/events/reward_safe.png",
+      "lockpickImage": "data/Assets/item/lockpick.png",
+      "keyItemId": "item_key",
+      "sounds": {
+        "move": "data/Assets/sound/lock_movement.mp3",
+        "break": "data/Assets/sound/lock_crush.mp3",
+        "open": "data/Assets/sound/lock_open.mp3"
+      },
+      "itemCount": 3,
+      "rewards": [
+        {
+          "type": "gold",
+          "amount": 25
+        },
+        {
+          "type": "experience",
+          "amount": 20
+        },
+        {
+          "type": "health",
+          "amount": 15
+        },
+        {
+          "type": "item",
+          "itemId": "item_key",
+          "amount": 1
+        }
+      ]
+    }
+  ],
   "dialog": [
     {
       "eventName": "opening_dialog",
@@ -569,6 +611,10 @@
             {
               "textKey": "dialog.sweety.answer.reward",
               "eventName": "reward"
+            },
+            {
+              "textKey": "dialog.sweety.answer.lockpick",
+              "eventName": "lockpick_stash"
             }
           ]
         }

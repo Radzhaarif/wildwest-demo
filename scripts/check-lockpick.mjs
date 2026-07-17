@@ -48,6 +48,7 @@ run("generated puzzles satisfy graph, safety, and solution constraints", () => {
       puzzle.scrambleMoveCount >= LOCKPICK_SCRAMBLE_MIN_MOVES
         && puzzle.scrambleMoveCount <= LOCKPICK_SCRAMBLE_MAX_MOVES,
     );
+    assert.equal(Number.isFinite(puzzle.shortestSolutionMoves), true);
     assert.ok(puzzle.shortestSolutionMoves >= LOCKPICK_MIN_SOLUTION_MOVES);
     assert.equal(isLockpickSolved(puzzle.startPositions), false);
     assert.equal(hasLockpickDanger(puzzle.startPositions, puzzle.bumpOffsets), false);

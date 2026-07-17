@@ -157,6 +157,7 @@ async function runSmoke(page, tracker, options) {
     timeoutMs,
   );
   await assertSmokeAudioVolume(page);
+  await assertFullscreenControl(page);
   if (startMode === "smoke-test") {
     await typeText(page, "iddqd");
     await waitForExpression(
@@ -673,6 +674,83 @@ async function runSmoke(page, tracker, options) {
   }, null, 2));
 }
 
+async function assertFullscreenControl(page) {
+  const summary = await evaluateJson(page, `(async () => {
+    const button = document.querySelector("#fullscreenButton");
+    const root = document.querySelector("#gameOrientationRoot");
+    const rect = button?.getBoundingClientRect();
+    if (!button || !root || !rect) {
+      return { present: false };
+    }
+
+    const requestDescriptor = Object.getOwnPropertyDescriptor(root, "requestFullscreen");
+    const exitDescriptor = Object.getOwnPropertyDescriptor(document, "exitFullscreen");
+    const elementDescriptor = Object.getOwnPropertyDescriptor(document, "fullscreenElement");
+    let enterCalls = 0;
+    let exitCalls = 0;
+
+    Object.defineProperty(root, "requestFullscreen", {
+      configurable: true,
+      value: async () => {
+        enterCalls += 1;
+      },
+    });
+    button.click();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    Object.defineProperty(document, "fullscreenElement", {
+      configurable: true,
+      get: () => root,
+    });
+    Object.defineProperty(document, "exitFullscreen", {
+      configurable: true,
+      value: async () => {
+        exitCalls += 1;
+      },
+    });
+    document.dispatchEvent(new Event("fullscreenchange"));
+    const activeLabel = button.getAttribute("aria-label") || "";
+    const activePressed = button.getAttribute("aria-pressed") || "";
+    button.click();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    restoreProperty(root, "requestFullscreen", requestDescriptor);
+    restoreProperty(document, "exitFullscreen", exitDescriptor);
+    restoreProperty(document, "fullscreenElement", elementDescriptor);
+    document.dispatchEvent(new Event("fullscreenchange"));
+
+    return {
+      present: true,
+      ready: button.classList.contains("is-ready"),
+      initialLabel: button.title || "",
+      activeLabel,
+      activePressed,
+      enterCalls,
+      exitCalls,
+      rightGap: Math.round(innerWidth - rect.right),
+      bottomGap: Math.round(innerHeight - rect.bottom),
+    };
+
+    function restoreProperty(target, name, descriptor) {
+      if (descriptor) {
+        Object.defineProperty(target, name, descriptor);
+      } else {
+        delete target[name];
+      }
+    }
+  })()`);
+
+  assert(summary.present, "Fullscreen button is missing.");
+  assert(summary.ready, "Fullscreen button did not become ready.");
+  assert(summary.enterCalls === 1, "Fullscreen button did not request fullscreen mode.");
+  assert(summary.exitCalls === 1, "Fullscreen button did not request fullscreen exit.");
+  assert(summary.activePressed === "true", "Fullscreen button did not expose its active state.");
+  assert(summary.activeLabel === "Exit full screen", "Fullscreen exit label was not localized.");
+  assert(summary.initialLabel === "Enter full screen", "Fullscreen entry label was not restored.");
+  assert(summary.rightGap >= 0 && summary.rightGap <= 40, "Fullscreen button is not anchored to the right edge.");
+  assert(summary.bottomGap >= 0 && summary.bottomGap <= 40, "Fullscreen button is not anchored to the bottom edge.");
+}
+
 async function assertSmokeAudioVolume(page) {
   const settings = await evaluateJson(page, `(() => {
     const storedSettings = JSON.parse(localStorage.getItem(${JSON.stringify(smokeSettingsStorageKey)}) || "{}");
@@ -942,8 +1020,8 @@ async function runSmokeTestLockpickSmoke(page, options) {
   assert(opened.surrenderPresent === false, "Lockpick overlay must not contain a surrender button.");
   assert(opened.keyQuantity === initialKeyQuantity, "Opening lockpick must not consume a key.");
   assert(opened.keyEnabled === true, "Expected key button to be enabled.");
-  assert(opened.scrambleMoveCount >= 9 && opened.scrambleMoveCount <= 18, "Unexpected lockpick scramble length.");
-  assert(opened.shortestSolutionMoves >= 6, "Lockpick solution must require at least six safe moves.");
+  assert(opened.scrambleMoveCount >= 12 && opened.scrambleMoveCount <= 18, "Unexpected lockpick scramble length.");
+  assert(opened.shortestSolutionMoves >= 12, "Lockpick solution must require at least twelve safe moves.");
   assert(opened.solutionExposed === false, "Lockpick UI session must not expose the test solution.");
 
   const hitZones = await evaluateJson(page, `(() => {

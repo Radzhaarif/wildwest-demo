@@ -133,6 +133,7 @@ const elements = {
   loadingProgressBar: document.querySelector("#loadingProgressBar"),
   loadingProgressText: document.querySelector("#loadingProgressText"),
   gameOrientationRoot: document.querySelector("#gameOrientationRoot"),
+  fullscreenButton: document.querySelector("#fullscreenButton"),
   mainMenuTitle: document.querySelector("#mainMenuTitle"),
   startGameButton: document.querySelector("#startGameButton"),
   tutorialButton: document.querySelector("#tutorialButton"),
@@ -468,6 +469,7 @@ const mapShellUi = createMapShellUiController({
 
 const {
   startMenuMusicAfterInteraction,
+  setupFullscreenButton,
   renderMenu,
   updateLocalizedUi,
   renderMapTopActionButtons,
@@ -483,6 +485,8 @@ const {
   addRunLogHeader,
   addLog,
 } = mapShellUi;
+
+setupFullscreenButton();
 
 const mapSettings = createMapSettingsController({
   state,

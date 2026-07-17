@@ -66,6 +66,8 @@ const REQUIRED_LOCALE_KEYS = [
   "ui.back",
   "ui.surrender",
   "ui.eventLog",
+  "ui.enterFullscreen",
+  "ui.exitFullscreen",
   "ui.downloadBattleTrace",
   "ui.yes",
   "ui.no",
