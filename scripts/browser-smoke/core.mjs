@@ -628,27 +628,60 @@ async function runSmoke(page, tracker, options) {
     if (!move?.from || !move?.to) {
       return { found: false, reason: "no-move" };
     }
-    const clickCell = (cell) => {
+    const getCell = (cell) => {
       const selector = '.battle-scaffold-cell[data-row="' + cell.row + '"][data-col="' + cell.col + '"]';
-      const element = document.querySelector(selector);
-      if (!element) {
-        return false;
-      }
-      element.click();
-      return true;
+      return document.querySelector(selector);
     };
-    const firstClicked = clickCell(move.from);
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    const secondClicked = clickCell(move.to);
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    const clicked = firstClicked && secondClicked;
+    const sourceElement = getCell(move.from);
+    const targetElement = getCell(move.to);
+    if (!sourceElement || !targetElement) {
+      return { found: true, triggered: false, reason: "missing-cell" };
+    }
+    const sourceRect = sourceElement.getBoundingClientRect();
+    const targetRect = targetElement.getBoundingClientRect();
+    const sourcePoint = {
+      x: sourceRect.left + (sourceRect.width / 2),
+      y: sourceRect.top + (sourceRect.height / 2),
+    };
+    const targetPoint = {
+      x: targetRect.left + (targetRect.width / 2),
+      y: targetRect.top + (targetRect.height / 2),
+    };
+    const pointerId = 41;
+    const dispatchPointer = (type, point, buttons) => sourceElement.dispatchEvent(new PointerEvent(type, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      pointerId,
+      pointerType: "touch",
+      isPrimary: true,
+      button: 0,
+      buttons,
+      clientX: point.x,
+      clientY: point.y,
+    }));
+    dispatchPointer("pointerdown", sourcePoint, 1);
+    dispatchPointer("pointermove", targetPoint, 1);
+    dispatchPointer("pointerup", targetPoint, 0);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    const activeBeforeSyntheticClick = document.querySelectorAll(".battle-cell-icon.is-swapping").length;
+    sourceElement.dispatchEvent(new MouseEvent("click", {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail: 1,
+      clientX: targetPoint.x,
+      clientY: targetPoint.y,
+    }));
+    await Promise.resolve();
     const swappingIcons = [...document.querySelectorAll(".battle-cell-icon.is-swapping")];
     const overlayStyle = getComputedStyle(document.querySelector(".battle-scaffold-overlay"));
     return {
       found: true,
       from: move.from,
       to: move.to,
-      clicked,
+      triggered: true,
+      activeBeforeSyntheticClick,
       activeSwapIcons: swappingIcons.length,
       swapAnimationNames: swappingIcons.map((element) => getComputedStyle(element).animationName),
       swapAnimationDurations: swappingIcons.map((element) => getComputedStyle(element).animationDuration),
@@ -658,7 +691,11 @@ async function runSmoke(page, tracker, options) {
     };
   })()`, { userGesture: true });
   assert(playedTraceMove.found === true, `Could not find a trace move candidate: ${playedTraceMove.reason || "unknown"}.`);
-  assert(playedTraceMove.clicked === true, "Could not click the trace move candidate cells.");
+  assert(playedTraceMove.triggered === true, `Could not swipe the trace move candidate cells: ${playedTraceMove.reason || "unknown"}.`);
+  assert(
+    playedTraceMove.activeBeforeSyntheticClick === 2,
+    `Expected two swapping icons before the synthetic touch click, got ${playedTraceMove.activeBeforeSyntheticClick}.`,
+  );
   assert(playedTraceMove.activeSwapIcons === 2, `Expected two actively swapping icons, got ${playedTraceMove.activeSwapIcons}.`);
   assert(
     playedTraceMove.swapAnimationNames.every((name) => name === "battleSwap"),

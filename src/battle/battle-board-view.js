@@ -3,7 +3,10 @@ import { formatText } from "./battle-formatters.js";
 
 const BATTLE_SWIPE_MIN_DISTANCE_PX = 10;
 const BATTLE_SWIPE_CELL_DISTANCE_RATIO = 0.22;
+const BATTLE_SYNTHETIC_CLICK_SUPPRESSION_MS = 600;
+const BATTLE_SYNTHETIC_CLICK_MAX_DISTANCE_PX = 32;
 const DEFAULT_BATTLE_CONTROL_SCHEME = "swipe-and-click";
+const battleBoardClickSuppressions = new WeakMap();
 
 export function renderBattleBoard(
   deps,
@@ -75,7 +78,6 @@ export function renderBattleBoard(
         pointerId: null,
         startX: 0,
         startY: 0,
-        suppressClick: false,
       };
 
       cell.addEventListener("pointerdown", (event) => {
@@ -128,7 +130,7 @@ export function renderBattleBoard(
         if (!targetCell) {
           return;
         }
-        suppressBattleCellClickOnce(swipeState);
+        suppressBattleBoardClickOnce(boardElement, event);
         event.preventDefault();
         if (!isBattleSwipeEnabled(context)) {
           return;
@@ -159,13 +161,12 @@ export function renderBattleBoard(
       });
 
       cell.addEventListener("click", async (event) => {
-        if (swipeState.suppressClick) {
-          swipeState.suppressClick = false;
+        if (consumeSuppressedBattleBoardClick(boardElement, event)) {
           event.preventDefault();
           event.stopPropagation();
           return;
         }
-        if (!isBattleClickEnabled(context)) {
+        if (context.battleState.isResolving || !isBattleClickEnabled(context)) {
           event.preventDefault();
           event.stopPropagation();
           return;
@@ -319,18 +320,39 @@ function getBattleBoardCellElement(boardElement, cell) {
 }
 
 function finishBattleCellPointerGesture(cell, boardElement, swipeState, pointerId) {
+  swipeState.pointerId = null;
   if (cell.hasPointerCapture?.(pointerId)) {
     cell.releasePointerCapture(pointerId);
   }
-  swipeState.pointerId = null;
   clearBattleSwipePreview(boardElement);
 }
 
-function suppressBattleCellClickOnce(swipeState) {
-  swipeState.suppressClick = true;
-  setTimeout(() => {
-    swipeState.suppressClick = false;
-  }, 0);
+function suppressBattleBoardClickOnce(boardElement, pointerEvent) {
+  battleBoardClickSuppressions.set(boardElement, {
+    clientX: Number(pointerEvent.clientX) || 0,
+    clientY: Number(pointerEvent.clientY) || 0,
+    expiresAt: performance.now() + BATTLE_SYNTHETIC_CLICK_SUPPRESSION_MS,
+  });
+}
+
+function consumeSuppressedBattleBoardClick(boardElement, clickEvent) {
+  const suppression = battleBoardClickSuppressions.get(boardElement);
+  if (!suppression) {
+    return false;
+  }
+  if (performance.now() > suppression.expiresAt) {
+    battleBoardClickSuppressions.delete(boardElement);
+    return false;
+  }
+
+  const deltaX = (Number(clickEvent.clientX) || 0) - suppression.clientX;
+  const deltaY = (Number(clickEvent.clientY) || 0) - suppression.clientY;
+  if (Math.hypot(deltaX, deltaY) > BATTLE_SYNTHETIC_CLICK_MAX_DISTANCE_PX) {
+    return false;
+  }
+
+  battleBoardClickSuppressions.delete(boardElement);
+  return true;
 }
 
 async function handleBattleCellClick(
