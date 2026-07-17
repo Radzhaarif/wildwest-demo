@@ -27,55 +27,31 @@ export async function animateBattleSwap(boardElement, firstCell, secondCell, dur
 }
 
 export async function animateBattleShakeCells(boardElement, cells, durationMs) {
-  for (const cell of cells) {
-    const element = getBattleCellIconElement(boardElement, cell);
-    if (element) {
-      runCellAnimation(element, "is-shaking", durationMs);
-    }
-  }
-  await wait(durationMs);
+  await animateBattleShakeElements(
+    cells.map((cell) => getBattleCellIconElement(boardElement, cell)),
+    durationMs,
+  );
 }
 
 export async function animateBattleWallBlockedSwap(boardElement, itemCell, blockedCell, durationMs) {
   const itemElement = getBattleCellIconElement(boardElement, itemCell);
   const wallElement = getBattleWallElement(boardElement, itemCell, blockedCell);
 
-  if (itemElement) {
-    runCellAnimation(itemElement, "is-shaking", durationMs);
-  }
-  if (wallElement) {
-    runCellAnimation(wallElement, "is-shaking", durationMs);
-  }
-
-  await wait(durationMs);
+  await animateBattleShakeElements([itemElement, wallElement], durationMs);
 }
 
 export async function animateBattleBoxBlockedClick(boardElement, boxCell, selectedCell, durationMs) {
   const selectedElement = selectedCell ? getBattleCellIconElement(boardElement, selectedCell) : null;
   const boxElement = getBattleBoxElement(boardElement, boxCell);
 
-  if (selectedElement) {
-    runCellAnimation(selectedElement, "is-shaking", durationMs);
-  }
-  if (boxElement) {
-    runCellAnimation(boxElement, "is-shaking", durationMs);
-  }
-
-  await wait(durationMs);
+  await animateBattleShakeElements([selectedElement, boxElement], durationMs);
 }
 
 export async function animateBattleVineBlockedClick(boardElement, vineCell, selectedCell, durationMs) {
   const selectedElement = selectedCell ? getBattleCellIconElement(boardElement, selectedCell) : null;
   const vineElement = getBattleVineElement(boardElement, vineCell);
 
-  if (selectedElement) {
-    runCellAnimation(selectedElement, "is-shaking", durationMs);
-  }
-  if (vineElement) {
-    runCellAnimation(vineElement, "is-shaking", durationMs);
-  }
-
-  await wait(durationMs);
+  await animateBattleShakeElements([selectedElement, vineElement], durationMs);
 }
 
 export async function animateBattleShuffle(boardElement, durationMs) {
@@ -286,7 +262,28 @@ export function animateBattleCellDeath(element, durationMs, delta) {
   });
 }
 
-function runBattleFrameAnimation(element, className, durationMs, renderFrame) {
+async function animateBattleShakeElements(elements, durationMs) {
+  const animationTargets = elements
+    .filter(Boolean)
+    .flatMap((element) => (
+      element.matches(".battle-board-box, .battle-board-vine, .battle-board-wall")
+        ? [...element.querySelectorAll("img")]
+        : [element]
+    ));
+  await Promise.all(animationTargets.map((element) => (
+    runBattleFrameAnimation(element, "is-shaking", durationMs, (progress) => {
+      const keyframes = [0, -7, 7, -5, 5, 0];
+      const segmentPosition = Math.min(keyframes.length - 1, progress * (keyframes.length - 1));
+      const segmentIndex = Math.min(keyframes.length - 2, Math.floor(segmentPosition));
+      const segmentProgress = easeInOutCubic(segmentPosition - segmentIndex);
+      const translateX = keyframes[segmentIndex]
+        + ((keyframes[segmentIndex + 1] - keyframes[segmentIndex]) * segmentProgress);
+      element.style.transform = `translate3d(${translateX}px, 0, 0)`;
+    })
+  )));
+}
+
+export function runBattleFrameAnimation(element, className, durationMs, renderFrame) {
   const safeDurationMs = Math.max(0, Number(durationMs) || 0);
   const previousStyles = {
     opacity: element.style.opacity,

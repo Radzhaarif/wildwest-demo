@@ -4,7 +4,7 @@ import {
   getBattleCellElement,
   getBattleCellIconElement,
   getBattleCellLocalMetrics,
-  runCellAnimation,
+  runBattleFrameAnimation,
 } from "./battle-animations.js";
 
 export async function resolveBattleCascades(deps, board, context, renderTargets) {
@@ -236,13 +236,14 @@ export async function animateBattleBoardMove(deps, boardElement, movement, conte
     0,
   );
 
-  for (const plan of animationPlans) {
+  await Promise.all(animationPlans.map((plan) => {
     const durationMs = Math.max(0, maxDurationMs - plan.delayMs);
-    plan.element.style.setProperty("--battle-move-y", `${plan.startTranslateY}px`);
-    runCellAnimation(plan.element, "is-moving", durationMs, null, plan.delayMs);
-  }
-
-  await deps.wait(maxDurationMs);
+    return runBattleFrameAnimation(plan.element, "is-moving", durationMs, (progress) => {
+      const gravityProgress = progress * progress;
+      plan.element.style.opacity = String(0.92 + (0.08 * progress));
+      plan.element.style.transform = `translate3d(0, ${plan.startTranslateY * (1 - gravityProgress)}px, 0)`;
+    });
+  }));
 }
 
 export function refillBattleBoardFromReserve(deps, context, beforeGravityBoard) {

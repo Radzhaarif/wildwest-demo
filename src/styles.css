@@ -2281,7 +2281,6 @@ button:disabled {
   box-shadow:
     0 34px 90px rgba(0, 0, 0, 0.72),
     0 0 0 1px rgba(255, 255, 255, 0.04) inset;
-  animation: rewardWindowIn 360ms ease-out both;
 }
 
 .reward-window::after {
@@ -2303,7 +2302,6 @@ button:disabled {
   background-size: cover;
   filter: blur(0) brightness(0.96) saturate(1.08);
   transform: scale(1);
-  animation: rewardImageBlur var(--reward-blur-ms, 2000ms) ease-in-out var(--reward-clear-ms, 1000ms) forwards;
 }
 
 .reward-items {
@@ -2415,8 +2413,8 @@ button.reward-item {
   box-shadow:
     0 24px 70px rgba(0, 0, 0, 0.56),
     0 0 44px rgba(255, 195, 82, 0.2);
-  opacity: 0;
-  animation: rewardInfoIn 360ms ease-out calc(var(--reward-delay-ms, 1000ms) + var(--reward-icon-zoom-ms, 4000ms)) forwards;
+  opacity: var(--reward-info-opacity, 1);
+  transform: translateY(var(--reward-info-y, 0));
 }
 
 .reward-item img {
@@ -2427,9 +2425,8 @@ button.reward-item {
   max-height: min(138px, 28vh);
   object-fit: contain;
   filter: drop-shadow(0 15px 26px rgba(0, 0, 0, 0.52));
-  opacity: 0;
-  transform: scale(0.16);
-  animation: rewardIconZoom var(--reward-icon-zoom-ms, 4000ms) linear var(--reward-delay-ms, 1000ms) forwards;
+  opacity: 1;
+  transform: scale(1);
 }
 
 .reward-item.reward-item--maxed img {
@@ -2440,8 +2437,8 @@ button.reward-item {
   top: 26px;
   padding: 3px 12px;
   font-size: 16px;
-  opacity: 0;
-  animation: rewardInfoIn 360ms ease-out calc(var(--reward-delay-ms, 1000ms) + var(--reward-icon-zoom-ms, 4000ms)) forwards;
+  opacity: var(--reward-info-opacity, 1);
+  transform: translateY(var(--reward-info-y, 0));
 }
 
 .reward-item strong {
@@ -2450,8 +2447,8 @@ button.reward-item {
   font-size: 19px;
   text-align: center;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.72);
-  opacity: 0;
-  animation: rewardInfoIn 360ms ease-out calc(var(--reward-delay-ms, 1000ms) + var(--reward-icon-zoom-ms, 4000ms)) forwards;
+  opacity: var(--reward-info-opacity, 1);
+  transform: translateY(var(--reward-info-y, 0));
 }
 
 .reward-item span {
@@ -2459,8 +2456,8 @@ button.reward-item {
   font-size: 24px;
   font-weight: 800;
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.72);
-  opacity: 0;
-  animation: rewardInfoIn 360ms ease-out calc(var(--reward-delay-ms, 1000ms) + var(--reward-icon-zoom-ms, 4000ms)) forwards;
+  opacity: var(--reward-info-opacity, 1);
+  transform: translateY(var(--reward-info-y, 0));
 }
 
 .reward-message {
@@ -2492,59 +2489,6 @@ button.reward-item {
 .reward-overlay--tutorial-level-up .reward-message button:disabled {
   color: var(--text);
   opacity: 1;
-}
-
-@keyframes rewardWindowIn {
-  from {
-    opacity: 0;
-    transform: translate(-50%, calc(-50% + 18px)) scale(0.96);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-}
-
-@keyframes rewardImageBlur {
-  from {
-    filter: blur(0) brightness(0.96) saturate(1.08);
-    transform: scale(1);
-  }
-
-  to {
-    filter: blur(12px) brightness(0.45) saturate(0.82);
-    transform: scale(1.06);
-  }
-}
-
-@keyframes rewardIconZoom {
-  0% {
-    opacity: 0;
-    transform: scale(0.16);
-  }
-
-  8% {
-    opacity: 1;
-    transform: scale(0.2);
-  }
-
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes rewardInfoIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .battle-scaffold-overlay {
@@ -3936,10 +3880,6 @@ button.reward-item {
   pointer-events: none;
 }
 
-.battle-board-box.is-shaking img {
-  animation: battleShake var(--battle-animation-ms, 500ms) ease-in-out both;
-}
-
 .battle-board-vine {
   display: grid;
   position: relative;
@@ -3960,10 +3900,6 @@ button.reward-item {
   height: 100%;
   object-fit: contain;
   pointer-events: none;
-}
-
-.battle-board-vine.is-shaking img {
-  animation: battleShake var(--battle-animation-ms, 500ms) ease-in-out both;
 }
 
 .battle-board-wall {
@@ -4011,10 +3947,6 @@ button.reward-item {
   align-self: end;
   justify-self: center;
   transform: translateY(calc(50% + var(--battle-board-gap) / 2)) rotate(90deg);
-}
-
-.battle-board-wall.is-shaking img {
-  animation: battleShake var(--battle-animation-ms, 500ms) ease-in-out both;
 }
 
 @keyframes battleWallSwapA {
@@ -4076,18 +4008,12 @@ button.reward-item {
   will-change: transform, opacity;
 }
 
-.battle-cell-icon.is-shaking {
-  animation: battleShake var(--battle-animation-ms, 500ms) ease-in-out both;
-}
-
 .battle-cell-icon.is-dying {
   z-index: 200;
 }
 
 .battle-cell-icon.is-moving {
   z-index: 200;
-  animation: battleBoardMove var(--battle-animation-ms, 500ms) ease-in both;
-  animation-delay: var(--battle-animation-delay-ms, 0ms);
 }
 
 .battle-cell-icon.is-shuffling {
@@ -4127,29 +4053,6 @@ button.reward-item {
   line-height: 1.25;
 }
 
-@keyframes battleShake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-
-  20% {
-    transform: translateX(-7px);
-  }
-
-  40% {
-    transform: translateX(7px);
-  }
-
-  60% {
-    transform: translateX(-5px);
-  }
-
-  80% {
-    transform: translateX(5px);
-  }
-}
-
 @keyframes battleRageWave {
   0% {
     opacity: 0;
@@ -4181,18 +4084,6 @@ button.reward-item {
 
   100% {
     transform: translate(-50%, -50%) rotate(360deg) scale(0.92);
-  }
-}
-
-@keyframes battleBoardMove {
-  from {
-    opacity: 0.92;
-    transform: translateY(var(--battle-move-y, -10px));
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 

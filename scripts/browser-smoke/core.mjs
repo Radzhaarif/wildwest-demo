@@ -438,6 +438,7 @@ async function runSmoke(page, tracker, options) {
   if (startMode === "reward") {
     await waitForExpression(page, "!document.querySelector('#rewardOverlay')?.classList.contains('hidden')", timeoutMs);
     await waitForExpression(page, "document.querySelectorAll('#rewardItems .reward-item').length > 0", timeoutMs);
+    await assertRewardFrameAnimation(page, timeoutMs);
     const beforeAction = await readMapActivitySnapshot(page);
     const rewardSummary = await evaluateJson(page, `(() => {
       const items = [...document.querySelectorAll("#rewardItems .reward-item")];
@@ -760,6 +761,46 @@ async function runSmoke(page, tracker, options) {
   );
   await waitForExpression(
     page,
+    "document.querySelectorAll('.battle-cell-icon.is-moving').length > 0",
+    timeoutMs,
+  );
+  const dropAnimationProgress = await evaluateJson(page, `(async () => {
+    const startedAt = performance.now();
+    let previous = [];
+    return new Promise((resolve) => {
+      const sample = () => {
+        const icons = [...document.querySelectorAll(".battle-cell-icon.is-moving")];
+        const current = icons.map((element) => ({
+          transform: getComputedStyle(element).transform,
+          opacity: Number(getComputedStyle(element).opacity),
+        }));
+        const changed = current.some((frame, index) => (
+          frame.transform
+          && frame.transform !== "none"
+          && previous[index]?.transform
+          && previous[index].transform !== "none"
+          && frame.transform !== previous[index].transform
+        ));
+        if (changed) {
+          resolve({ found: true, count: current.length, previous, current });
+          return;
+        }
+        if (performance.now() - startedAt >= 1000) {
+          resolve({ found: false, count: current.length, previous, current });
+          return;
+        }
+        previous = current;
+        requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    });
+  })()`);
+  assert(
+    dropAnimationProgress.found === true,
+    `Board drop animation did not progress between rendered frames: ${JSON.stringify(dropAnimationProgress)}.`,
+  );
+  await waitForExpression(
+    page,
     "(globalThis.__wildwestDebug?.battle?.context?.battleTrace?.moves?.length || 0) >= 1"
       + " && !globalThis.__wildwestDebug?.battle?.context?.battleState?.isResolving",
     timeoutMs,
@@ -898,6 +939,55 @@ async function assertSmokeAudioVolume(page) {
   );
 }
 
+async function assertRewardFrameAnimation(page, timeoutMs) {
+  const progress = await evaluateJson(page, `(async () => {
+    const overlay = document.querySelector("#rewardOverlay");
+    const image = document.querySelector("#rewardItems .reward-item img");
+    const startedAt = performance.now();
+    const readScale = () => {
+      const transform = image ? getComputedStyle(image).transform : "none";
+      if (!transform || transform === "none") {
+        return 1;
+      }
+      return new DOMMatrixReadOnly(transform).a;
+    };
+    return new Promise((resolve) => {
+      const sample = () => {
+        const opacity = image ? Number(getComputedStyle(image).opacity) : 1;
+        const scale = readScale();
+        if (opacity > 0 && scale > 0.16 && scale < 0.99) {
+          resolve({
+            found: true,
+            opacity,
+            scale,
+            frameAnimation: overlay?.dataset.frameAnimation || "",
+          });
+          return;
+        }
+        if (performance.now() - startedAt >= ${Math.min(timeoutMs, 4000)}) {
+          resolve({
+            found: false,
+            opacity,
+            scale,
+            frameAnimation: overlay?.dataset.frameAnimation || "",
+          });
+          return;
+        }
+        requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    });
+  })()`);
+  assert(
+    progress.found === true,
+    `Reward icon animation did not expose an intermediate frame: ${JSON.stringify(progress)}.`,
+  );
+  assert(
+    progress.frameAnimation === "running",
+    `Expected reward frame animation to be running, got ${progress.frameAnimation || "none"}.`,
+  );
+}
+
 async function runLevelUpActivitySmoke(page, options) {
   const { expectedVersion, timeoutMs } = options;
   const beforeAction = await readMapActivitySnapshot(page);
@@ -912,6 +1002,7 @@ async function runLevelUpActivitySmoke(page, options) {
       + " && document.querySelectorAll('#rewardItems .reward-item--choice').length > 0",
     timeoutMs,
   );
+  await assertRewardFrameAnimation(page, timeoutMs);
 
   const levelUpSummary = await evaluateJson(page, `(() => {
     const choices = [...document.querySelectorAll("#rewardItems .reward-item--choice")];

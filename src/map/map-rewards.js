@@ -22,6 +22,8 @@ export function createMapRewardsController(deps) {
     scrollAvailableNodesIntoActionZone,
     completePendingMapIfReady,
   } = deps;
+  let rewardAnimationFrameId = null;
+  let rewardAnimationToken = 0;
 
   function resolveReward(node, options = {}) {
     const payload = options.payload || node.payload || {};
@@ -264,7 +266,7 @@ export function createMapRewardsController(deps) {
 
   function showRewardOverlay({ eventImage, message, rewards }) {
     state.activeLevelUp = null;
-    applyRewardAnimationSettings();
+    const animation = applyRewardAnimationSettings();
     elements.rewardBackdrop.style.backgroundImage = `url("${resolveAssetPath(eventImage)}")`;
     elements.rewardItems.innerHTML = "";
     for (const [index, reward] of rewards.entries()) {
@@ -277,6 +279,7 @@ export function createMapRewardsController(deps) {
     elements.rewardOverlay.classList.remove("reward-overlay--tutorial-level-up");
     elements.rewardOverlay.classList.remove("reward-overlay--tutorial-ready");
     elements.rewardOverlay.classList.remove("hidden");
+    startRewardAnimation(animation);
   }
 
   function showNextLevelUpReward(options = {}) {
@@ -298,7 +301,7 @@ export function createMapRewardsController(deps) {
           : null,
         scrollToNext: options.scrollToNext !== false,
       };
-      applyRewardAnimationSettings();
+      const animation = applyRewardAnimationSettings();
       elements.rewardBackdrop.style.backgroundImage = `url("${resolveAssetPath(level.eventImage)}")`;
       elements.rewardItems.innerHTML = "";
       for (const [index, reward] of rewards.entries()) {
@@ -320,6 +323,7 @@ export function createMapRewardsController(deps) {
       elements.rewardOverlay.classList.toggle("reward-overlay--tutorial-level-up", tutorial?.enabled === true);
       elements.rewardOverlay.classList.remove("reward-overlay--tutorial-ready");
       elements.rewardOverlay.classList.remove("hidden");
+      startRewardAnimation(animation);
       return true;
     }
 
@@ -430,6 +434,7 @@ export function createMapRewardsController(deps) {
     elements.rewardOverlay.style.setProperty("--reward-clear-ms", `${animation.clearMs}ms`);
     elements.rewardOverlay.style.setProperty("--reward-blur-ms", `${animation.blurMs}ms`);
     elements.rewardOverlay.style.setProperty("--reward-icon-zoom-ms", `${animation.iconZoomMs}ms`);
+    return animation;
   }
 
   function getRewardAnimationSettings() {
@@ -442,6 +447,135 @@ export function createMapRewardsController(deps) {
       iconZoomMs: getPositiveNumber(settings.iconZoomMs, defaults.iconZoomMs || 4000),
       iconStaggerMs: getPositiveNumber(settings.iconStaggerMs, defaults.iconStaggerMs || 160),
     };
+  }
+
+  function startRewardAnimation(animation) {
+    cancelRewardAnimation();
+    const animationToken = rewardAnimationToken;
+    const rewardWindow = elements.rewardOverlay.querySelector(".reward-window");
+    const coarsePointer = window.matchMedia?.("(pointer: coarse)")?.matches === true;
+    const itemPlans = [...elements.rewardItems.children].map((item, index) => ({
+      item,
+      image: item.querySelector("img"),
+      startMs: animation.iconDelayMs + (index * animation.iconStaggerMs),
+    }));
+    const totalDurationMs = Math.max(
+      360,
+      animation.clearMs + animation.blurMs,
+      ...itemPlans.map((plan) => plan.startMs + animation.iconZoomMs + 360),
+    );
+    const renderFrame = (elapsedMs) => {
+      const windowProgress = easeOutCubic(getTimelineProgress(elapsedMs, 0, 360));
+      rewardWindow.style.opacity = String(windowProgress);
+      rewardWindow.style.transform = [
+        `translate(-50%, calc(-50% + ${18 * (1 - windowProgress)}px))`,
+        `scale(${0.96 + (0.04 * windowProgress)})`,
+      ].join(" ");
+
+      const backdropProgress = easeInOutQuad(
+        getTimelineProgress(elapsedMs, animation.clearMs, animation.blurMs),
+      );
+      const blurPx = coarsePointer ? 0 : 12 * backdropProgress;
+      const brightness = coarsePointer ? 0.45 : 0.96 - (0.51 * backdropProgress);
+      const saturation = coarsePointer ? 0.82 : 1.08 - (0.26 * backdropProgress);
+      elements.rewardBackdrop.style.filter = [
+        `blur(${blurPx}px)`,
+        `brightness(${brightness})`,
+        `saturate(${saturation})`,
+      ].join(" ");
+      elements.rewardBackdrop.style.transform = `scale(${1 + (0.06 * backdropProgress)})`;
+
+      for (const plan of itemPlans) {
+        const iconProgress = getTimelineProgress(
+          elapsedMs,
+          plan.startMs,
+          animation.iconZoomMs,
+        );
+        if (plan.image) {
+          plan.image.style.opacity = String(Math.min(1, iconProgress / 0.08));
+          plan.image.style.transform = `scale(${0.16 + (0.84 * iconProgress)})`;
+        }
+        const infoProgress = easeOutCubic(getTimelineProgress(
+          elapsedMs,
+          plan.startMs + animation.iconZoomMs,
+          360,
+        ));
+        plan.item.style.setProperty("--reward-info-opacity", String(infoProgress));
+        plan.item.style.setProperty("--reward-info-y", `${8 * (1 - infoProgress)}px`);
+      }
+    };
+
+    rewardWindow.style.willChange = "transform, opacity";
+    elements.rewardBackdrop.style.willChange = "transform, filter";
+    for (const plan of itemPlans) {
+      if (plan.image) {
+        plan.image.style.willChange = "transform, opacity";
+      }
+    }
+    elements.rewardOverlay.dataset.frameAnimation = "running";
+    renderFrame(0);
+
+    let startTimestamp = null;
+    const runFrame = (timestamp) => {
+      if (
+        animationToken !== rewardAnimationToken
+        || elements.rewardOverlay.classList.contains("hidden")
+      ) {
+        return;
+      }
+      if (startTimestamp === null) {
+        startTimestamp = timestamp;
+      }
+      const elapsedMs = Math.min(totalDurationMs, timestamp - startTimestamp);
+      renderFrame(elapsedMs);
+      if (elapsedMs < totalDurationMs) {
+        rewardAnimationFrameId = window.requestAnimationFrame(runFrame);
+        return;
+      }
+
+      rewardAnimationFrameId = window.requestAnimationFrame(() => {
+        if (animationToken !== rewardAnimationToken) {
+          return;
+        }
+        rewardAnimationFrameId = null;
+        rewardWindow.style.removeProperty("will-change");
+        elements.rewardBackdrop.style.removeProperty("will-change");
+        for (const plan of itemPlans) {
+          plan.image?.style.removeProperty("will-change");
+        }
+        elements.rewardOverlay.dataset.frameAnimation = "complete";
+      });
+    };
+    rewardAnimationFrameId = window.requestAnimationFrame(runFrame);
+  }
+
+  function cancelRewardAnimation() {
+    rewardAnimationToken += 1;
+    if (rewardAnimationFrameId !== null) {
+      window.cancelAnimationFrame(rewardAnimationFrameId);
+      rewardAnimationFrameId = null;
+    }
+    delete elements.rewardOverlay.dataset.frameAnimation;
+  }
+
+  function getTimelineProgress(elapsedMs, startMs, durationMs) {
+    if (elapsedMs <= startMs) {
+      return 0;
+    }
+    if (durationMs <= 0) {
+      return 1;
+    }
+    return Math.min(1, (elapsedMs - startMs) / durationMs);
+  }
+
+  function easeOutCubic(progress) {
+    return 1 - ((1 - progress) ** 3);
+  }
+
+  function easeInOutQuad(progress) {
+    return progress < 0.5
+      ? 2 * progress * progress
+      : 1 - (((-2 * progress) + 2) ** 2) / 2;
   }
 
   function handleRewardClaim() {
@@ -503,12 +637,20 @@ export function createMapRewardsController(deps) {
   }
 
   function hideRewardOverlay() {
+    cancelRewardAnimation();
     elements.rewardOverlay.classList.add("hidden");
     elements.rewardOverlay.classList.remove("reward-overlay--choice");
     elements.rewardOverlay.classList.remove("reward-overlay--tutorial-level-up");
     elements.rewardOverlay.classList.remove("reward-overlay--tutorial-ready");
     elements.rewardItems.innerHTML = "";
+    const rewardWindow = elements.rewardOverlay.querySelector(".reward-window");
+    rewardWindow.style.removeProperty("opacity");
+    rewardWindow.style.removeProperty("transform");
+    rewardWindow.style.removeProperty("will-change");
     elements.rewardBackdrop.style.backgroundImage = "";
+    elements.rewardBackdrop.style.removeProperty("filter");
+    elements.rewardBackdrop.style.removeProperty("transform");
+    elements.rewardBackdrop.style.removeProperty("will-change");
     elements.rewardDialogText.textContent = "";
     elements.rewardClaimButton.disabled = false;
   }
