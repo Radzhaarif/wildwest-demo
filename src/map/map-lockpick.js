@@ -32,6 +32,7 @@ export function createMapLockpickController(deps) {
   } = deps;
 
   const timerIds = new Set();
+  const animationFrameIds = new Set();
 
   function openLockpick(node, completion = {}) {
     closeLockpick();
@@ -53,7 +54,6 @@ export function createMapLockpickController(deps) {
       remainingLockpicks: LOCKPICK_MAX_LIVES,
       isAnimating: false,
       isConfirmingLeave: false,
-      transitionMs: 0,
       statusKey: "lockpick.status.ready",
     };
 
@@ -64,13 +64,6 @@ export function createMapLockpickController(deps) {
     clearOverlayStateClasses();
     elements.lockpickOverlay.classList.remove("hidden");
     renderLockpick();
-    schedule(() => {
-      if (!state.activeLockpickSession) {
-        return;
-      }
-      state.activeLockpickSession.transitionMs = LOCKPICK_ROTATION_MS;
-      renderLockpick();
-    }, 0);
     addLog(formatText("log.lockpickOpened", { node: node.id }));
   }
 
@@ -201,14 +194,13 @@ export function createMapLockpickController(deps) {
       action,
       session.puzzle.sectorCount,
     );
-    session.visualSteps = session.visualSteps.map((step, index) => step + deltas[index]);
+    const targetVisualSteps = session.visualSteps.map((step, index) => step + deltas[index]);
     session.isAnimating = true;
-    session.transitionMs = LOCKPICK_ROTATION_MS;
     session.statusKey = "lockpick.status.moving";
     elements.lockpickOverlay.classList.add("is-moving");
     playConfiguredSound("move");
     renderLockpick();
-    schedule(finishRotation, LOCKPICK_ROTATION_MS);
+    animateRingSteps(targetVisualSteps, LOCKPICK_ROTATION_MS, finishRotation);
   }
 
   function finishRotation() {
@@ -269,27 +261,25 @@ export function createMapLockpickController(deps) {
       return;
     }
     session.positions = [...session.puzzle.startPositions];
-    session.visualSteps = session.visualSteps.map((visualStep, index) => (
+    const targetVisualSteps = session.visualSteps.map((visualStep, index) => (
       getNearestVisualStep(
         visualStep,
         session.puzzle.startPositions[index],
         session.puzzle.sectorCount,
       )
     ));
-    session.transitionMs = LOCKPICK_RESET_MS;
     session.statusKey = "lockpick.status.resetting";
     elements.lockpickOverlay.classList.add("is-resetting");
     renderLockpick();
-    schedule(() => {
+    animateRingSteps(targetVisualSteps, LOCKPICK_RESET_MS, () => {
       if (!state.activeLockpickSession) {
         return;
       }
       elements.lockpickOverlay.classList.remove("is-resetting");
-      session.transitionMs = LOCKPICK_ROTATION_MS;
       session.isAnimating = false;
       session.statusKey = "lockpick.status.ready";
       renderLockpick();
-    }, LOCKPICK_RESET_MS);
+    });
   }
 
   function useKey() {
@@ -375,6 +365,7 @@ export function createMapLockpickController(deps) {
 
   function closeLockpick() {
     clearTimers();
+    clearAnimationFrames();
     clearOverlayStateClasses();
     elements.lockpickOverlay.classList.add("hidden");
     elements.lockpickConfirm.classList.add("hidden");
@@ -427,13 +418,9 @@ export function createMapLockpickController(deps) {
         .filter((relation) => relation.master === session.selectedRingIndex)
         .map((relation) => [relation.slave, relation.direction]),
     );
+    renderRingRotations(session);
     for (const ring of elements.lockpickRings.children) {
       const ringIndex = Number(ring.dataset.ringIndex);
-      ring.style.setProperty(
-        "--lockpick-ring-rotation",
-        `${session.visualSteps[ringIndex] * session.puzzle.stepDegrees}deg`,
-      );
-      ring.style.setProperty("--lockpick-ring-transition-ms", `${session.transitionMs}ms`);
       ring.classList.toggle("is-selected", ringIndex === session.selectedRingIndex);
       ring.classList.toggle("is-same", directRelations.get(ringIndex) === "same");
       ring.classList.toggle("is-opposite", directRelations.get(ringIndex) === "opposite");
@@ -456,6 +443,55 @@ export function createMapLockpickController(deps) {
       "aria-label",
       formatText("lockpick.selectedRingLabel", { ring: session.selectedRingIndex + 1 }),
     );
+  }
+
+  function renderRingRotations(session) {
+    for (const ring of elements.lockpickRings.children) {
+      const ringIndex = Number(ring.dataset.ringIndex);
+      ring.style.setProperty(
+        "--lockpick-ring-rotation",
+        `${session.visualSteps[ringIndex] * session.puzzle.stepDegrees}deg`,
+      );
+    }
+  }
+
+  function animateRingSteps(targetVisualSteps, durationMs, onComplete) {
+    const session = state.activeLockpickSession;
+    if (!session) {
+      return;
+    }
+    const startVisualSteps = [...session.visualSteps];
+    let startedAt = null;
+
+    function renderFrame(timestamp) {
+      if (state.activeLockpickSession !== session) {
+        return;
+      }
+      if (startedAt === null) {
+        startedAt = timestamp;
+      }
+      const progress = Math.min(1, Math.max(0, (timestamp - startedAt) / durationMs));
+      const easedProgress = 1 - ((1 - progress) ** 3);
+      session.visualSteps = startVisualSteps.map((step, index) => (
+        step + (targetVisualSteps[index] - step) * easedProgress
+      ));
+      renderRingRotations(session);
+
+      if (progress < 1) {
+        requestFrame(renderFrame);
+        return;
+      }
+
+      session.visualSteps = [...targetVisualSteps];
+      renderRingRotations(session);
+      requestFrame(() => {
+        if (state.activeLockpickSession === session) {
+          onComplete?.();
+        }
+      });
+    }
+
+    requestFrame(renderFrame);
   }
 
   function renderLockpickLives(session) {
@@ -525,11 +561,27 @@ export function createMapLockpickController(deps) {
     return timerId;
   }
 
+  function requestFrame(callback) {
+    const frameId = requestAnimationFrame((timestamp) => {
+      animationFrameIds.delete(frameId);
+      callback(timestamp);
+    });
+    animationFrameIds.add(frameId);
+    return frameId;
+  }
+
   function clearTimers() {
     for (const timerId of timerIds) {
       clearTimeout(timerId);
     }
     timerIds.clear();
+  }
+
+  function clearAnimationFrames() {
+    for (const frameId of animationFrameIds) {
+      cancelAnimationFrame(frameId);
+    }
+    animationFrameIds.clear();
   }
 
   return {

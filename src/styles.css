@@ -1897,11 +1897,13 @@ button:disabled {
   width: var(--lockpick-ring-size);
   aspect-ratio: 1;
   transform: translate(-50%, -50%) rotate(var(--lockpick-ring-rotation));
-  transition-property: transform;
-  transition-duration: var(--lockpick-ring-transition-ms, 200ms);
-  transition-timing-function: cubic-bezier(0.22, 0.76, 0.24, 1);
   border-radius: 50%;
   pointer-events: none;
+}
+
+.lockpick-overlay.is-moving .lockpick-ring,
+.lockpick-overlay.is-resetting .lockpick-ring {
+  will-change: transform;
 }
 
 .lockpick-ring-surface {

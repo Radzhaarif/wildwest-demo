@@ -1136,6 +1136,21 @@ async function runSmokeTestLockpickSmoke(page, options) {
       scrambleMoveCount: Number(session?.puzzle?.scrambleMoveCount || 0),
       shortestSolutionMoves: Number(session?.puzzle?.shortestSolutionMoves || 0),
       solutionExposed: Object.hasOwn(session?.puzzle || {}, "solutionActions"),
+      relationCounts: (() => {
+        const incoming = Array(session?.puzzle?.ringCount || 0).fill(0);
+        const outgoing = Array(session?.puzzle?.ringCount || 0).fill(0);
+        for (const relation of session?.puzzle?.relations || []) {
+          outgoing[relation.master] += 1;
+          incoming[relation.slave] += 1;
+        }
+        return {
+          incoming,
+          outgoing,
+          pureMasters: incoming.filter((count, index) => count === 0 && outgoing[index] > 0).length,
+          pureSubordinates: outgoing.filter((count, index) => count === 0 && incoming[index] > 0).length,
+          tripleMasters: outgoing.filter((count) => count === 3).length,
+        };
+      })(),
     };
   })()`);
   assert(opened.ringCount === 5, `Expected five lockpick rings, got ${opened.ringCount}.`);
@@ -1151,6 +1166,13 @@ async function runSmokeTestLockpickSmoke(page, options) {
   assert(opened.scrambleMoveCount >= 12 && opened.scrambleMoveCount <= 18, "Unexpected lockpick scramble length.");
   assert(opened.shortestSolutionMoves >= 12, "Lockpick solution must require at least twelve safe moves.");
   assert(opened.solutionExposed === false, "Lockpick UI session must not expose the test solution.");
+  assert(opened.relationCounts.pureMasters === 1, "Lockpick must have exactly one pure master.");
+  assert(opened.relationCounts.pureSubordinates === 1, "Lockpick must have exactly one pure subordinate.");
+  assert(
+    opened.relationCounts.outgoing.every((count) => count >= 0 && count <= 3),
+    `Unexpected lockpick master connection counts: ${opened.relationCounts.outgoing.join(", ")}.`,
+  );
+  assert(opened.relationCounts.tripleMasters <= 1, "Lockpick must not have two masters with three connections.");
 
   const hitZones = await evaluateJson(page, `(() => {
     const state = globalThis.__wildwestDebug?.map?.state;
@@ -1191,14 +1213,58 @@ async function runSmokeTestLockpickSmoke(page, options) {
   assert(selectionControls.outerDisabled === false, "Outer selector must be enabled on the innermost ring.");
   assert(selectionControls.innerDisabled === true, "Inner selector must be disabled on the innermost ring.");
 
-  const clockwiseKeyboard = await evaluateJson(page, `(() => {
+  const clockwiseKeyboard = await evaluateJson(page, `(() => new Promise((resolve) => {
     const session = globalThis.__wildwestDebug?.map?.state?.activeLockpickSession;
     const before = [...(session?.positions || [])];
+    const visualBefore = [...(session?.visualSteps || [])];
     document.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, code: "KeyD", key: "d" }));
-    return { before, after: [...(session?.positions || [])], animating: session?.isAnimating === true };
-  })()`, { userGesture: true });
+    const after = [...(session?.positions || [])];
+    const visualAfterDispatch = [...(session?.visualSteps || [])];
+    const animating = session?.isAnimating === true;
+    let sampleCount = 0;
+
+    function sampleAnimation() {
+      sampleCount += 1;
+      const currentSession = globalThis.__wildwestDebug?.map?.state?.activeLockpickSession;
+      const visualSteps = [...(currentSession?.visualSteps || [])];
+      const rotationSteps = [...document.querySelectorAll("#lockpickRings .lockpick-ring")]
+        .map((ring) => Number.parseFloat(ring.style.getPropertyValue("--lockpick-ring-rotation")) / 30);
+      const hasIntermediateVisual = visualSteps.some(
+        (step) => Math.abs(step - Math.round(step)) > 0.0001,
+      );
+      const hasIntermediateRotation = rotationSteps.some(
+        (step) => Number.isFinite(step) && Math.abs(step - Math.round(step)) > 0.0001,
+      );
+      if (
+        (hasIntermediateVisual && hasIntermediateRotation)
+        || currentSession?.isAnimating !== true
+        || sampleCount >= 12
+      ) {
+        resolve({
+          before,
+          after,
+          visualBefore,
+          visualAfterDispatch,
+          animating,
+          sampleCount,
+          hasIntermediateVisual,
+          hasIntermediateRotation,
+        });
+        return;
+      }
+      requestAnimationFrame(sampleAnimation);
+    }
+
+    requestAnimationFrame(sampleAnimation);
+  }))()`, { userGesture: true });
   assert(clockwiseKeyboard.before.join("|") !== clockwiseKeyboard.after.join("|"), "D did not rotate the selected ring.");
   assert(clockwiseKeyboard.animating === true, "D rotation did not enter animation state.");
+  assert(
+    clockwiseKeyboard.visualBefore.join("|") === clockwiseKeyboard.visualAfterDispatch.join("|"),
+    "D rotation jumped to its final visual position before the first animation frame.",
+  );
+  assert(clockwiseKeyboard.hasIntermediateVisual === true, "D rotation did not pass through an intermediate visual angle.");
+  assert(clockwiseKeyboard.hasIntermediateRotation === true, "D rotation did not render an intermediate CSS angle.");
   await waitForExpression(
     page,
     "globalThis.__wildwestDebug?.map?.state?.activeLockpickSession?.isAnimating === false",

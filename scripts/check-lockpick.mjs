@@ -36,6 +36,38 @@ run("mutual relations keep independent directions", () => {
   assert.deepEqual(getLockpickActionDeltas(relations, { master: 1, direction: 1 }), [-1, 1, 0, 0, 0]);
 });
 
+run("relation validator enforces the unique pure roles and triple-master limit", () => {
+  const noPureSubordinate = validateLockpickRelations([
+    { master: 0, slave: 1, direction: "same" },
+    { master: 1, slave: 2, direction: "same" },
+    { master: 2, slave: 3, direction: "same" },
+    { master: 3, slave: 4, direction: "same" },
+    { master: 4, slave: 1, direction: "same" },
+  ]);
+  assert.equal(noPureSubordinate.valid, false);
+
+  const noPureMaster = validateLockpickRelations([
+    { master: 0, slave: 1, direction: "same" },
+    { master: 1, slave: 2, direction: "same" },
+    { master: 2, slave: 3, direction: "same" },
+    { master: 3, slave: 0, direction: "same" },
+    { master: 3, slave: 4, direction: "same" },
+  ]);
+  assert.equal(noPureMaster.valid, false);
+
+  const twoTripleMasters = validateLockpickRelations([
+    { master: 0, slave: 1, direction: "same" },
+    { master: 0, slave: 2, direction: "same" },
+    { master: 0, slave: 4, direction: "same" },
+    { master: 1, slave: 2, direction: "same" },
+    { master: 1, slave: 3, direction: "same" },
+    { master: 1, slave: 4, direction: "same" },
+    { master: 2, slave: 3, direction: "same" },
+    { master: 3, slave: 4, direction: "same" },
+  ]);
+  assert.equal(twoTripleMasters.valid, false);
+});
+
 run("generated puzzles satisfy graph, safety, and solution constraints", () => {
   for (let seedIndex = 0; seedIndex < 80; seedIndex += 1) {
     const puzzle = generateLockpickPuzzle({
@@ -44,6 +76,14 @@ run("generated puzzles satisfy graph, safety, and solution constraints", () => {
     });
     const relationValidation = validateLockpickRelations(puzzle.relations, puzzle.ringCount);
     assert.equal(relationValidation.valid, true, relationValidation.issues.join(", "));
+    assert.equal(relationValidation.pureMasterIndices.length, 1);
+    assert.equal(relationValidation.pureSubordinateIndices.length, 1);
+    assert.notEqual(
+      relationValidation.pureMasterIndices[0],
+      relationValidation.pureSubordinateIndices[0],
+    );
+    assert.ok(relationValidation.outgoingCounts.every((count) => count >= 0 && count <= 3));
+    assert.ok(relationValidation.outgoingCounts.filter((count) => count === 3).length <= 1);
     assert.ok(
       puzzle.scrambleMoveCount >= LOCKPICK_SCRAMBLE_MIN_MOVES
         && puzzle.scrambleMoveCount <= LOCKPICK_SCRAMBLE_MAX_MOVES,

@@ -72,24 +72,30 @@ export function generateLockpickRelations(options = {}) {
 
   for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
     const ringIndices = Array.from({ length: ringCount }, (_, index) => index);
-    const doubleMasterCount = randomInt(1, Math.min(2, ringCount - 1), random);
-    const doubleMasters = new Set(shuffle(ringIndices, random).slice(0, doubleMasterCount));
+    const roleOrder = shuffle(ringIndices, random);
+    const pureSubordinate = roleOrder[0];
+    const pureMaster = roleOrder[1];
+    const masters = ringIndices.filter((ringIndex) => ringIndex !== pureSubordinate);
+    const tripleMaster = ringCount >= 4 && random() < 0.4
+      ? pickRandom(masters, random)
+      : -1;
     const outDegrees = ringIndices.map((ringIndex) => {
-      if (doubleMasters.has(ringIndex)) {
-        return 2;
+      if (ringIndex === pureSubordinate) {
+        return 0;
       }
-      return random() < 0.66 ? 1 : 0;
+      if (ringIndex === tripleMaster) {
+        return 3;
+      }
+      return randomInt(1, Math.min(2, ringCount - 1), random);
     });
-
-    const nonDoubleMasters = ringIndices.filter((ringIndex) => !doubleMasters.has(ringIndex));
-    if (!outDegrees.some((count) => count === 0)) {
-      outDegrees[pickRandom(nonDoubleMasters, random)] = 0;
-    }
 
     const relations = [];
     for (const master of ringIndices) {
       const slaveCandidates = shuffle(
-        ringIndices.filter((ringIndex) => ringIndex !== master),
+        ringIndices.filter((ringIndex) => (
+          ringIndex !== master
+          && ringIndex !== pureMaster
+        )),
         random,
       );
       for (const slave of slaveCandidates.slice(0, outDegrees[master])) {
@@ -148,18 +154,23 @@ export function validateLockpickRelations(relations, ringCount = LOCKPICK_RING_C
     undirected[slave].add(master);
   }
 
-  if (outgoingCounts.some((count) => count > 2)) {
-    issues.push("a master cannot control more than two rings");
+  if (outgoingCounts.some((count) => count > 3)) {
+    issues.push("a master cannot control more than three rings");
   }
-  const doubleMasterCount = outgoingCounts.filter((count) => count === 2).length;
-  if (doubleMasterCount < 1 || doubleMasterCount > 2) {
-    issues.push("one or two rings must control exactly two rings");
+  if (outgoingCounts.filter((count) => count === 3).length > 1) {
+    issues.push("no more than one master can control three rings");
   }
-  if (!incomingCounts.some((count) => count === 0)) {
-    issues.push("at least one ring must have no master");
+  const pureMasterIndices = incomingCounts
+    .map((count, index) => (count === 0 && outgoingCounts[index] > 0 ? index : -1))
+    .filter((index) => index >= 0);
+  const pureSubordinateIndices = outgoingCounts
+    .map((count, index) => (count === 0 && incomingCounts[index] > 0 ? index : -1))
+    .filter((index) => index >= 0);
+  if (pureMasterIndices.length !== 1) {
+    issues.push("exactly one ring must be a master but not a subordinate");
   }
-  if (!outgoingCounts.some((count) => count === 0)) {
-    issues.push("at least one ring must have no slaves");
+  if (pureSubordinateIndices.length !== 1) {
+    issues.push("exactly one ring must be a subordinate but not a master");
   }
   if (incomingCounts.some((count, index) => count === 0 && outgoingCounts[index] === 0)) {
     issues.push("a ring cannot have both no master and no slaves");
@@ -184,6 +195,8 @@ export function validateLockpickRelations(relations, ringCount = LOCKPICK_RING_C
     issues,
     incomingCounts,
     outgoingCounts,
+    pureMasterIndices,
+    pureSubordinateIndices,
   };
 }
 
