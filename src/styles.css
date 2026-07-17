@@ -2557,6 +2557,14 @@ button.reward-item {
   backdrop-filter: blur(8px) brightness(0.58);
 }
 
+@media (hover: none) and (pointer: coarse) {
+  .battle-scaffold-overlay {
+    background: rgba(6, 5, 4, 0.94);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
 .battle-scaffold-fx-layer {
   position: absolute;
   inset: 0;
@@ -4060,6 +4068,7 @@ button.reward-item {
 
 .battle-cell-icon.is-swapping {
   z-index: 200;
+  backface-visibility: hidden;
   animation: battleSwap var(--battle-animation-ms, 1000ms) ease-in-out both;
 }
 
@@ -4117,11 +4126,11 @@ button.reward-item {
 
 @keyframes battleSwap {
   from {
-    transform: translate(0, 0);
+    transform: translate3d(0, 0, 0);
   }
 
   to {
-    transform: translate(var(--battle-swap-x, 0), var(--battle-swap-y, 0));
+    transform: translate3d(var(--battle-swap-x, 0), var(--battle-swap-y, 0), 0);
   }
 }
 

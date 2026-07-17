@@ -611,7 +611,7 @@ async function runSmoke(page, tracker, options) {
     `Expected every missing inventory slot to keep a dimmable icon, got ${summary.battle.missingIconImages}/${summary.battle.missingSlots}.`,
   );
 
-  const playedTraceMove = await evaluateJson(page, `(() => {
+  const playedTraceMove = await evaluateJson(page, `(async () => {
     const context = globalThis.__wildwestDebug?.battle?.context;
     if (!context?.engine || !context?.battleState?.board || !context?.request?.itemCatalog) {
       return { found: false, reason: "missing-context" };
@@ -637,15 +637,47 @@ async function runSmoke(page, tracker, options) {
       element.click();
       return true;
     };
+    const firstClicked = clickCell(move.from);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const secondClicked = clickCell(move.to);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const clicked = firstClicked && secondClicked;
+    const swappingIcons = [...document.querySelectorAll(".battle-cell-icon.is-swapping")];
+    const overlayStyle = getComputedStyle(document.querySelector(".battle-scaffold-overlay"));
     return {
       found: true,
       from: move.from,
       to: move.to,
-      clicked: clickCell(move.from) && clickCell(move.to),
+      clicked,
+      activeSwapIcons: swappingIcons.length,
+      swapAnimationNames: swappingIcons.map((element) => getComputedStyle(element).animationName),
+      swapAnimationDurations: swappingIcons.map((element) => getComputedStyle(element).animationDuration),
+      swapTransforms: swappingIcons.map((element) => getComputedStyle(element).transform),
+      coarsePointer: matchMedia("(pointer: coarse)").matches,
+      overlayBackdropFilter: overlayStyle.backdropFilter || overlayStyle.webkitBackdropFilter || "",
     };
   })()`, { userGesture: true });
   assert(playedTraceMove.found === true, `Could not find a trace move candidate: ${playedTraceMove.reason || "unknown"}.`);
   assert(playedTraceMove.clicked === true, "Could not click the trace move candidate cells.");
+  assert(playedTraceMove.activeSwapIcons === 2, `Expected two actively swapping icons, got ${playedTraceMove.activeSwapIcons}.`);
+  assert(
+    playedTraceMove.swapAnimationNames.every((name) => name === "battleSwap"),
+    `Unexpected swap animation names: ${playedTraceMove.swapAnimationNames.join(", ")}.`,
+  );
+  assert(
+    playedTraceMove.swapAnimationDurations.every((duration) => duration !== "0s"),
+    `Swap animation has zero duration: ${playedTraceMove.swapAnimationDurations.join(", ")}.`,
+  );
+  assert(
+    playedTraceMove.swapTransforms.every((transform) => transform && transform !== "none"),
+    `Swap animation has no intermediate transform: ${playedTraceMove.swapTransforms.join(", ")}.`,
+  );
+  if (playedTraceMove.coarsePointer) {
+    assert(
+      playedTraceMove.overlayBackdropFilter === "none",
+      `Expected mobile battle backdrop filter to be disabled, got ${playedTraceMove.overlayBackdropFilter}.`,
+    );
+  }
   await waitForExpression(
     page,
     "(globalThis.__wildwestDebug?.battle?.context?.battleTrace?.moves?.length || 0) >= 1"
